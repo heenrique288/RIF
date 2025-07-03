@@ -9,4 +9,11 @@ class Home extends BaseController
 		$data['content'] = "Sem conteúdo, por enquanto";
         return view('dashboard', $data);
     }
+
+    public function teste(): string
+    {
+		$data['content'] = view('sys/home');
+
+        return view('dashboard', $data);
+    }
 }

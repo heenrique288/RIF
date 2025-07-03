@@ -1,9 +1,52 @@
 <head>
     <style>
         .table-striped td,
+        /* Modificação na tabela de alunos*/
         .table-striped th {
             padding-top: 15px;
             padding-bottom: 15px;
+        }
+
+        .morris-hover {
+            /* Este estilo é referente as informações que aparecem no GRÁFICO DE BARRAS!!! */
+            position: absolute !important;
+            z-index: 9999;
+            background-color: black;
+            border: 2px white;
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            /* fundo preto semi-transparente */
+            border: 1px solid #ccc !important;
+            /* borda cinza */
+            color: #fff !important;
+            /* texto branco */
+            padding: 8px 12px !important;
+            /* espaçamento interno */
+            border-radius: 4px !important;
+            /* cantos arredondados */
+            font-size: 14px !important;
+            white-space: nowrap !important;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #my-awesome-dropzone {
+            padding-top: 70%;
+            position: relative;
+        }
+
+        #my-awesome-dropzone .dz-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .file-upload-wrapper {
+            margin-top: auto;
+            /* empurra para o final do card-body */
         }
     </style>
 </head>
@@ -46,8 +89,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex flex-row justify-content-between">
-                        <h4 class="card-title mb-1">Quantidade de Alunos por Curso</h4>
-                        <p class="text-muted mb-1">Data de Hoje</p>
+                        <h4 class="card-title mb-1">Quantidade de Alunos por Turma</h4>
+                        <p class="text-muted mb-1">Data de Hoje - 02/07/2025</p>
                     </div>
                     <div class="row">
                         <div class="col-12">
@@ -60,12 +103,12 @@
                                     </div>
                                     <div class="preview-item-content d-sm-flex flex-grow">
                                         <div class="flex-grow">
-                                            <h6 class="preview-subject">Informática</h6>
+                                            <h6 class="preview-subject">1° B - Informática</h6>
                                             <p class="text-muted mb-0">60 alunos</p>
                                         </div>
                                         <div class="mr-auto text-sm-right pt-2 pt-sm-0">
                                             <p class="text-muted" style="text-align: center;">15 min atrás</p>
-                                            <p class="text-muted mb-0">30 entregue, 30 pendente </p>
+                                            <p class="text-muted mb-0">30 servidos, 30 pendente </p>
                                         </div>
                                     </div>
                                 </div>
@@ -77,12 +120,12 @@
                                     </div>
                                     <div class="preview-item-content d-sm-flex flex-grow">
                                         <div class="flex-grow">
-                                            <h6 class="preview-subject">Eletrotécnica</h6>
+                                            <h6 class="preview-subject">2° A - Eletrotécnica</h6>
                                             <p class="text-muted mb-0">60 alunos</p>
                                         </div>
                                         <div class="mr-auto text-sm-right pt-2 pt-sm-0">
                                             <p class="text-muted" style="text-align: center;">2 min atrás</p>
-                                            <p class="text-muted mb-0">23 entregue, 37 pendentes </p>
+                                            <p class="text-muted mb-0">23 servidos, 37 pendentes </p>
                                         </div>
                                     </div>
                                 </div>
@@ -94,12 +137,12 @@
                                     </div>
                                     <div class="preview-item-content d-sm-flex flex-grow">
                                         <div class="flex-grow">
-                                            <h6 class="preview-subject">Química</h6>
+                                            <h6 class="preview-subject">3° A - Química</h6>
                                             <p class="text-muted mb-0">80 alunos</p>
                                         </div>
                                         <div class="mr-auto text-sm-right pt-2 pt-sm-0">
                                             <p class="text-muted" style="text-align: center;">35 min atrás</p>
-                                            <p class="text-muted mb-0">75 entregue, 5 pendentes</p>
+                                            <p class="text-muted mb-0">75 servidos, 5 pendentes</p>
                                         </div>
                                     </div>
                                 </div>
@@ -111,22 +154,22 @@
                                     </div>
                                     <div class="preview-item-content d-sm-flex flex-grow">
                                         <div class="flex-grow">
-                                            <h6 class="preview-subject">Edificações </h6>
+                                            <h6 class="preview-subject">1° A - Edificações </h6>
                                             <p class="text-muted mb-0">0 alunos </p>
                                         </div>
                                         <div class="mr-auto text-sm-right pt-2 pt-sm-0">
                                             <p class="text-muted" style="text-align: center;">0 min atrás</p>
-                                            <p class="text-muted mb-0">0 entregue, 0 pendentes </p>
+                                            <p class="text-muted mb-0">0 servidos, 0 pendentes </p>
                                         </div>
                                     </div>
                                 </div>
-                                <h4 class="card-title" style="padding: 20px 0px 20px 0px;">Cursos com contraturno Hoje </h4>
+                                <h4 class="card-title" style="padding: 20px 0px 20px 0px;">Turmas com contraturno Hoje </h4>
                                 <button type="button" class="btn btn-primary btn-icon-text">
-                                    <i class="mdi mdi-laptop"></i> Info </button>
-                                <button type="button" class="btn btn-info btn-icon-text"> Quim <i class="mdi mdi-test-tube"></i>
+                                    <i class="mdi mdi-laptop"></i> 1° B - Info </button>
+                                <button type="button" class="btn btn-info btn-icon-text"> 3° A - Quim <i class="mdi mdi-test-tube"></i>
                                 </button>
                                 <button type="button" class="btn btn-success btn-icon-text">
-                                    <i class="mdi mdi-lightbulb-outline"></i> Eltro </button>
+                                    <i class="mdi mdi-lightbulb-outline"></i> 2° A - Eletro </button>
                             </div>
                         </div>
                     </div>
@@ -220,9 +263,45 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" id="titulo-grafico" style="text-align: center; padding: 10px 0;">
+                        Estatística das Últimas: Quartas e Quintas
+                    </h4>
+                    <div id="morris-bar-example"></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <button id="anterior" class="btn btn-icon">
+                            <i class="mdi mdi-chevron-double-left" style="font-size: 28px;"></i>
+                        </button>
+                        <button id="proximo" class="btn btn-icon">
+                            <i class="mdi mdi-chevron-double-right" style="font-size: 28px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" style="text-align: center;">Imagem QRCode</h4>
+                    <form action="/file-upload" class="dropzone d-flex align-items-center" id="my-awesome-dropzone">
+                    </form>
+                    <div class="file-upload-wrapper">
+                        <div id="fileuploader">Upload</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
+    // GRÁFICO REDONDO
+    //
+    //
     document.addEventListener("DOMContentLoaded", function() {
         var ctx = document.getElementById("transaction-history").getContext("2d");
 
@@ -260,5 +339,101 @@
                 cutout: '70%' // mantém o "buraco" no centro do gráfico
             }
         });
+    });
+
+    //GRÁFICO DE BARRAS
+    //
+    //
+    //
+    // GRÁFICO DE BARRAS 1
+    const datasets = [{
+            titulo: "Estatística das Últimas: Quartas",
+            dados: [{
+                    y: 'Semana Passada',
+                    a: 150,
+                    b: 100,
+                    c: 90
+                },
+                {
+                    y: 'Semana Retrasada',
+                    a: 100,
+                    b: 100,
+                    c: 80
+                }
+            ]
+        },
+        { //GRÁFICO DE BARRAS 2
+            titulo: "Estatística das Últimas: Quintas",
+            dados: [{
+                    y: 'Semana Passada',
+                    a: 120,
+                    b: 80,
+                    c: 60
+                },
+                {
+                    y: 'Semana Retrasada',
+                    a: 90,
+                    b: 70,
+                    c: 50
+                }
+            ]
+        }
+    ];
+
+    let currentIndex = 0;
+    let chart;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof Morris !== 'undefined') {
+            chart = Morris.Bar({
+                element: 'morris-bar-example',
+                data: datasets[currentIndex].dados,
+                xkey: 'y',
+                ykeys: ['a', 'b', 'c'],
+                labels: ['Previstos', 'Confirmados', 'Servidos'], //Informações do gráfico
+                barColors: ['#1f3bb3', '#f1536e', 'green'], //cores do gráfico
+                hideHover: 'false',
+                gridLineColor: '#e0e0e0',
+                resize: true
+            });
+
+            document.getElementById("titulo-grafico").innerText = datasets[currentIndex].titulo;
+
+            document.getElementById("proximo").addEventListener("click", function() {
+                currentIndex = (currentIndex + 1) % datasets.length;
+                atualizarGrafico();
+            });
+
+            document.getElementById("anterior").addEventListener("click", function() {
+                currentIndex = (currentIndex - 1 + datasets.length) % datasets.length;
+                atualizarGrafico();
+            });
+        } else {
+            console.error('Morris.js não carregado.');
+        }
+    });
+
+    function atualizarGrafico() {
+        chart.setData(datasets[currentIndex].dados);
+        document.getElementById("titulo-grafico").innerText = datasets[currentIndex].titulo;
+    }
+</script>
+
+<script src="<?= base_url('assets/vendors/raphael/raphael.min.js') ?>"></script>
+<script src="<?= base_url('assets/vendors/morris.js/morris.min.js') ?>"></script>
+<script src="<?= base_url('assets/vendors/dropzone/dropzone.js') ?>"></script>
+<script src="<?= base_url('assets/vendors/jquery-file-upload/jquery.uploadfile.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery-file-upload.js') ?>"></script>
+<script src="<?= base_url('assets/js/dropzone.js') ?>"></script>
+
+<script>
+    // DROPZONE 
+    document.addEventListener("DOMContentLoaded", function() {
+        const dz = document.getElementById('my-awesome-dropzone');
+        const dzMessage = dz.querySelector('.dz-message');
+        if (dzMessage) {
+            // Remove o botão gerado pela Dropzone
+            dzMessage.innerHTML = '<span>Drop files here to upload</span>';
+        }
     });
 </script>

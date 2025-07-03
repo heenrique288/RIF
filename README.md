@@ -17,7 +17,7 @@ app.baseURL = 'http://localhost/refeicoes/public'
 
 #para conectar corretamente ao banco de dados
 database.default.hostname = localhost
-database.default.database = horarios
+database.default.database = refeicoes
 database.default.username = root
 database.default.password =
 database.default.DBDriver = MySQLi

@@ -259,7 +259,7 @@
 							<span class="text-muted text-center text-sm-left d-block d-sm-inline-block">
 								[CI <?php echo CodeIgniter\CodeIgniter::CI_VERSION ?>] | 
 								[PHP <?php echo phpversion(); ?>] |
-								[Database <?php //echo \Config\Database::connect()->getVersion(); ?>]
+								[Database <?php echo \Config\Database::connect()->getVersion(); ?>]
 							</span>
 						<?php //endif; ?>
 

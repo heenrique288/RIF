@@ -40,6 +40,12 @@ class CreateControleRefeicao extends Migration
                 'type'              => 'INT',
                 'constraint'        => 1,
                 'unsigned'          => TRUE
+            ],
+
+            'motivo' => [
+                'type'              => 'INT',
+                'constraint'        => 2,
+                'unsigned'          => TRUE
             ]
         ]);
 

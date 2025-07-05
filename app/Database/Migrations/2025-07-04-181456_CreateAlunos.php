@@ -25,6 +25,12 @@ class CreateAlunos extends Migration
                 'type'              => 'INT',
                 'constraint'        => 11,
                 'unsigned'          => TRUE
+            ],
+
+            'status' => [
+                'type'              => 'INT',
+                'constraint'        => 1,
+                'unsigned'          => TRUE
             ]
         ]);
 

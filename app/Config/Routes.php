@@ -14,3 +14,10 @@ $routes->group('/cursos', function ($routes) {
     $routes->put('/atualizar', 'CursoController::update');
     $routes->delete('/deletar', 'CursoController::update');
 });
+
+$routes->group('/turmas', function ($routes) {
+    $routes->get('/', 'TurmaController::index');
+    $routes->post('/criar', 'TurmaController::store');
+    $routes->put('/atualizar', 'TurmaController::update');
+    $routes->delete('/deletar', 'TurmaController::delete');
+});

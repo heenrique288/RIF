@@ -15,9 +15,17 @@ $routes->group('/cursos', function ($routes) {
     $routes->delete('/deletar', 'CursoController::update');
 });
 
+$routes->group('controle-refeicoes', function ($routes) {
+    $routes->get('', 'ControleRefeicoesController::index');
+    $routes->post('salvar', 'ControleRefeicoesController::salvar');
+    $routes->post('atualizar', 'ControleRefeicoesController::atualizar');
+    $routes->post('deletar', 'ControleRefeicoesController::deletar');
+});
+
 $routes->group('/turmas', function ($routes) {
     $routes->get('/', 'TurmaController::index');
     $routes->post('/criar', 'TurmaController::store');
     $routes->put('/atualizar', 'TurmaController::update');
     $routes->delete('/deletar', 'TurmaController::delete');
 });
+

@@ -1,23 +1,17 @@
 <?php
 
 namespace App\Controllers;
-
 use App\Models\CursoModel;
 
 class CursoController extends BaseController 
 {
-    /**
-     * Renderiza a tela de cursos, listando todos os cursos cadastrados
-     * 
-     * @route GET /cursos
-     * @return view
-     */
     public function index()
     {
         $model = new CursoModel();
         $data['cursos'] = $model->orderBy('nome')->findAll();
 
-        return view('sys/cursos', $data);
+        $data['content'] = view('sys/cursos', $data);
+        return view('dashboard', $data);
     }
 
     /**

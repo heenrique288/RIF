@@ -53,38 +53,21 @@
 
 <div class="content-wrapper">
     <div class="row">
-        <div class="col-md-4 grid-margin stretch-card">
+        <!-- QR Code -->
+        <div class="col-lg-4 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title" style="text-align: center">Estatística do Almoço</h4>
-                    <div class="position-relative">
-                        <div class="daoughnutchart-wrapper">
-                            <canvas id="transaction-history" class="transaction-chart"></canvas>
-                        </div>
-                        <div class="custom-value">200 <span>Total de Alunos Previstos</span>
-                        </div>
-                    </div>
-                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                        <div class="text-md-center text-xl-left">
-                            <h6 class="mb-1">Segunda</h6>
-                            <p class="text-muted mb-0">01 Jul 2025, 09:12AM</p>
-                        </div>
-                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
-                            <h6 class="font-weight-bold mb-0">150</h6>
-                        </div>
-                    </div>
-                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                        <div class="text-md-center text-xl-left">
-                            <h6 class="mb-1">Terça</h6>
-                            <p class="text-muted mb-0">30 Jun 2025, 09:12AM</p>
-                        </div>
-                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
-                            <h6 class="font-weight-bold mb-0">113</h6>
-                        </div>
+                    <h4 class="card-title" style="text-align: center;">Imagem QRCode</h4>
+                    <form action="/file-upload" class="dropzone d-flex align-items-center" id="my-awesome-dropzone">
+                    </form>
+                    <div class="file-upload-wrapper">
+                        <div id="fileuploader">Upload</div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Card para a Quantidade de Alunos por Turma -->
         <div class="col-md-8 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
@@ -177,6 +160,9 @@
             </div>
         </div>
     </div>
+    <!-- Fim da primeira linha  -->
+
+    <!-- Estatística por Aluno -->
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -187,9 +173,11 @@
                         <thead>
                             <tr>
                                 <th> Foto </th>
-                                <th> Nome e sobrenome </th>
+                                <th> Nome </th>
                                 <th> Matrícula </th>
                                 <th> Hora </th>
+                                <th> Status </th> <!-- 0 - Disponível / 1- Confirmado / 2- Retirado / 3- Cancelado -->
+                                <th> Motivo </th> <!-- 0 - Contraturno / 1- Estágio / 2- Treino / 3- Projeto / 4- Visita Técnica -->
                                 <th> Data </th>
                             </tr>
                         </thead>
@@ -201,6 +189,8 @@
                                 <td> Herman Beck </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:11 </td>
+                                <td><label class="badge badge-danger"> Cancelado </label></td>
+                                <td> Contraturno </td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -210,6 +200,8 @@
                                 <td> Messsy Adam </td>
                                 <td> 2025106809087</td>
                                 <td> 11:11 </td>
+                                <td><label class="badge badge-warning"> Disponível </label></td>
+                                <td> Contraturno </td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -219,6 +211,8 @@
                                 <td> John Richards </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:11 </td>
+                                <td><label class="badge badge-info"> Retirado </label></td>
+                                <td><button class="btn btn-outline-primary"> View </button></td> <!-- SUGESTÃO: Esse botão view, eu pensei em colocar em casos de motivos mais detalhados ou específicos que precise de uma justificativa melhor. Quando o usuário clicar em view, aparecerá na tela o motivo, explicando o porquê que aquele aluno está pegando a ficha naquele dia. -->
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -228,6 +222,8 @@
                                 <td> Peter Meggik </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:10 </td>
+                                <td><label class="badge badge-success"> Confirmado </label></td>
+                                <td> Contraturno </td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -237,6 +233,8 @@
                                 <td> Edward </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:10 </td>
+                                <td><label class="badge badge-success"> Confirmado </label></td>
+                                <td> Estágio </td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -246,6 +244,8 @@
                                 <td> John Doe </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:10 </td>
+                                <td><label class="badge badge-success"> Confirmado </label></td>
+                                <td> Visita Técnica </td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                             <tr>
@@ -255,6 +255,8 @@
                                 <td> Henry Tom </td>
                                 <td> 2025106809087 </td>
                                 <td> 11:10 </td>
+                                <td><label class="badge badge-success"> Confirmado </label></td>
+                                <td><button class="btn btn-outline-primary">View</button></td>
                                 <td> Jun 26, 2025 </td>
                             </tr>
                         </tbody>
@@ -263,8 +265,47 @@
             </div>
         </div>
     </div>
+    <!-- Fim das Estatísticas do Aluno -->
+
+    <!-- Começo da linha 3 -->
     <div class="row">
-        <div class="col-lg-6 grid-margin stretch-card">
+
+        <!-- Gráfico Redondo para as Estatísticas do Almoço -->
+        <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" style="text-align: center">Estatística do Almoço</h4>
+                    <div class="position-relative">
+                        <div class="daoughnutchart-wrapper">
+                            <canvas id="transaction-history" class="transaction-chart"></canvas>
+                        </div>
+                        <div class="custom-value">200 <span>Total de Alunos Previstos</span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
+                        <div class="text-md-center text-xl-left">
+                            <h6 class="mb-1">Segunda</h6>
+                            <p class="text-muted mb-0">01 Jul 2025, 09:12AM</p>
+                        </div>
+                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
+                            <h6 class="font-weight-bold mb-0">150</h6>
+                        </div>
+                    </div>
+                    <div class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
+                        <div class="text-md-center text-xl-left">
+                            <h6 class="mb-1">Terça</h6>
+                            <p class="text-muted mb-0">30 Jun 2025, 09:12AM</p>
+                        </div>
+                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
+                            <h6 class="font-weight-bold mb-0">113</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Barras -->
+        <div class="col-lg-8 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title" id="titulo-grafico" style="text-align: center; padding: 10px 0;">
@@ -282,18 +323,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title" style="text-align: center;">Imagem QRCode</h4>
-                    <form action="/file-upload" class="dropzone d-flex align-items-center" id="my-awesome-dropzone">
-                    </form>
-                    <div class="file-upload-wrapper">
-                        <div id="fileuploader">Upload</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+
     </div>
 
 </div>

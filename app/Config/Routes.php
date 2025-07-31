@@ -29,3 +29,5 @@ $routes->group('/turmas', function ($routes) {
     $routes->delete('/deletar', 'TurmaController::delete');
 });
 
+$routes->get('/alunos', 'AlunoController::index');
+

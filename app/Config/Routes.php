@@ -24,8 +24,8 @@ $routes->group('controle-refeicoes', function ($routes) {
 
 $routes->group('/turmas', function ($routes) {
     $routes->get('/', 'TurmaController::index');
-    $routes->post('/criar', 'TurmaController::store');
-    $routes->put('/atualizar', 'TurmaController::update');
-    $routes->delete('/deletar', 'TurmaController::delete');
+    $routes->post('criar', 'TurmaController::store');
+    $routes->put('atualizar', 'TurmaController::update');
+    $routes->delete('deletar', 'TurmaController::delete');
 });
 

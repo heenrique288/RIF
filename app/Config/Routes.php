@@ -29,5 +29,9 @@ $routes->group('/turmas', function ($routes) {
     $routes->delete('deletar', 'TurmaController::delete');
 });
 
-$routes->get('/alunos', 'AlunoController::index');
-
+$routes->group('/alunos', function ($routes) {
+    $routes->get('/', 'AlunoController::index');
+    $routes->post('criar', 'AlunoController::store');
+    $routes->put('atualizar', 'AlunoController::update');
+    $routes->delete('deletar', 'AlunoController::delete');
+});

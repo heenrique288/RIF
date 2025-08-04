@@ -10,9 +10,9 @@ $routes->get('/teste', 'Home::teste');
 
 $routes->group('/cursos', function ($routes) {
     $routes->get('/', 'CursoController::index');
-    $routes->post('/criar', 'CursoController::store');
-    $routes->put('/atualizar', 'CursoController::update');
-    $routes->delete('/deletar', 'CursoController::update');
+    $routes->post('criar', 'CursoController::store');
+    $routes->put('atualizar', 'CursoController::update');
+    $routes->delete('deletar', 'CursoController::update');
 });
 
 $routes->group('controle-refeicoes', function ($routes) {
@@ -29,5 +29,9 @@ $routes->group('/turmas', function ($routes) {
     $routes->delete('deletar', 'TurmaController::delete');
 });
 
-$routes->get('/alunos', 'AlunoController::index');
-
+$routes->group('/alunos', function ($routes) {
+    $routes->get('/', 'AlunoController::index');
+    $routes->post('criar', 'AlunoController::store');
+    $routes->put('atualizar', 'AlunoController::update');
+    $routes->delete('deletar', 'AlunoController::delete');
+});

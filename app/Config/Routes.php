@@ -39,11 +39,8 @@ $routes->group('controle-refeicoes', static function ($routes) {
 });
 
 //==============================================================
-// Rotas para Desenvolvimento Futuro
-// Descomente e ajuste conforme a implementação dos controllers.
-//==============================================================
-/*
 // Rotas de Alunos
+//==============================================================
 $routes->group('alunos', static function ($routes) {
     $routes->get('', 'AlunoController::index');
     $routes->get('criar', 'AlunoController::create');
@@ -53,7 +50,9 @@ $routes->group('alunos', static function ($routes) {
     $routes->delete('deletar/(:num)', 'AlunoController::delete/$1');
 });
 
+//==============================================================
 // Rotas de Usuários
+//==============================================================
 $routes->group('usuarios', static function ($routes) {
     $routes->get('', 'UsuarioController::index');
     $routes->post('criar', 'UsuarioController::store');
@@ -61,7 +60,9 @@ $routes->group('usuarios', static function ($routes) {
     $routes->delete('deletar/(:num)', 'UsuarioController::delete/$1');
 });
 
+//==============================================================
 // Rotas de Agendamento
+//==============================================================
 $routes->group('agendamento', static function ($routes) {
     $routes->post('admin/gravar', 'AgendamentoController::gravarPorAdmin');
     $routes->post('aluno/confirmar', 'AgendamentoController::confirmarPorAluno');
@@ -69,12 +70,16 @@ $routes->group('agendamento', static function ($routes) {
     $routes->put('admin/aprovar/(:num)', 'AgendamentoController::aprovarSolicitacao/$1');
 });
 
+//==============================================================
 // Rotas do Restaurante
+//==============================================================
 $routes->group('restaurante', static function ($routes) {
     $routes->post('registrar-servida', 'RefeicaoController::registrarServida');
 });
 
+//==============================================================
 // Rotas de Relatórios
+//==============================================================
 $routes->group('relatorios', static function ($routes) {
     $routes->get('', 'RelatorioController::index');
     $routes->get('previstos', 'RelatorioController::refeicoesPrevistas');
@@ -82,4 +87,3 @@ $routes->group('relatorios', static function ($routes) {
     $routes->get('nao-servidos', 'RelatorioController::refeicoesNaoServidas');
     $routes->get('confirmados', 'RelatorioController::confirmados');
 });
-*/

@@ -33,9 +33,11 @@
 			color: #999 !important;
 			background-color: transparent !important;
 		}
-		.sidebar .nav.sub-menu {			
+
+		.sidebar .nav.sub-menu {
 			padding: 0 0 0 2rem;
 		}
+
 		.sidebar .nav .nav-item .nav-link .menu-title {
 			font-size: 0.80rem;
 		}
@@ -53,7 +55,7 @@
 				</a>
 			</div>
 			<ul class="nav">
-				
+
 				<li class="nav-item">
 					<a class="nav-link" href="<?php echo base_url("/") ?>" style="margin-top:20px;">
 						<span class="menu-icon">
@@ -64,40 +66,40 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#refeicoes" aria-expanded="true" aria-controls="refeicoes">
+					<a class="nav-link" data-bs-toggle="collapse" href="#refeicoes" aria-expanded="false" aria-controls="refeicoes">
 						<span class="menu-icon">
-							<i class="mdi mdi-calendar-clock" style="color: #00d25b"></i>
+							<i class="mdi mdi-silverware-clean" style="color: #00d25b"></i>
 						</span>
 						<span class="menu-title">Gestão de Refeições</span>
 						<i class="menu-arrow"></i>
 					</a>
-					<div class="collapse show" id="refeicoes">
+					<div class="collapse" id="refeicoes">
 						<ul class="nav flex-column sub-menu">
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('sys/uque'); ?>">
+								<a class="nav-link" href="<?php echo base_url('#'); ?>">
 									<span class="menu-icon">
-										<i class="mdi mdi-clock-time-eight"></i>
+										<i class="mdi mdi-calendar-month-outline"></i>
 									</span>
-									<span class="menu-title">Link 1</span>
+									<span class="menu-title">Agendamentos</span>
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('sys/versao'); ?>">
+								<a class="nav-link" href="<?php echo base_url('#'); ?>">
 									<span class="menu-icon">
-										<i class="mdi mdi-multicast"></i>
+										<i class="mdi mdi-chart-line"></i>
 									</span>
-									<span class="menu-title">Link 2</span>
+									<span class="menu-title">Solicitações</span>
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('sys/relatorios'); ?>">
+								<a class="nav-link" href="<?php echo base_url('#'); ?>">
 									<span class="menu-icon">
-										<i class="mdi mdi-laptop"></i>
+										<i class="mdi mdi-license"></i>
 									</span>
-									<span class="menu-title">Link 3</span>
+									<span class="menu-title">Entregas</span>
 								</a>
 							</li>
 						</ul>
@@ -113,73 +115,93 @@
 						<i class="menu-arrow"></i>
 					</a>
 					<div class="collapse" id="cadastros">
-					
+
 						<ul class="nav flex-column sub-menu">
-						
+
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('sys/professor'); ?>">
+								<a class="nav-link" href="<?php echo base_url('sys/usuarios'); ?>">
 									<span class="menu-icon">
 										<i class="mdi mdi-account"></i>
 									</span>
-									<span class="menu-title">Cadastro 1</span>
+									<span class="menu-title">Usuários</span>
 								</a>
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('sys/matriz'); ?>">
+								<a class="nav-link" href="<?php echo base_url('sys/alunos'); ?>">
 									<span class="menu-icon">
-										<i class="mdi mdi-notebook-check"></i>
+										<i class="mdi mdi-account-group"></i>
 									</span>
-									<span class="menu-title">Cadastro 2</span>
+									<span class="menu-title">Alunos</span>
 								</a>
 							</li>
-							
+
+							<li class="nav-item">
+								<a class="nav-link" href="<?php echo base_url('sys/cursos'); ?>">
+									<span class="menu-icon">
+										<i class="mdi mdi-school"></i>
+									</span>
+									<span class="menu-title">Cursos</span>
+								</a>
+							</li>
+
+							<li class="nav-item">
+								<a class="nav-link" href="<?php echo base_url('sys/turmas'); ?>">
+									<span class="menu-icon">
+										<i class="mdi mdi-account-group"></i>
+									</span>
+									<span class="menu-title">Turmas</span>
+								</a>
+							</li>
+
 						</ul>
 					</div>
-				</li>				
+				</li>
 
-				<?php //if (auth()->user()->inGroup('admin')): ?>					
+				<?php //if (auth()->user()->inGroup('admin')): 
+				?>
 
-					<li class="nav-item">
-						<a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
-							<span class="menu-icon">
-								<i class="fa fa-gears" style="color: #fc424a"></i>
-							</span>
-							<span class="menu-title">Avançado</span>
-							<i class="menu-arrow"></i>
-						</a>						
+				<li class="nav-item">
+					<a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
+						<span class="menu-icon">
+							<i class="fa fa-gears" style="color: #fc424a"></i>
+						</span>
+						<span class="menu-title">Avançado</span>
+						<i class="menu-arrow"></i>
+					</a>
 
-						<div class="collapse" id="op_avancadas">
-							<ul class="nav flex-column sub-menu">
-								<li class="nav-item"> 
-									<a class="nav-link" href="<?php echo base_url('sys/admin'); ?>">
-										<span class="menu-icon">
-											<i class="fa fa-users"></i>
-										</span>
-										<span class="menu-title">Usuários do Sistema</span>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="#">
-										<span class="menu-icon">
-											<i class="mdi mdi-backup-restore"></i>
-										</span>
-										<span class="menu-title">Backup</span>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" href="#">
-										<span class="menu-icon">
-											<i class="fa fa-trash"></i>
-										</span>
-										<span class="menu-title">Limpeza</span>
-									</a>
-								</li>								
-							</ul>
-						</div>
-					</li>					
-					
-				<?php //endif; ?>
+					<div class="collapse" id="op_avancadas">
+						<ul class="nav flex-column sub-menu">
+							<li class="nav-item">
+								<a class="nav-link" href="<?php echo base_url('sys/admin'); ?>">
+									<span class="menu-icon">
+										<i class="fa fa-users"></i>
+									</span>
+									<span class="menu-title">Usuários do Sistema</span>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#">
+									<span class="menu-icon">
+										<i class="mdi mdi-backup-restore"></i>
+									</span>
+									<span class="menu-title">Backup</span>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link" href="#">
+									<span class="menu-icon">
+										<i class="fa fa-trash"></i>
+									</span>
+									<span class="menu-title">Limpeza</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+				<?php //endif; 
+				?>
 
 			</ul>
 		</nav>
@@ -196,18 +218,20 @@
 					</button>
 
 					<ul class="navbar-nav navbar-nav-right">
-					
+
 						<!--<li class="nav-item">
 							<a class="nav-link count-indicator" id="indicadorVersao" href="<?php echo base_url('sys/versao'); ?>">
-								<i class="mdi mdi-multicast"></i> Versão ativa: <span class="badge badge-primary"> <?php //echo $versao_nome; ?> </span>
+								<i class="mdi mdi-multicast"></i> Versão ativa: <span class="badge badge-primary"> <?php //echo $versao_nome; 
+																													?> </span>
 							</a>
 						</li>-->
-						
+
 						<li class="nav-item dropdown">
 							<a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
 								<div class="navbar-profile">
 									<!--<img class="img-xs rounded-circle" src="<?php echo base_url("assets/images/faces/face15.jpg"); ?>" alt="">-->
-									<p class="mb-0 d-none d-sm-block navbar-profile-name"><?php //echo auth()->user()->username; ?></p>
+									<p class="mb-0 d-none d-sm-block navbar-profile-name"><?php //echo auth()->user()->username; 
+																							?></p>
 									<i class="mdi mdi-menu-down d-none d-sm-block"></i>
 								</div>
 							</a>
@@ -255,13 +279,15 @@
 
 						<span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright© 2025~ <a href="javascript: void()">Calama Dev's</a>.</span>
 
-						<?php //if (auth()->user()->inGroup('admin')): ?>
-							<span class="text-muted text-center text-sm-left d-block d-sm-inline-block">
-								[CI <?php echo CodeIgniter\CodeIgniter::CI_VERSION ?>] | 
-								[PHP <?php echo phpversion(); ?>] |
-								[Database <?php echo \Config\Database::connect()->getVersion(); ?>]
-							</span>
-						<?php //endif; ?>
+						<?php //if (auth()->user()->inGroup('admin')): 
+						?>
+						<span class="text-muted text-center text-sm-left d-block d-sm-inline-block">
+							[CI <?php echo CodeIgniter\CodeIgniter::CI_VERSION ?>] |
+							[PHP <?php echo phpversion(); ?>] |
+							[Database <?php echo \Config\Database::connect()->getVersion(); ?>]
+						</span>
+						<?php //endif; 
+						?>
 
 						<span class="text-muted float-none float-sm-end d-block mt-1 mt-sm-0 text-center">Feito a mão e com <i class="mdi mdi-heart text-danger"></i></span>
 

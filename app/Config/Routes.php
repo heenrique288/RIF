@@ -26,7 +26,7 @@ $routes->group('sys', function ($routes) {
         $routes->get('', 'TurmaController::index');
         $routes->post('criar', 'TurmaController::store');
         $routes->post('atualizar', 'TurmaController::update');
-        $routes->delete('deletar/(:num)', 'TurmaController::delete/$1');
+        $routes->post('deletar', 'TurmaController::delete');
     });
 
     //==============================================================

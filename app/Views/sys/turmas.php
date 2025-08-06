@@ -24,8 +24,8 @@
                             <td><?= esc($turma['nome']) ?></td>
                             <td><?= esc($turma['curso_nome'] ?? 'Sem Curso') ?></td>
                             <td>
-                                <button class="btn btn-sm btn-warning">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
+                                <button class="btn btn-sm btn-warning btn-editar" data-bs-toggle="modal" data-bs-target="#turmaModalEditar" data-turma-id="<?= esc($turma['id']) ?>" data-turma-nome="<?= esc($turma['nome']) ?>" data-turma-curso-id="<?= esc($turma['curso_id']) ?>">Editar</button>
+                                <button class="btn btn-sm btn-danger btn-deletar" data-bs-toggle="modal" data-bs-target="#turmaModalDeletar" data-turma-id="<?= esc($turma['id']) ?>" data-turma-nome="<?= esc($turma['nome']) ?>">Excluir</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -37,16 +37,53 @@
             </tbody>
         </table>
     </div>
+
+    <br>
+
+    <?php if (session()->getFlashdata('successo')): ?>
+        <div id="sucessoAlert" class="alert alert-fill-success" role="alert">
+            <i class="mdi mdi-alert-circle"></i> <?= session()->getFlashdata('successo') ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (session()->getFlashdata('erro')): ?>
+        <div id="erroAlert" class="alert alert-fill-danger" role="alert">
+            <i class="mdi mdi-alert-circle"></i> <?= session()->getFlashdata('erro') ?>
+        </div>
+    <?php endif; ?>
+
 </div>
 
 <?= $this->include('components/turmas/modal_cad_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_del_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_edit_turma', ['cursos' => $cursos]) ?>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <script>
     $(document).ready(function() {
+
+        //Para aparecer as divs de sucesso ou erro e depois sumir
+        const alertaSucesso = $('#sucessoAlert');
+        const alertaErro = $('#erroAlert');
+
+        if (alertaSucesso.length) {
+            setTimeout(function() {
+                alertaSucesso.fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+
+        if (alertaErro.length) {
+            setTimeout(function() {
+                alertaErro.fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        }
+        // ----------------------------------------
+
         // Aceita o submit da modal
         $('#turmaForm').on('submit', function(e) {
             e.preventDefault();
@@ -97,5 +134,31 @@
         $('#turmaModal').on('hidden.bs.modal', function() {
             $('#turmaForm')[0].reset();
         });
+
+        //Coloca o valor das variaveis nome e id no modal de Deletar
+        $('.btn-deletar').on('click', function() {
+            var turmaId = $(this).data('turma-id');
+            var turmaNome = $(this).data('turma-nome')
+
+            var modal = $('#turmaModalDeletar')
+            
+            modal.find('#deleteTurmaId').val(turmaId)
+            modal.find('#deletar-nome').text(turmaNome)
+        })
+
+        //Coloca o valor das variaveis nome, id e curso id no modal de Editar
+        $('.btn-editar').on('click', function() {
+            var turmaId = $(this).data('turma-id');
+            var turmaNome = $(this).data('turma-nome');
+            var cursoId = $(this).data('turma-curso-id');
+
+            var modal = $('#turmaModalEditar');
+            
+            modal.find('#editTurmaId').val(turmaId);
+            modal.find('#edit-nome').val(turmaNome);
+            modal.find('#edit-curso_id').val(cursoId);
+        })
+
+
     });
 </script>

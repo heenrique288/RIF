@@ -60,20 +60,21 @@ class TurmaController extends BaseController
         $input['curso_id'] = strip_tags($post['curso_id']);
 
         if ($turmas_model->save($input)) {
-            return redirect()->to(base_url('/sys/turmas/alert=sucessoAtualizar'));
+            return redirect()->to(base_url('/sys/turmas'))->with('successo', 'Turma atualizada com sucesso!');
         } else {
-            return redirect()->to(base_url('/sys/turmas/alert=falhaAtualizar'));
+            return redirect()->to(base_url('/sys/turmas'))->with('erro', 'Ocorreu um erro ao atualizar a turma.');
         }
     }
 
-    public function delete($turmaId)
+    public function delete()
     {
         $turmas_model = new TurmaModel();
+        $turmaId = $this->request->getPost('id'); 
 
         if ($turmas_model->where('id', $turmaId)->delete()) {
-            return redirect()->to(base_url('/sys/turmas/alert=sucessoDeletar'));
+            return redirect()->to(base_url('/sys/turmas'))->with('successo', 'Turma excluída com sucesso');
         } else {
-            return redirect()->to(base_url('/sys/turmas/alert=falhaDeletar'));
+            return redirect()->to(base_url('/sys/turmas'))->with('erro', 'Ocorreu um erro ao excluir a turma.');
         }
     }
 }

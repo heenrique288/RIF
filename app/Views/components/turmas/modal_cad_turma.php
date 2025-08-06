@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="turmaForm" action="<?= site_url('turmas/criar') ?>" method="post">
+                <form id="turmaForm" action="<?= site_url('sys/turmas/criar') ?>" method="post">
                     <?= csrf_field() ?>
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome da Turma</label>

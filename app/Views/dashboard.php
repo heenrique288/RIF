@@ -86,7 +86,7 @@
 							</li>
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('#'); ?>">
+								<a class="nav-link" href="<?php echo base_url('sys/solicitacoes'); ?>">
 									<span class="menu-icon">
 										<i class="mdi mdi-chart-line"></i>
 									</span>

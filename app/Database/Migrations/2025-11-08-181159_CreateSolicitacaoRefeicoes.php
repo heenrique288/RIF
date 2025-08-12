@@ -47,11 +47,11 @@ class CreateSolicitacaoRefeicoes extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('turma_id', 'turmas', 'id');
-        $this->forge->createTable('solicitacaoRefeicoes');
+        $this->forge->createTable('solicitacao_refeicoes');
     }
 
     public function down()
     {
-        $this->forge->dropTable('solicitacaoRefeicoes', true, true);
+        $this->forge->dropTable('solicitacao_refeicoes', true, true);
     }
 }

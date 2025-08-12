@@ -40,6 +40,16 @@ $routes->group('sys', function ($routes) {
     });
 
     //==============================================================
+    // Rotas de Solicitação de Refeições
+    //==============================================================
+    $routes->group('solicitacoes', static function ($routes) {
+        $routes->get('', 'SolicitacaoRefeicoesController::index');
+        $routes->post('create', 'SolicitacaoRefeicoesController::create');
+        $routes->post('update', 'SolicitacaoRefeicoesController::update');
+        $routes->post('delete', 'SolicitacaoRefeicoesController::delete');
+    });
+
+    //==============================================================
     // Rotas de Alunos
     //==============================================================
     $routes->group('alunos', static function ($routes) {

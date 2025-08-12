@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class SolicitacaoRefeicoesModel extends Model
 {
-    protected $table            = 'solicitacaoRefeicoes';
+    protected $table            = 'solicitacao_refeicoes';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nome'];
+    protected $allowedFields    = ['turma_id', 'data_refeicao', 'crc', 'status', 'codigo', 'justificativa'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -32,10 +32,10 @@ class SolicitacaoRefeicoesModel extends Model
         'id' => 'permit_empty|is_natural_no_zero|max_length[11]',
         'turma_id' => 'required|is_natural_no_zero',
         'data_refeicao' => 'required|date',
-        'crc' => 'required',
-        'status' => 'required',
-        'codigo' => 'required',
-        'justificativa' => 'required',
+        'crc' => 'required|string',
+        'status' => 'permit_empty|numeric',
+        'codigo' => 'required|numeric',
+        'justificativa' => 'required|string|max_length[255]|min_length[8]',
     ];
 
     protected $validationMessages = [
@@ -58,6 +58,8 @@ class SolicitacaoRefeicoesModel extends Model
         ],
         'justificativa' => [
             'required' => 'Informe a justificativa da solicitação.',
+            'min_length' => 'A justificativa deve ter pelo menos 8 caracteres.',
+            'max_length' => 'A justificativa deve ter no máximo 255 caracteres.',
         ],
     ];
 

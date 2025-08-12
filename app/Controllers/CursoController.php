@@ -95,7 +95,7 @@ class CursoController extends BaseController
             session()->setFlashdata('sucesso', 'Curso deletado com sucesso!');
             return $this->redirectToBaseRoute();
         } catch (Exception $e) {
-            return $this->redirectToBaseRoute(['Ocorreu um deletar ao editar o curso!']);
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao deletar o curso!']);
         }
     }
 }

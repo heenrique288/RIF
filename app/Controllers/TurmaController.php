@@ -64,11 +64,11 @@ class TurmaController extends BaseController
         $input['curso_id'] = (int) strip_tags($post['curso_id']);
 
         try {
-            $turmas_model = new TurmaModel();
-            $sucesso = $turmas_model->save($input);
+            $turma = new TurmaModel();
+            $sucesso = $turma->save($input);
 
             if (!$sucesso) {
-                return $this->redirectToBaseRoute($turmas_model->errors());
+                return $this->redirectToBaseRoute($turma->errors());
             }
 
             session()->setFlashdata('sucesso', 'Turma atualizada com sucesso!');
@@ -84,14 +84,14 @@ class TurmaController extends BaseController
     public function delete()
     {
         $post = $this->request->getPost();
-        $turmaId = (int) strip_tags($post['id']);
+        $id = (int) strip_tags($post['id']);
 
         try {
-            $turmas_model = new TurmaModel();
-            $sucesso = $turmas_model->delete($turmaId);
+            $turma = new TurmaModel();
+            $sucesso = $turma->delete($id);
 
             if (!$sucesso) {
-                return $this->redirectToBaseRoute($turmas_model->errors());
+                return $this->redirectToBaseRoute($turma->errors());
             }
 
             session()->setFlashdata('sucesso', 'Turma deletada com sucesso!');

@@ -14,9 +14,9 @@ $routes->group('sys', function ($routes) {
     //==============================================================
     $routes->group('cursos', static function ($routes) {
         $routes->get('', 'CursoController::index');
-        $routes->post('criar', 'CursoController::store');
-        $routes->post('atualizar', 'CursoController::update');
-        $routes->post('deletar', 'CursoController::delete');
+        $routes->post('create', 'CursoController::create');
+        $routes->post('update', 'CursoController::update');
+        $routes->post('delete', 'CursoController::delete');
     });
 
     //==============================================================
@@ -24,9 +24,9 @@ $routes->group('sys', function ($routes) {
     //==============================================================
     $routes->group('turmas', static function ($routes) {
         $routes->get('', 'TurmaController::index');
-        $routes->post('criar', 'TurmaController::store');
-        $routes->post('atualizar', 'TurmaController::update');
-        $routes->delete('deletar/(:num)', 'TurmaController::delete/$1');
+        $routes->post('create', 'TurmaController::create');
+        $routes->post('update', 'TurmaController::update');
+        $routes->delete('delete', 'TurmaController::delete');
     });
 
     //==============================================================

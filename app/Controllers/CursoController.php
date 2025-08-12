@@ -8,6 +8,8 @@ use Exception;
 
 class CursoController extends BaseController
 {
+    protected $baseRoute = 'sys/cursos';
+
     public function index()
     {
         $model = new CursoModel();
@@ -18,34 +20,31 @@ class CursoController extends BaseController
     }
 
     /**
-     * Cadastra um novo curso no sistema.
-     *
-     * @route POST /cursos/criar
+     * @route POST /cursos/create
      */
-    public function store()
+    public function create()
     {
-        $curso = new CursoModel();
-
         $post = $this->request->getPost();
 
         $input['nome'] = strip_tags($post['nome']);
 
         try {
-            if ($curso->insert($input)) {
-                session()->setFlashdata('sucesso', 'Curso cadastrado com sucesso!');
-                return redirect()->to(base_url('/sys/cursos'));
-            } else {
-                return redirect()->to(base_url('/sys/cursos'))->with('erros', $curso->errors())->withInput();
+            $curso = new CursoModel();
+            $sucesso = $curso->insert($input);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($curso->errors());
             }
+
+            session()->setFlashdata('sucesso', 'Curso cadastrado com sucesso!');
+            return $this->redirectToBaseRoute();
         } catch (Exception $e) {
-            return redirect()->to(base_url('/sys/cursos'))->with('erros', ['Ocorreu um erro ao cadastrar o curso!'])->withInput();
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao cadastrar o curso!']);
         }
     }
 
     /**
-     * Atualiza os dados de um curso.
-     * 
-     * @route PUT /cursos/atualizar
+     * @route POST /cursos/update
      */
     public function update()
     {
@@ -54,47 +53,49 @@ class CursoController extends BaseController
         $input['id'] = (int) strip_tags($post['id']);
         $input['nome'] = strip_tags($post['nome']);
 
+
         try {
             $curso = new CursoModel();
-            if ($curso->save($input)) {
-                session()->setFlashdata('sucesso', 'Curso atualizado com sucesso!');
-                return redirect()->to(base_url('/sys/cursos'));
-            } else {
-                return redirect()->to(base_url('/sys/cursos'))->with('erros', $curso->errors())->withInput();
-            }
-        } catch (DatabaseException $e) {
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                return redirect()->to(base_url('/sys/cursos'))->with('erros', ['Já existe um curso com este nome!'])->withInput();
+            $sucesso = $curso->save($input);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($curso->errors());
             }
 
-            return redirect()->to(base_url('/sys/cursos'))->with('erros', ['Ocorreu um erro ao editar o curso!'])->withInput();
+            session()->setFlashdata('sucesso', 'Curso atualizado com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (DatabaseException $e) {
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                return $this->redirectToBaseRoute(['Já existe um curso com este nome!']);
+            }
+
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao editar o curso!']);
         } catch (\Exception $e) {
-            return redirect()->to(base_url('/sys/cursos'))->with('erros', ['Ocorreu um erro inesperado ao editar o curso!'])->withInput();
+            return $this->redirectToBaseRoute(['Ocorreu um erro inesperado ao editar o curso!']);
         }
     }
 
     /**
-     * Deleta um curso.
-     * 
-     * @route DELETE /cursos/deletar
+     * @route POST /cursos/delete
      */
     public function delete()
     {
         $post = $this->request->getPost();
+
         $id = (int) strip_tags($post['id']);
 
-        $curso = new CursoModel();
-
         try {
-            if ($curso->delete($id)) {
-                session()->setFlashdata('sucesso', 'Curso deletado com sucesso!');
-                return redirect()->to(base_url('/sys/cursos'));
-            } else {
-                session()->setFlashdata('erro', $curso->errors());
-                return redirect()->to(base_url('/sys/cursos'));
+            $curso = new CursoModel();
+            $sucesso = $curso->delete($id);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($curso->errors());
             }
+
+            session()->setFlashdata('sucesso', 'Curso deletado com sucesso!');
+            return $this->redirectToBaseRoute();
         } catch (Exception $e) {
-            return redirect()->to(base_url('/sys/cursos'))->with('erros', ['Ocorreu um deletar ao editar o curso!'])->withInput();
+            return $this->redirectToBaseRoute(['Ocorreu um deletar ao editar o curso!']);
         }
     }
 }

@@ -1,6 +1,7 @@
 <div class="modal fade" id="modal-cadastrar-solicitacao" tabindex="-1" role="dialog" aria-labelledby="modal-cadastrar-solicitacao-label" aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width: 700px;">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-cadastrar-solicitacao-label">Cadastrar Nova Solicitação</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
@@ -9,8 +10,9 @@
             </div>
 
             <form id="form-cadastrar-solicitacao" class="forms-sample" method="post" action="<?php echo base_url('sys/solicitacoes/create'); ?>">
+                <?php echo csrf_field() ?>
+
                 <div class="modal-body">
-                    <?php echo csrf_field() ?>
 
                     <div class="mb-3">
                         <label for="turma_id" class="form-label">Turma</label>
@@ -45,12 +47,13 @@
                             id="justificativa"
                             class="form-control"
                             rows="3"
+                            minlength="8"
                             maxlength="255"
                             style="min-height: 80px;"
                             require></textarea>
                     </div>
-
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary me-2">Salvar</button>

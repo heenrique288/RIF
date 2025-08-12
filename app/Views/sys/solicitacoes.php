@@ -76,7 +76,6 @@
 
 </div>
 
-
 <script>
     $(document).ready(function() {
 
@@ -91,6 +90,17 @@
                     position: 'top-center'
                 });
             <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
+            $.toast({
+                heading: 'Sucesso',
+                text: '<?= session('sucesso') ?>',
+                showHideTransition: 'fade',
+                icon: 'success',
+                loaderBg: '#35dc5fff',
+                position: 'top-center'
+            });
         <?php endif; ?>
 
     });

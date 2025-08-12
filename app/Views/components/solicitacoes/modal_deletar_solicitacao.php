@@ -1,6 +1,7 @@
 <div class="modal fade" id="modal-deletar-solicitacao" tabindex="-1" role="dialog" aria-labelledby="modal-deletar-solicitacao-label" aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width: 700px;">
         <div class="modal-content">
+            
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-deletar-solicitacao-label">Deletar Solicitação</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">

@@ -8,15 +8,7 @@ use Exception;
 
 class SolicitacaoRefeicoesController extends BaseController
 {
-    private $indexRoute = 'sys/solicitacoes';
-
-    private function redirectToIndex(?array $erros = [])
-    {
-        if (gettype($erros) != "array" || count($erros) < 1) {
-            return redirect()->to(base_url($this->indexRoute));
-        }
-        return redirect()->to(base_url($this->indexRoute))->with('erros', $erros)->withInput();
-    }
+    protected $baseRoute = 'sys/solicitacoes';
 
     public function index()
     {
@@ -31,14 +23,10 @@ class SolicitacaoRefeicoesController extends BaseController
     }
 
     /**
-     * Cadastra uma nova solicitacao no sistema.
-     *
      * @route POST sys/solicitacoes/create
      */
     public function create()
     {
-        $solicitacao = new SolicitacaoRefeicoesModel();
-
         $post = $this->request->getPost();
 
         $input['turma_id'] = (int) strip_tags($post['turma_id']);
@@ -49,20 +37,21 @@ class SolicitacaoRefeicoesController extends BaseController
         $input['justificativa'] = strip_tags($post['justificativa']);
 
         try {
-            if ($solicitacao->insert($input)) {
-                session()->setFlashdata('sucesso', 'Solicitação cadastrada com sucesso!');
-                return $this->redirectToIndex();
-            } else {
-                return $this->redirectToIndex($solicitacao->errors());
+            $solicitacao = new SolicitacaoRefeicoesModel();
+            $sucesso = $solicitacao->insert($input);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($solicitacao->errors());
             }
+
+            session()->setFlashdata('sucesso', 'Solicitação cadastrada com sucesso!');
+            return $this->redirectToBaseRoute();
         } catch (Exception $e) {
-            return $this->redirectToIndex(['Ocorreu um erro ao cadastrar a solicitação!']);
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao cadastrar a solicitação!']);
         }
     }
 
     /**
-     * Atualiza os dados de uma solicitacao.
-     * 
      * @route POST sys/solicitacoes/update
      */
     public function update()
@@ -79,21 +68,20 @@ class SolicitacaoRefeicoesController extends BaseController
 
         try {
             $solicitacao = new SolicitacaoRefeicoesModel();
-            if ($solicitacao->save($input)) {
-                session()->setFlashdata('sucesso', 'Solicitação atualizada com sucesso!');
-                return $this->redirectToIndex();
-            } else {
-                session()->setFlashdata('erro', $solicitacao->errors());
-                return $this->redirectToIndex($solicitacao->errors());
+            $sucesso = $solicitacao->save($input);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($solicitacao->errors());
             }
+
+            session()->setFlashdata('sucesso', 'Solicitação atualizada com sucesso!');
+            return $this->redirectToBaseRoute();
         } catch (\Exception $e) {
-            return $this->redirectToIndex(['Ocorreu um erro ao editar a solicitação!']);
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao editar a solicitação!']);
         }
     }
 
     /**
-     * Deleta uma solicitacao.
-     * 
      * @route POST sys/solicitacoes/delete
      */
     public function delete()
@@ -102,18 +90,18 @@ class SolicitacaoRefeicoesController extends BaseController
 
         $id = (int) strip_tags($post['id']);
 
-        $solicitacao = new SolicitacaoRefeicoesModel();
-
         try {
-            if ($solicitacao->delete($id)) {
-                session()->setFlashdata('sucesso', 'Solicitação deletada com sucesso!');
-                return $this->redirectToIndex();
-            } else {
-                session()->setFlashdata('erro', $solicitacao->errors());
-                return $this->redirectToIndex($solicitacao->errors());
+            $solicitacao = new SolicitacaoRefeicoesModel();
+            $sucesso = $solicitacao->delete($id);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($solicitacao->errors());
             }
+
+            session()->setFlashdata('sucesso', 'Solicitação deletada com sucesso!');
+            return $this->redirectToBaseRoute();
         } catch (Exception $e) {
-            return $this->redirectToIndex(['Ocorreu um erro ao deletar a solicitação!']);
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao deletar a solicitação!']);
         }
     }
 }

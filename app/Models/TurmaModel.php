@@ -33,19 +33,18 @@ class TurmaModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'nome'     => 'required|min_length[3]|max_length[255]',
-        'curso_id' => 'required|is_not_unique[cursos.id]'
+        'nome'     => 'required|min_length[3]|max_length[96]',
+        'curso_id' => 'required|numeric'
     ];
 
     protected $validationMessages   = [
         'nome'     => [
-            'required' => 'Campo Obrigatório',
-            'min_length' => 'O nome deve ter no mínimo 3 caracteres',
-            'max_length' => 'O nome deve ter no máximo 255 caracteres',
+            'required' => 'Informe o nome da turma',
+            'min_length' => 'O nome é muito curto.',
+            'max_length' => 'O nome é muito longo.',
         ],
         'curso_id' => [
-            'required' => 'Campo Obrigatório',
-            'is_not_unique' => 'Esse curso já foi cadastrado',
+            'required' => 'Informe o curso da turma',
         ]
     ];
 

@@ -63,7 +63,7 @@ class SolicitacaoRefeicoesController extends BaseController
     /**
      * Atualiza os dados de uma solicitacao.
      * 
-     * @route PUT sys/solicitacoes/update
+     * @route POST sys/solicitacoes/update
      */
     public function update()
     {
@@ -94,7 +94,7 @@ class SolicitacaoRefeicoesController extends BaseController
     /**
      * Deleta uma solicitacao.
      * 
-     * @route DELETE sys/solicitacoes/delete
+     * @route POST sys/solicitacoes/delete
      */
     public function delete()
     {

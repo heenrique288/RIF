@@ -5,9 +5,12 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\TurmaModel;
 use App\Models\CursoModel;
+use Exception;
 
 class TurmaController extends BaseController
 {
+    protected $baseRoute = '/sys/turmas';
+
     public function index()
     {
         $turmas_model = new TurmaModel();
@@ -24,56 +27,77 @@ class TurmaController extends BaseController
         return view('dashboard', $data);
     }
 
-    public function store()
+    /**
+     * @route POST /turmas/create
+     */
+    public function create()
     {
-        if (!$this->request->isAJAX()) {
-            return $this->response->setStatusCode(403, 'Acesso Negado');
-        }
+        $post = $this->request->getPost();
 
-        $turmas_model = new TurmaModel();
+        $input['nome'] = strip_tags($post['nome']);
+        $input['curso_id'] = (int) strip_tags($post['curso_id']);
 
-        $rules = [
-            'nome'     => 'required|min_length[3]|max_length[255]',
-            'curso_id' => 'required|is_not_unique[cursos.id]'
-        ];
+        try {
+            $turma = new TurmaModel();
+            $sucesso = $turma->insert($input);
 
-        if (!$this->validate($rules)) {
-            return $this->response->setJSON(['success' => false, 'errors' => $this->validator->getErrors()]);
-        }
-        $input = $this->validator->getValidated();
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($turma->errors());
+            }
 
-        if ($turmas_model->insert($input)) {
-            return $this->response->setJSON(['success' => true, 'message' => 'Turma cadastrada com sucesso!']);
-        } else {
-            return $this->response->setJSON(['success' => false, 'errors' => ['database' => 'Ocorreu um erro ao salvar no banco de dados.']]);
+            session()->setFlashdata('sucesso', 'Turma cadastrada com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao cadastrar a turma!']);
         }
     }
 
+    /**
+     * @route POST /turmas/update
+     */
     public function update()
     {
-        $turmas_model = new TurmaModel();
-
         $post = $this->request->getPost();
 
         $input['id'] = (int) strip_tags($post['id']);
         $input['nome'] = strip_tags($post['nome']);
-        $input['curso_id'] = strip_tags($post['curso_id']);
+        $input['curso_id'] = (int) strip_tags($post['curso_id']);
 
-        if ($turmas_model->save($input)) {
-            return redirect()->to(base_url('/sys/turmas/alert=sucessoAtualizar'));
-        } else {
-            return redirect()->to(base_url('/sys/turmas/alert=falhaAtualizar'));
+        try {
+            $turmas_model = new TurmaModel();
+            $sucesso = $turmas_model->save($input);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($turmas_model->errors());
+            }
+
+            session()->setFlashdata('sucesso', 'Turma atualizada com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao editar a turma!']);
         }
     }
 
-    public function delete($turmaId)
+    /**
+     * @route POST /turmas/delete
+     */
+    public function delete()
     {
-        $turmas_model = new TurmaModel();
+        $post = $this->request->getPost();
+        $turmaId = (int) strip_tags($post['id']);
 
-        if ($turmas_model->where('id', $turmaId)->delete()) {
-            return redirect()->to(base_url('/sys/turmas/alert=sucessoDeletar'));
-        } else {
-            return redirect()->to(base_url('/sys/turmas/alert=falhaDeletar'));
+        try {
+            $turmas_model = new TurmaModel();
+            $sucesso = $turmas_model->delete($turmaId);
+
+            if (!$sucesso) {
+                return $this->redirectToBaseRoute($turmas_model->errors());
+            }
+
+            session()->setFlashdata('sucesso', 'Turma deletada com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao deletar a turma!']);
         }
     }
 }

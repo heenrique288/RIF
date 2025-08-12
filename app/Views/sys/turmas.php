@@ -28,8 +28,32 @@
                             <td><?= esc($turma['nome']) ?></td>
                             <td><?= esc($turma['curso_nome'] ?? 'Sem Curso') ?></td>
                             <td>
-                                <button class="btn btn-sm btn-warning">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
+                                <div class="d-flex">
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-editar-turmas"
+                                            data-id="<?php echo esc($turma['id']); ?>"
+                                            data-nome="<?php echo esc($turma['nome']); ?>"
+                                            data-curso_id="<?php echo esc($turma['curso_id']); ?>">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-deletar-turma"
+                                            data-id="<?php echo esc($turma['id']); ?>"
+                                            data-nome="<?php echo esc($turma['nome']); ?>">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

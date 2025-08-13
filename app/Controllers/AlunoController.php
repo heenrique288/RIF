@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\AlunoModel;
 use App\Models\TurmaModel;
+use App\Models\CursoModel;
 
 class AlunoController extends BaseController
 {
@@ -11,22 +12,16 @@ class AlunoController extends BaseController
     {
         $alunoModel = new AlunoModel();
         $turmaModel = new TurmaModel();
-        
-        $alunos = $alunoModel->paginate(10);
-        $pager = $alunoModel->pager;
+        $cursoModel = new CursoModel();
 
-        $dataAlunos = [
-            'alunos' => $alunos,
-            'pager' => $pager,
-            'turmas' => $turmaModel->select('turmas.*, cursos.nome as curso_nome')->join('cursos', 'cursos.id = turmas.curso_id')->findAll(),
-        ];
-        
-        $mainContent = view('sys/aluno', $dataAlunos);
+        $data['alunos'] = $alunoModel->orderBy('nome')->findAll();
+        $data['turmas'] = $turmaModel
+                        ->select('turmas.*, cursos.nome as curso_nome')
+                        ->join('cursos', 'cursos.id = turmas.curso_id')
+                        ->orderBy('turmas.nome')
+                        ->findAll();
 
-        $data = [
-            'content' => $mainContent,
-        ];
-        
+        $data['content'] = view('sys/aluno', $data);
         return view('dashboard', $data);
     }
     

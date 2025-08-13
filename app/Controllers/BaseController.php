@@ -22,6 +22,14 @@ use Psr\Log\LoggerInterface;
 abstract class BaseController extends Controller
 {
     /**
+     * Rota base para onde o método redirectToBaseRoute irá redirecionar;
+     * Pode (e deve) ser redefinido pelo controlador que estender essa classe.
+     * 
+     * @var string
+     */
+    protected $baseRoute = 'sys/';
+
+    /**
      * Instance of the main Request object.
      *
      * @var CLIRequest|IncomingRequest
@@ -54,5 +62,15 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = service('session');
+    }
+
+    protected function redirectToBaseRoute(?array $erros = [])
+    {
+        if (gettype($erros) != "array" || count($erros) < 1) {
+            return redirect()->to(base_url($this->baseRoute));
+        }
+        
+        session()->setFlashdata('erros', $erros);
+        return redirect()->to(base_url($this->baseRoute))->with('erros', $erros)->withInput();
     }
 }

@@ -1,6 +1,7 @@
 <div class="modal fade" id="modal-editar-solicitacao" tabindex="-1" role="dialog" aria-labelledby="modal-editar-solicitacao-label" aria-hidden="true">
     <div class="modal-dialog" role="document" style="max-width: 700px;">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-editar-solicitacao-label">Editar Solicitação</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
@@ -9,8 +10,9 @@
             </div>
 
             <form id="form-editar-solicitacao" class="forms-sample" method="post" action="<?php echo base_url('sys/solicitacoes/update'); ?>">
+                <?php echo csrf_field() ?>
+
                 <div class="modal-body">
-                    <?php echo csrf_field() ?>
 
                     <input type="hidden" id="edit-id" name="id" />
                     <input type="hidden" id="edit-status" name="status" />
@@ -52,8 +54,8 @@
                             style="min-height: 80px;"
                             require></textarea>
                     </div>
-
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary me-2">Salvar</button>

@@ -32,8 +32,22 @@ class TurmaModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+        'nome'     => 'required|min_length[3]|max_length[96]',
+        'curso_id' => 'required|numeric'
+    ];
+
+    protected $validationMessages   = [
+        'nome'     => [
+            'required' => 'Informe o nome da turma',
+            'min_length' => 'O nome é muito curto.',
+            'max_length' => 'O nome é muito longo.',
+        ],
+        'curso_id' => [
+            'required' => 'Informe o curso da turma',
+        ]
+    ];
+
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 

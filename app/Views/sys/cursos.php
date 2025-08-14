@@ -5,20 +5,6 @@
 <div>
     <h1>Cursos</h1>
 
-    <?php if (session()->has('erros')): ?>
-        <div class="card">
-            <div class="card-body">
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php foreach (session('erros') as $erro): ?>
-                            <li> <i class="mdi mdi-alert-circle"></i><?= esc($erro) ?></li>
-                        <?php endforeach ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
     <div class="my-4">
         <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-curso">
             <i class="fa fa-plus-circle btn-icon-prepend"></i>
@@ -91,6 +77,17 @@
                     position: 'top-center'
                 });
             <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
+            $.toast({
+                heading: 'Sucesso',
+                text: '<?= session('sucesso') ?>',
+                showHideTransition: 'fade',
+                icon: 'success',
+                loaderBg: '#35dc5fff',
+                position: 'top-center'
+            });
         <?php endif; ?>
 
     });

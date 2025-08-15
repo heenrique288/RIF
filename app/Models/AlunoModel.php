@@ -26,9 +26,9 @@ class AlunoModel extends Model
     // Validation
     // A regra `is_unique` com o placeholder `{id}` funciona tanto para a inserção (onde o ID é nulo) quanto para a atualização.
     protected $validationRules      = [
-        'matricula' => 'required|numeric|min_length[5]|max_length[10]|is_unique[alunos.matricula,matricula,{id}]',
+        'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula,matricula,{id}]',
         'nome'      => 'required|min_length[3]|max_length[255]',
-        'turma_id'  => 'required|numeric',
+        //'turma_id'  => 'numeric',
         'status'    => 'required|in_list[ativo,inativo]',
     ];
 
@@ -46,8 +46,7 @@ class AlunoModel extends Model
             'max_length' => 'O nome deve ter no máximo 255 caracteres.',
         ],
         'turma_id' => [
-            'required' => 'O ID da turma é obrigatório.',
-            'numeric'  => 'O ID da turma deve ser um número.',
+            //'numeric'  => 'O ID da turma deve ser um número.',
         ],
         'status' => [
             'required' => 'O status é obrigatório.',

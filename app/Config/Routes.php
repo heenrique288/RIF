@@ -27,6 +27,8 @@ $routes->group('sys', function ($routes) {
         $routes->post('create', 'TurmaController::create');
         $routes->post('update', 'TurmaController::update');
         $routes->delete('delete', 'TurmaController::delete');
+        $routes->post('import', 'TurmaController::import');
+        $routes->post('importProcess', 'TurmaController::importProcess'); 
     });
 
     //==============================================================
@@ -40,16 +42,6 @@ $routes->group('sys', function ($routes) {
     });
 
     //==============================================================
-    // Rotas de Solicitação de Refeições
-    //==============================================================
-    $routes->group('solicitacoes', static function ($routes) {
-        $routes->get('', 'SolicitacaoRefeicoesController::index');
-        $routes->post('create', 'SolicitacaoRefeicoesController::create');
-        $routes->post('update', 'SolicitacaoRefeicoesController::update');
-        $routes->post('delete', 'SolicitacaoRefeicoesController::delete');
-    });
-
-    //==============================================================
     // Rotas de Alunos
     //==============================================================
     $routes->group('alunos', static function ($routes) {
@@ -58,6 +50,8 @@ $routes->group('sys', function ($routes) {
         $routes->get('editar/(:num)', 'AlunoController::edit/$1');
         $routes->put('atualizar/(:num)', 'AlunoController::update/$1');
         $routes->delete('deletar/(:num)', 'AlunoController::delete/$1');
+        $routes->post('import', 'AlunoController::import');
+        $routes->post('importProcess', 'AlunoController::importProcess'); 
     });
 
     //==============================================================

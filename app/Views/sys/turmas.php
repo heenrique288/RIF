@@ -1,4 +1,7 @@
 <?= $this->include('components/turmas/modal_cadastrar_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_editar_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_deletar_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_importar_alunos_turma', ['cursos' => $cursos]) ?>
 
 <div>
     <h1>Turmas</h1>
@@ -34,7 +37,7 @@
                                             type="button"
                                             class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#modal-editar-turmas"
+                                            data-bs-target="#modal-editar-turma"
                                             data-id="<?php echo esc($turma['id']); ?>"
                                             data-nome="<?php echo esc($turma['nome']); ?>"
                                             data-curso_id="<?php echo esc($turma['curso_id']); ?>">
@@ -53,6 +56,21 @@
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </span>
+
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Importar Lista de alunos">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-info button-trans-info btn-icon me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-importar-alunos-turma"
+                                            data-id="<?php echo esc($turma['id']); ?>"
+                                            data-nome="<?php echo esc($turma['nome']); ?>"
+                                            data-curso_nome="<?php echo esc($turma['curso_nome']); ?>"
+                                            data-curso_id="<?php echo esc($turma['curso_id']); ?>">
+
+                                            <i class="fa fa-upload"></i>
+                                        </button>
+                                    </span>
                                 </div>
                             </td>
                         </tr>
@@ -66,3 +84,34 @@
         </table>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+
+        <?php if (session()->has('erros')): ?>
+            <?php foreach (session('erros') as $erro): ?>
+                $.toast({
+                    heading: 'Erro',
+                    text: '<?= esc($erro); ?>',
+                    showHideTransition: 'fade',
+                    icon: 'error',
+                    loaderBg: '#dc3545',
+                    position: 'top-center'
+                });
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
+            $.toast({
+                heading: 'Sucesso',
+                text: '<?= session('sucesso') ?>',
+                showHideTransition: 'fade',
+                icon: 'success',
+                loaderBg: '#35dc5fff',
+                position: 'top-center'
+            });
+        <?php endif; ?>
+
+    });
+
+</script>

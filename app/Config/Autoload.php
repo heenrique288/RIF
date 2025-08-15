@@ -39,6 +39,8 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
+        'PhpOffice\\PhpSpreadsheet' => APPPATH . 'ThirdParty/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
+        'Psr\\SimpleCache' => APPPATH . 'ThirdParty/psr/simple-cache/src/',
     ];
 
     /**

@@ -51,16 +51,10 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            
-            <div class="mt-3">
-                <?= $pager->links() ?>
-            </div>
-
         <?php else: ?>
             <p>Nenhum aluno encontrado no banco de dados.</p>
         <?php endif; ?>
     </div>
-
 </div>
 
 

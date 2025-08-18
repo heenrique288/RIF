@@ -3,12 +3,26 @@
 <?= $this->include('components/alunos/modal_edit_aluno', ['turmas' => $turmas]) ?>
 <?= $this->include('components/alunos/modal_importar_aluno', ['turmas' => $turmas]) ?>
 
-<div>
-    <h1>Alunos</h1>
+<div class="container-fluid">
+    <h1 class="mt-4">Alunos Cadastrados</h1>
+
+    <?php if ($sucesso = session()->getFlashdata('sucesso')): ?>
+        <div class="my-4 alert alert-success"><?= esc($sucesso) ?></div>
+    <?php endif; ?>
+
+    <?php if ($erros = session()->getFlashdata('erros')): ?>
+        <div class="my-4 alert alert-danger">
+            <ul>
+                <?php foreach ($erros as $error): ?>
+                    <li><?= esc($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
 
     <div class="my-4">
-        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#alunoModal">
-            <i class="fa fa-plus-circle btn-icon-prepend"></i>
+        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-aluno">
+            <i class="mdi mdi-plus-circle btn-icon-prepend"></i>
             Novo Aluno
         </button>
         <button type="button" class="btn btn-info btn-fw" data-bs-toggle="modal" data-bs-target="#modal-importar-aluno">
@@ -17,14 +31,17 @@
         </button>
     </div>
 
-    <div class="table-container mt-4">
+    <div class="table-responsive">
         <?php if (isset($alunos) && !empty($alunos)): ?>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Matrícula</th>
                         <th>Nome</th>
-                        <th>Turma ID</th>
+                        <th>Turma</th>
+                        <th>Curso</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -34,18 +51,47 @@
                         <tr>
                             <td><?= esc($aluno['matricula']) ?></td>
                             <td><?= esc($aluno['nome']) ?></td>
-                            <td><?= esc($aluno['turma_id']) ?></td>
+                            <td><?= esc($aluno['turma_nome']) ?></td>
+                            <td><?= esc($aluno['curso_nome']) ?></td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <?php foreach ($aluno['emails'] ?? ['Nenhum e-mail'] as $email): ?>
+                                        <small class="font-weight-bold"><?= esc($email) ?></small>
+                                    <?php endforeach; ?>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <?php foreach ($aluno['telefones'] ?? ['Nenhum telefone'] as $telefone): ?>
+                                        <small class="font-weight-bold"><?= esc($telefone) ?></small>
+                                    <?php endforeach; ?>
+                                </div>
+                            </td>
                             <td><?= $aluno['status'] == 1 ? 'Ativo' : 'Inativo' ?></td>
                             <td>
-                                <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editarAlunoModal"
-                                    data-matricula="<?= esc($aluno['matricula']) ?>">
-                                    Editar
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deletarModal"
-                                    data-matricula="<?= esc($aluno['matricula']) ?>"
-                                    data-nome="<?= esc($aluno['nome']) ?>">
-                                    Deletar
-                                </button>
+                                <div class="d-flex">
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success btn-icon me-1 edit-aluno-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-editar-aluno"
+                                            data-matricula="<?= esc($aluno['matricula']) ?>">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                    </span>
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger btn-icon"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deletarModal"
+                                            data-matricula="<?= esc($aluno['matricula']) ?>"
+                                            data-nome="<?= esc($aluno['nome']) ?>">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -57,77 +103,178 @@
     </div>
 </div>
 
+<style>
+    .modal-dialog {
+        margin-top: 10vh;
+    }
 
+    .form-control[disabled], .form-control[readonly] {
+        background-color: #2a3038;
+        color: #fff;
+        opacity: 1;
+    }
+
+    .form-control {
+        color: #fff !important;
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    input#curso.form-control[disabled] {
+        cursor: not-allowed;
+    }
+
+    .tooltip-on-top {
+        z-index: 1060 !important;
+    }
+</style>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var deletarModal = document.getElementById('deletarModal');
-        deletarModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var matricula = button.getAttribute('data-matricula');
-            var nome = button.getAttribute('data-nome');
-            var modalTitle = deletarModal.querySelector('.modal-title');
-            var modalBody = deletarModal.querySelector('.modal-body');
-            var modalForm = deletarModal.querySelector('form');
-            modalTitle.textContent = 'Deletar Aluno';
-            modalBody.textContent = 'Tem certeza de que deseja deletar o aluno ' + nome + ' (Matrícula: ' + matricula + ')?';
-            modalForm.action = '<?= base_url('sys/alunos/deletar') ?>/' + matricula;
+    $(document).ready(function() {
+        const repeaters = {
+            email: {
+                template: (value = '') => `
+                    <div class="email-repeater-item d-flex align-items-center mb-2">
+                        <div class="input-group me-2">
+                            <input type="email" class="form-control form-control-sm" name="email[]" placeholder="aluno@gmail.com" value="${value}" required>
+                        </div>
+                        <button type="button" class="btn btn-inverse-danger btn-sm icon-btn remove-email me-2" data-bs-toggle="tooltip" title="Remover Email">
+                            <i class="mdi mdi-delete"></i>
+                        </button>
+                        <button type="button" class="btn btn-inverse-info btn-sm icon-btn add-email" data-bs-toggle="tooltip" title="Adicionar Email">
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>`,
+                placeholder: 'É necessário ter pelo menos um e-mail.'
+            },
+            telefone: {
+                template: (value = '') => `
+                    <div class="telefone-repeater-item d-flex align-items-center mb-2">
+                        <div class="input-group me-2">
+                            <input type="text" class="form-control form-control-sm" name="telefone[]" placeholder="Ex: (99) 99999-9090" value="${value}" required>
+                        </div>
+                        <button type="button" class="btn btn-inverse-danger btn-sm icon-btn remove-telefone me-2" data-bs-toggle="tooltip" title="Remover Telefone">
+                            <i class="mdi mdi-delete"></i>
+                        </button>
+                        <button type="button" class="btn btn-inverse-info btn-sm icon-btn add-telefone" data-bs-toggle="tooltip" title="Adicionar Telefone">
+                            <i class="mdi mdi-plus"></i>
+                        </button>
+                    </div>`,
+                placeholder: 'É necessário ter pelo menos um telefone.'
+            }
+        };
+
+        const initTooltips = () => {
+            $('[data-bs-toggle="tooltip"]').each(function() {
+                const tooltipInstance = bootstrap.Tooltip.getInstance(this);
+                if (tooltipInstance) {
+                    tooltipInstance.dispose();
+                }
+
+                new bootstrap.Tooltip(this, {
+                    container: 'body',
+                    customClass: 'tooltip-on-top',
+                    offset: [0, 10]
+                });
+            });
+        };
+
+        const setupRepeater = (containerId, type, values = []) => {
+            const container = $(containerId);
+            container.empty();
+            if (values.length > 0) {
+                values.forEach(value => container.append(repeaters[type].template(value)));
+            } else {
+                container.append(repeaters[type].template());
+            }
+            updateRepeaterButtons(container);
+        };
+
+        const updateRepeaterButtons = container => {
+            const isSingleItem = container.find('.email-repeater-item, .telefone-repeater-item').length <= 1;
+            container.find('.remove-email, .remove-telefone').toggle(!isSingleItem);
+        };
+
+        const handleAddButtonClick = function() {
+            const type = $(this).hasClass('add-email') ? 'email' : 'telefone';
+            const container = $(this).closest('.card-body').find(`[id$="-repeater-container"]`);
+            container.append(repeaters[type].template());
+            updateRepeaterButtons(container);
+            initTooltips();
+        };
+
+        const handleRemoveButtonClick = function() {
+            const type = $(this).hasClass('remove-email') ? 'email' : 'telefone';
+            const container = $(this).closest('.card-body').find(`[id$="-repeater-container"]`);
+            
+            if (container.find(`.${type}-repeater-item`).length > 1) {
+                const tooltipInstance = bootstrap.Tooltip.getInstance(this);
+                if (tooltipInstance) {
+                    tooltipInstance.dispose();
+                }
+                $(this).closest(`.${type}-repeater-item`).remove();
+                updateRepeaterButtons(container);
+                initTooltips();
+            } else {
+                alert(repeaters[type].placeholder);
+            }
+        };
+
+        const handleTurmaChange = function() {
+            const cursoNome = $(this).find('option:selected').data('curso-nome');
+            $(this).closest('.modal-body').find('input[name="curso"]').val(cursoNome || 'Selecione uma turma');
+        };
+
+        const handleDeletarModalShow = function(event) {
+            const button = $(event.relatedTarget);
+            const matricula = button.data('matricula');
+            const nome = button.data('nome');
+            const modal = $(this);
+            modal.find('.modal-body p').html(`Tem certeza de que deseja deletar o aluno <strong>${nome}</strong> (Matrícula: ${matricula})?`);
+            modal.find('#delete-matricula').val(matricula);
+        };
+
+        $('#modal-cadastrar-aluno').on('show.bs.modal', function() {
+            $(this).find('form')[0].reset();
+            $('#curso').val('Selecione uma turma');
+            setupRepeater('#email-repeater-container', 'email');
+            setupRepeater('#telefone-repeater-container', 'telefone');
+            initTooltips();
         });
 
-        var editarAlunoModal = document.getElementById('editarAlunoModal');
-        editarAlunoModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var matricula = button.getAttribute('data-matricula');
-            
-            fetch('<?= base_url('sys/alunos/editar') ?>/' + matricula)
+        $('#modal-editar-aluno').on('show.bs.modal', function(event) {
+            const matricula = $(event.relatedTarget).data('matricula');
+            const modal = $(this);
+            const url = `<?= base_url('sys/alunos/edit') ?>/${matricula}`;
+
+            fetch(url)
                 .then(response => response.json())
                 .then(aluno => {
-                    if (aluno.error) {
-                        alert(aluno.error);
-                        return;
-                    }
-
-                    document.getElementById('edit_matricula').value = aluno.matricula;
-                    document.getElementById('edit_nome').value = aluno.nome;
-                    document.getElementById('edit_turma_id').value = aluno.turma_id;
-                    document.getElementById('edit_status').value = (aluno.status == 1) ? 'ativo' : 'inativo';
+                    modal.find('#edit_matricula').val(aluno.matricula);
+                    modal.find('#edit_nome').val(aluno.nome);
+                    modal.find('#edit_turma_id').val(aluno.turma_id);
+                    modal.find('#edit_status').val(aluno.status);
                     
-                    var form = document.getElementById('formEditarAluno');
-                    form.action = '<?= base_url('sys/alunos/atualizar') ?>/' + aluno.matricula;
+                    const cursoNome = modal.find(`#edit_turma_id option[value='${aluno.turma_id}']`).data('curso-nome');
+                    modal.find('#edit_curso').val(cursoNome || 'Selecione uma turma');
+                    
+                    setupRepeater('#edit-email-repeater-container', 'email', aluno.emails);
+                    setupRepeater('#edit-telefone-repeater-container', 'telefone', aluno.telefones);
+                    initTooltips();
                 })
                 .catch(error => console.error('Erro ao buscar dados do aluno:', error));
         });
+
+        $(document).on('click', '.add-email, .add-telefone', handleAddButtonClick);
+        $(document).on('click', '.remove-email, .remove-telefone', handleRemoveButtonClick);
+        $(document).on('change', '#turma_id, #edit_turma_id', handleTurmaChange);
+        $('#deletarModal').on('show.bs.modal', handleDeletarModalShow);
+        
+        initTooltips();
     });
-
-    $(document).ready(function() {
-
-        <?php if (session()->has('erros')): ?>
-            <?php foreach (session('erros') as $erro): ?>
-                $.toast({
-                    heading: 'Erro',
-                    text: '<?= esc($erro); ?>',
-                    showHideTransition: 'fade',
-                    icon: 'error',
-                    loaderBg: '#dc3545',
-                    position: 'top-center'
-                });
-            <?php endforeach; ?>
-        <?php endif; ?>
-
-        <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
-            $.toast({
-                heading: 'Sucesso',
-                text: '<?= session('sucesso') ?>',
-                showHideTransition: 'fade',
-                icon: 'success',
-                loaderBg: '#35dc5fff',
-                position: 'top-center'
-            });
-        <?php endif; ?>
-
-    });
-
 </script>
 
 

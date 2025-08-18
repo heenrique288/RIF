@@ -50,6 +50,8 @@ $routes->group('sys', function ($routes) {
         $routes->get('edit/(:any)', 'AlunoController::edit/$1'); 
         $routes->put('update', 'AlunoController::update');
         $routes->delete('delete', 'AlunoController::delete');
+        $routes->post('import', 'AlunoController::import');
+        $routes->post('importProcess', 'AlunoController::importProcess'); 
     });
 
     //==============================================================

@@ -44,14 +44,12 @@ $routes->group('sys', function ($routes) {
     //==============================================================
     // Rotas de Alunos
     //==============================================================
-    $routes->group('alunos', static function ($routes) {
+     $routes->group('alunos', static function ($routes) {
         $routes->get('', 'AlunoController::index');
-        $routes->post('criar', 'AlunoController::criar');
-        $routes->get('editar/(:num)', 'AlunoController::edit/$1');
-        $routes->put('atualizar/(:num)', 'AlunoController::update/$1');
-        $routes->delete('deletar/(:num)', 'AlunoController::delete/$1');
-        $routes->post('import', 'AlunoController::import');
-        $routes->post('importProcess', 'AlunoController::importProcess'); 
+        $routes->post('create', 'AlunoController::create');
+        $routes->get('edit/(:any)', 'AlunoController::edit/$1'); 
+        $routes->put('update', 'AlunoController::update');
+        $routes->delete('delete', 'AlunoController::delete');
     });
 
     //==============================================================

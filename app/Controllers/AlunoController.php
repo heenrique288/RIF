@@ -2,9 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Controllers\BaseController;
 use App\Models\AlunoModel;
+use App\Models\AlunoEmailModel;
+use App\Models\AlunoTelefoneModel;
 use App\Models\TurmaModel;
-use App\Models\CursoModel;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -12,73 +14,163 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class AlunoController extends BaseController
 {
+    protected $baseRoute = '/sys/alunos';
+
     public function index()
     {
         $alunoModel = new AlunoModel();
+        $alunoEmailModel = new AlunoEmailModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
         $turmaModel = new TurmaModel();
-        $cursoModel = new CursoModel();
+        
+        $alunos = $alunoModel
+            ->select('alunos.*, t.nome as turma_nome, c.nome as curso_nome')
+            ->join('turmas as t', 't.id = alunos.turma_id', 'left')
+            ->join('cursos as c', 'c.id = t.curso_id', 'left')
+            ->orderBy('alunos.nome')
+            ->findAll();
 
-        $data['alunos'] = $alunoModel->orderBy('nome')->findAll();
+        foreach ($alunos as &$aluno) {
+            $emails = $alunoEmailModel->where('aluno_id', $aluno['matricula'])->findAll();
+            $aluno['emails'] = array_column($emails, 'email');
+            
+            $telefones = $alunoTelefoneModel->where('aluno_id', $aluno['matricula'])->findAll();
+            $aluno['telefones'] = array_column($telefones, 'telefone');
+        }
+
+        $data['alunos'] = $alunos;
         $data['turmas'] = $turmaModel
-                        ->select('turmas.*, cursos.nome as curso_nome')
-                        ->join('cursos', 'cursos.id = turmas.curso_id')
-                        ->orderBy('turmas.nome')
-                        ->findAll();
+            ->select('turmas.*, c.nome as curso_nome')
+            ->join('cursos as c', 'c.id = turmas.curso_id', 'left')
+            ->orderBy('turmas.nome')
+            ->findAll();
 
         $data['content'] = view('sys/aluno', $data);
         return view('dashboard', $data);
     }
     
-    public function criar()
+    public function create()
     {
         $alunoModel = new AlunoModel();
-        $postData = $this->request->getPost();
+        $alunoEmailModel = new AlunoEmailModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+        $post = $this->request->getPost();
         
-        // CORREÇÃO: A validação e a inserção agora são mais simples. O modelo lida com a conversão.
-        if (!$alunoModel->insert($postData)) {
-            return redirect()->back()->withInput()->with('errors', $alunoModel->errors());
-        } else {
-            return redirect()->to('sys/alunos')->with('success', 'Aluno cadastrado com sucesso!');
+        $alunoModel->db->transBegin();
+        
+        try {
+            $alunoData = [
+                'matricula' => strip_tags($post['matricula']),
+                'nome'      => strip_tags($post['nome']),
+                'turma_id'  => (int)strip_tags($post['turma_id']),
+                'status'    => strip_tags($post['status']),
+            ];
+
+            if (!$alunoModel->insert($alunoData)) {
+                $alunoModel->db->transRollback();
+                return $this->redirectToBaseRoute($alunoModel->errors());
+            }
+
+            $this->saveAssociatedData($alunoEmailModel, $post['email'] ?? [], $alunoData['matricula'], 'email', $alunoData['status']);
+            $this->saveAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $alunoData['matricula'], 'telefone', $alunoData['status']);
+
+            $alunoModel->db->transCommit();
+            session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones cadastrados com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            $alunoModel->db->transRollback();
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao cadastrar o aluno, e-mails e/ou telefones!']);
+        }
+    }
+
+    public function update()
+    {
+        $alunoModel = new AlunoModel();
+        $alunoEmailModel = new AlunoEmailModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+        $post = $this->request->getPost();
+        
+        $matricula = strip_tags($post['matricula']);
+
+        $alunoModel->db->transBegin();
+        
+        try {
+            $alunoData = [
+                'nome'      => strip_tags($post['nome']),
+                'turma_id'  => (int)strip_tags($post['turma_id']),
+                'status'    => strip_tags($post['status']),
+            ];
+
+            if (!$alunoModel->update($matricula, $alunoData)) {
+                $alunoModel->db->transRollback();
+                return $this->redirectToBaseRoute($alunoModel->errors());
+            }
+
+            $this->updateAssociatedData($alunoEmailModel, $post['email'] ?? [], $matricula, 'email', $alunoData['status']);
+            $this->updateAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $matricula, 'telefone', $alunoData['status']);
+
+            $alunoModel->db->transCommit();
+            session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones atualizados com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            $alunoModel->db->transRollback();
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao editar o aluno, e-mails e/ou telefones!']);
         }
     }
     
-    public function delete($id)
+    public function delete()
     {
         $alunoModel = new AlunoModel();
+        $alunoEmailModel = new AlunoEmailModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+        $post = $this->request->getPost();
         
-        if ($alunoModel->delete($id)) {
-            return redirect()->to('sys/alunos')->with('success', 'Aluno deletado com sucesso!');
-        } else {
-            return redirect()->to('sys/alunos')->with('errors', ['Erro ao deletar o aluno.']);
+        $matricula = strip_tags($post['matricula']);
+
+        $alunoModel->db->transBegin();
+        
+        try {
+            $alunoTelefoneModel->where('aluno_id', $matricula)->delete();
+            $alunoEmailModel->where('aluno_id', $matricula)->delete();
+            $alunoModel->where('matricula', $matricula)->delete();
+            
+            if ($alunoModel->db->transStatus() === false) {
+                $alunoModel->db->transRollback();
+                return $this->redirectToBaseRoute(['Erro ao deletar o aluno.']);
+            }
+
+            $alunoModel->db->transCommit();
+            session()->setFlashdata('sucesso', 'Aluno e dados relacionados deletados com sucesso!');
+            return $this->redirectToBaseRoute();
+        } catch (Exception $e) {
+            $alunoModel->db->transRollback();
+            return $this->redirectToBaseRoute(['Ocorreu um erro ao deletar o aluno!']);
         }
     }
     
-    public function edit($id)
+    public function edit($matricula)
     {
         $alunoModel = new AlunoModel();
-        $aluno = $alunoModel->find($id);
+        $alunoEmailModel = new AlunoEmailModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+        
+        $aluno = $alunoModel->find($matricula);
 
         if ($aluno === null) {
             return $this->response->setStatusCode(404)->setJSON(['error' => 'Aluno não encontrado.']);
         }
 
+        $aluno['status'] = ($aluno['status'] == 1) ? 'ativo' : 'inativo';
+        
+        $emails = $alunoEmailModel->where('aluno_id', $matricula)->findAll();
+        $aluno['emails'] = array_column($emails, 'email');
+
+        $telefones = $alunoTelefoneModel->where('aluno_id', $matricula)->findAll();
+        $aluno['telefones'] = array_column($telefones, 'telefone');
+
         return $this->response->setJSON($aluno);
     }
 
-    public function update($id)
-    {
-        $alunoModel = new AlunoModel();
-        $postData = $this->request->getPost();
-        
-        unset($postData['matricula']);
-        unset($postData['_method']);
-
-        if (!$alunoModel->update($id, $postData)) {
-            return redirect()->back()->withInput()->with('errors', $alunoModel->errors());
-        } else {
-            return redirect()->to('sys/alunos')->with('success', 'Aluno atualizado com sucesso!');
-        }
-    }
 
 
     /**
@@ -234,4 +326,13 @@ class AlunoController extends BaseController
         return $redirect;
     }
 
+    protected function redirectToBaseRoute($errors = null)
+    {
+        if ($errors) {
+            session()->setFlashdata('erros', $errors);
+            return redirect()->to($this->baseRoute)->withInput();
+        }
+        
+        return redirect()->to($this->baseRoute);
+    }
 }

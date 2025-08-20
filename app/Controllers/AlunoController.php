@@ -71,8 +71,30 @@ class AlunoController extends BaseController
                 return $this->redirectToBaseRoute($alunoModel->errors());
             }
 
-            $this->saveAssociatedData($alunoEmailModel, $post['email'] ?? [], $alunoData['matricula'], 'email', $alunoData['status']);
-            $this->saveAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $alunoData['matricula'], 'telefone', $alunoData['status']);
+            if (!empty($post['email']) && is_array($post['email'])) {
+                foreach ($post['email'] as $email) {
+                    $emailData = [
+                        'aluno_id' => strip_tags($post['matricula']),
+                        'email'    => trim($email),
+                        'status'   => 'ativo'
+                    ];
+                    $alunoEmailModel->insert($emailData);
+                }
+            }
+
+            if (!empty($post['telefone']) && is_array($post['telefone'])) {
+                foreach ($post['telefone'] as $telefone) {
+                    $telefoneData = [
+                        'aluno_id' => strip_tags($post['matricula']),
+                        'telefone' => trim(str_replace(['(', ')', ' ', '-', '+'], '', $telefone)),
+                        'status'   => 'ativo'
+                    ];
+                    $alunoTelefoneModel->insert($telefoneData);
+                }
+            }
+
+            //$this->saveAssociatedData($alunoEmailModel, $post['email'] ?? [], $alunoData['matricula'], 'email', $alunoData['status']);
+            //$this->saveAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $alunoData['matricula'], 'telefone', $alunoData['status']);
 
             $alunoModel->db->transCommit();
             session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones cadastrados com sucesso!');
@@ -106,8 +128,73 @@ class AlunoController extends BaseController
                 return $this->redirectToBaseRoute($alunoModel->errors());
             }
 
-            $this->updateAssociatedData($alunoEmailModel, $post['email'] ?? [], $matricula, 'email', $alunoData['status']);
-            $this->updateAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $matricula, 'telefone', $alunoData['status']);
+            if (!empty($post['email'])) {
+                // pega todos do banco
+                $emailsExistentes = $alunoEmailModel->where('aluno_id', $matricula)->findAll();
+                
+                // pega os id dos emails enviados do form
+                $idsDeEmailsEnviados = $post['email_id'] ?? [];
+                $idsDeEmailsEnviados = array_filter($idsDeEmailsEnviados);
+
+                // deleta os do banco que não foram enviados do form
+                foreach ($emailsExistentes as $emailExistente) {
+                    if (!in_array($emailExistente['id'], $idsDeEmailsEnviados)) {
+                        $alunoEmailModel->delete($emailExistente['id']);
+                    }
+                }
+                
+                // Salva ou seta os vieram do form
+                foreach ($post['email'] as $i => $email) {
+                    $emailId = $post['email_id'][$i] ?? null;
+
+                    $emailData = [
+                        'aluno_id' => $matricula,
+                        'email'    => trim($email),
+                        'status'   => 'ativo',
+                    ];
+
+                    if ($emailId) {
+                        $emailData['id'] = $emailId;
+                    }
+
+                    $alunoEmailModel->save($emailData); 
+                }
+            }
+
+            if (!empty($post['telefone'])) {
+                // pega todos do banco
+                $telefonesExistentes = $alunoTelefoneModel->where('aluno_id', $matricula)->findAll();
+                
+                // pega os id dos telefones enviados do form
+                $idsDeTelefonesEnviados = $post['telefone_id'] ?? [];
+                $idsDeTelefonesEnviados = array_filter($idsDeTelefonesEnviados); 
+
+                // deleta os do banco que não foram enviados do form
+                foreach ($telefonesExistentes as $telefoneExistente) {
+                    if (!in_array($telefoneExistente['id'], $idsDeTelefonesEnviados)) {
+                        $alunoTelefoneModel->delete($telefoneExistente['id']);
+                    }
+                }
+                
+                // Salva ou seta os vieram do form
+                foreach ($post['telefone'] as $i => $telefone) {
+                    $telefoneId = $post['telefone_id'][$i] ?? null;
+
+                    $telefoneData = [
+                        'aluno_id' => $matricula,
+                        'telefone' => trim(str_replace(['(', ')', '-', ' '], '', $telefone)), //deixa limpo
+                        'status'   => 'ativo',
+                    ];
+
+                    if ($telefoneId) {
+                        $telefoneData['id'] = $telefoneId;
+                    }
+
+                    $alunoTelefoneModel->save($telefoneData);
+                }
+            }
+            //$this->updateAssociatedData($alunoEmailModel, $post['email'] ?? [], $matricula, 'email', $alunoData['status']);
+            //$this->updateAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $matricula, 'telefone', $alunoData['status']);
 
             $alunoModel->db->transCommit();
             session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones atualizados com sucesso!');

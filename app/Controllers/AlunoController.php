@@ -289,7 +289,9 @@ class AlunoController extends BaseController
         }
 
         $aluno = new AlunoModel();
-        // depois vai existir os models de telefone e email
+        $emailModel = new AlunoEmailModel();
+        $telefoneModel = new AlunoTelefoneModel();
+        
         $insertedCount = 0;
         $errors = [];
 
@@ -303,13 +305,45 @@ class AlunoController extends BaseController
             ];
 
             $sucesso = $aluno->insert($data);
-            //depois vai ser feita a inserção de email e telefone
 
             if (!$sucesso) {
                 $errosDoModelo = $aluno->errors();
                 $errors[] = "Ocorreu um erro ao importar o aluno de matrícula {$alunoData['matricula']}: " . implode(', ', $errosDoModelo);
             } else {
                 $insertedCount++;
+                $alunoId = $aluno->getInsertID();
+
+                //Faz a inserção dos emails
+                if (!empty($alunoData['email'])) {
+                    foreach ($alunoData['email'] as $email) {
+                        // se não é vazio ou apenas um hífen
+                        if (!empty(trim($email)) && trim($email) !== '-') {
+                            $emailModel->insert([
+                                'aluno_id' => $alunoId,
+                                'email'    => $email,
+                                'status' => 'ativo' //deixar assim por enquanto até verificar como será validado
+                            ]);
+                        }
+                    }
+                }
+
+                //Faz a inserção dos telefones
+                if (!empty($alunoData['telefone'])) {
+                    foreach ($alunoData['telefone'] as $telefone) {
+                        if (!empty(trim($telefone)) && trim($telefone) !== '-') {
+
+                            $telefonePadrao = str_replace(['(', ')', ' ', '-'], '', $telefone);
+                            
+                            $telefoneModel->insert([
+                                'aluno_id' => $alunoId,
+                                'telefone' => $telefonePadrao,
+                                'status' => 'ativo' //deixar assim por enquanto até verificar como será validado
+                            ]);
+                        }
+                    }
+                }
+
+
             }
         }
 

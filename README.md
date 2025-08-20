@@ -41,6 +41,33 @@ php spark db:create refeicoes
 php spark migrate --all
 ```
 
+## Instalação do SHIELD
+
+### 1) Baixar e instalar o composer:
+
+```
+Download: https://getcomposer.org/Composer-Setup.exe
+
+Tutorial: https://www.youtube.com/watch?v=t-WoLniiBfc
+```
+
+### 2) Instalar o shield usando composer:
+
+```
+Abra o terminal da sua IDE e utilize o comando: composer require codeigniter4/shield
+```
+
+### 3) Configurar o shield:
+
+```
+Abra o terminal do VSCode e utilize o comando: php spark shield:setup
+n -> Enter
+n -> Enter
+y -> Enter
+
+Tabelas do shield criadas
+```
+
 # Métodos SHIELD comumente utilizados
 
 ### **Métodos da Classe `Session`**

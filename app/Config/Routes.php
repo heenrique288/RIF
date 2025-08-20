@@ -8,6 +8,10 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('/teste', 'Home::teste');
 
+// Shield Auth routes
+service('auth')->routes($routes);
+service('auth')->routes($routes, ['except' => ['login', 'register']]);
+
 $routes->group('sys', function ($routes) {
     //==============================================================
     // Rotas de Cursos

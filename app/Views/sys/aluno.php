@@ -18,8 +18,8 @@
     </div>
 
     <div class="table-responsive">
-        <?php if (isset($alunos) && !empty($alunos)): ?>
-            <table class="table">
+        <?php if (!empty($alunos)): ?>
+            <table class="table" id="tabela-alunos" style="width:100%;">
                 <thead>
                     <tr>
                         <th>Matrícula</th>
@@ -33,55 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($alunos as $aluno): ?>
-                        <tr>
-                            <td><?= esc($aluno['matricula']) ?></td>
-                            <td><?= esc($aluno['nome']) ?></td>
-                            <td><?= esc($aluno['turma_nome']) ?></td>
-                            <td><?= esc($aluno['curso_nome']) ?></td>
-                            <td>
-                                <div class="d-flex flex-column">
-                                    <?php foreach ($aluno['emails'] ?? ['Nenhum e-mail'] as $email): ?>
-                                        <small class="font-weight-bold"><?= esc($email) ?></small>
-                                    <?php endforeach; ?>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column">
-                                    <?php foreach ($aluno['telefones'] ?? ['Nenhum telefone'] as $telefone): ?>
-                                        <small class="font-weight-bold"><?= esc($telefone) ?></small>
-                                    <?php endforeach; ?>
-                                </div>
-                            </td>
-                            <td><?= $aluno['status'] == 1 ? 'Ativo' : 'Inativo' ?></td>
-                            <td>
-                                <div class="d-flex">
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
-                                        <button
-                                            type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success btn-icon me-1 edit-aluno-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modal-editar-aluno"
-                                            data-matricula="<?= esc($aluno['matricula']) ?>">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                    </span>
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
-                                        <button
-                                            type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger btn-icon"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deletarModal"
-                                            data-matricula="<?= esc($aluno['matricula']) ?>"
-                                            data-nome="<?= esc($aluno['nome']) ?>">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
+                    </tbody>
             </table>
         <?php else: ?>
             <p>Nenhum aluno encontrado no banco de dados.</p>
@@ -93,33 +45,31 @@
     .modal-dialog {
         margin-top: 10vh;
     }
-
     .form-control[disabled], .form-control[readonly] {
         background-color: #2a3038;
         color: #fff;
         opacity: 1;
     }
-
     .form-control {
         color: #fff !important;
     }
-
     select.form-control {
         cursor: pointer;
     }
-
     input#curso.form-control[disabled] {
         cursor: not-allowed;
     }
-
     .tooltip-on-top {
         z-index: 1060 !important;
     }
 </style>
 
-
 <script>
+    const dataTableLangUrl = "<?php echo base_url('assets/js/traducao-dataTable/pt_br.json'); ?>";
+    const alunosData = <?= json_encode($alunos) ?>;
+
     $(document).ready(function() {
+        // Objeto que contém os templates e a lógica para cada tipo de repetidor
         const repeaters = {
             email: {
                 template: (value = '') => `
@@ -159,7 +109,6 @@
                 if (tooltipInstance) {
                     tooltipInstance.dispose();
                 }
-
                 new bootstrap.Tooltip(this, {
                     container: 'body',
                     customClass: 'tooltip-on-top',
@@ -259,7 +208,93 @@
         $(document).on('change', '#turma_id, #edit_turma_id', handleTurmaChange);
         $('#deletarModal').on('show.bs.modal', handleDeletarModalShow);
         
-        initTooltips();
+        // Inicialização do DataTables
+        $('#tabela-alunos').DataTable({
+            data: alunosData,
+            columns: [
+                { data: 'matricula' },
+                { data: 'nome' },
+                { data: 'turma_nome' },
+                { data: 'curso_nome' },
+                { 
+                    data: 'emails',
+                    render: function(data, type, row) {
+                        let html = '';
+                        if (Array.isArray(data) && data.length > 0) {
+                            html = data.map(email => `<small class="font-weight-bold">${email}</small>`).join('');
+                        } else {
+                            html = '<small class="font-weight-bold">Nenhum e-mail</small>';
+                        }
+                        return `<div class="d-flex flex-column">${html}</div>`;
+                    }
+                },
+                { 
+                    data: 'telefones',
+                    render: function(data, type, row) {
+                        let html = '';
+                        if (Array.isArray(data) && data.length > 0) {
+                            html = data.map(telefone => `<small class="font-weight-bold">${telefone}</small>`).join('');
+                        } else {
+                            html = '<small class="font-weight-bold">Nenhum telefone</small>';
+                        }
+                        return `<div class="d-flex flex-column">${html}</div>`;
+                    }
+                },
+                {
+                    data: 'status',
+                    render: function(data, type, row) {
+                        return data == 1 ? 'Ativo' : 'Inativo';
+                    }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return `
+                            <div class="d-flex">
+                                <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
+                                    <button
+                                        type="button"
+                                        class="justify-content-center align-items-center d-flex btn btn-inverse-success btn-icon me-1 edit-aluno-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal-editar-aluno"
+                                        data-matricula="${data.matricula}">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                </span>
+                                <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
+                                    <button
+                                        type="button"
+                                        class="justify-content-center align-items-center d-flex btn btn-inverse-danger btn-icon"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deletarModal"
+                                        data-matricula="${data.matricula}"
+                                        data-nome="${data.nome}">
+                                        <i class="mdi mdi-delete"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        `;
+                    }
+                }
+            ],
+            language: {
+                search: "Pesquisar:",
+                url: dataTableLangUrl
+            },
+            ordering: true,
+            aLengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Todos"],
+            ],
+            initComplete: function(settings, json) {
+                initTooltips();
+            },
+            drawCallback: function() {
+                initTooltips();
+            }
+        });
+
+        // Lógica de notificação
         <?php if (session()->has('erros')): ?>
             <?php foreach (session('erros') as $erro): ?>
                 $.toast({
@@ -272,7 +307,6 @@
                 });
             <?php endforeach; ?>
         <?php endif; ?>
-
         <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
             $.toast({
                 heading: 'Sucesso',
@@ -285,7 +319,3 @@
         <?php endif; ?>
     });
 </script>
-
-
-
-

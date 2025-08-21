@@ -6,20 +6,6 @@
 <div class="container-fluid">
     <h1 class="mt-4">Alunos Cadastrados</h1>
 
-    <?php if ($sucesso = session()->getFlashdata('sucesso')): ?>
-        <div class="my-4 alert alert-success"><?= esc($sucesso) ?></div>
-    <?php endif; ?>
-
-    <?php if ($erros = session()->getFlashdata('erros')): ?>
-        <div class="my-4 alert alert-danger">
-            <ul>
-                <?php foreach ($erros as $error): ?>
-                    <li><?= esc($error) ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-
     <div class="my-4">
         <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-aluno">
             <i class="mdi mdi-plus-circle btn-icon-prepend"></i>
@@ -274,6 +260,29 @@
         $('#deletarModal').on('show.bs.modal', handleDeletarModalShow);
         
         initTooltips();
+        <?php if (session()->has('erros')): ?>
+            <?php foreach (session('erros') as $erro): ?>
+                $.toast({
+                    heading: 'Erro',
+                    text: '<?= esc($erro); ?>',
+                    showHideTransition: 'fade',
+                    icon: 'error',
+                    loaderBg: '#dc3545',
+                    position: 'top-center'
+                });
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!session()->has('erros') && session()->has('sucesso')): ?>
+            $.toast({
+                heading: 'Sucesso',
+                text: '<?= session('sucesso') ?>',
+                showHideTransition: 'fade',
+                icon: 'success',
+                loaderBg: '#35dc5fff',
+                position: 'top-center'
+            });
+        <?php endif; ?>
     });
 </script>
 

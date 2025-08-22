@@ -55,53 +55,48 @@ class AlunoController extends BaseController
         $alunoEmailModel = new AlunoEmailModel();
         $alunoTelefoneModel = new AlunoTelefoneModel();
         $post = $this->request->getPost();
-        
+
+        $alunoData = [
+            'matricula' => strip_tags($post['matricula']),
+            'nome'      => strip_tags($post['nome']),
+            'turma_id'  => (int)strip_tags($post['turma_id']),
+            'status'    => strip_tags($post['status']),
+        ];
+
+        // Se a validação do aluno falhar (matrícula ou nome duplicados)
+        if (!$alunoModel->validate($alunoData)) {
+            return $this->redirectToBaseRoute($alunoModel->errors());
+        }
+
         $alunoModel->db->transBegin();
-        
+
         try {
-            $alunoData = [
-                'matricula' => strip_tags($post['matricula']),
-                'nome'      => strip_tags($post['nome']),
-                'turma_id'  => (int)strip_tags($post['turma_id']),
-                'status'    => strip_tags($post['status']),
-            ];
-
-            if (!$alunoModel->insert($alunoData)) {
-                $alunoModel->db->transRollback();
-                return $this->redirectToBaseRoute($alunoModel->errors());
-            }
-
-            if (!empty($post['email']) && is_array($post['email'])) {
-                foreach ($post['email'] as $email) {
-                    $emailData = [
-                        'aluno_id' => strip_tags($post['matricula']),
-                        'email'    => trim($email),
-                        'status'   => 'ativo'
-                    ];
-                    $alunoEmailModel->insert($emailData);
+            $alunoModel->insert($alunoData);
+            // Coleta e insere os e-mails
+            $emails = $post['email'] ?? [];
+            foreach ($emails as $email) {
+                $emailData = ['aluno_id' => $alunoData['matricula'], 'email' => trim($email), 'status' => 'ativo'];
+                if (!$alunoEmailModel->validate($emailData) || !$alunoEmailModel->insert($emailData)) {
+                    $alunoModel->db->transRollback();
+                    return $this->redirectToBaseRoute($alunoEmailModel->errors() ?? ['Erro ao inserir e-mail.']);
                 }
             }
-
-            if (!empty($post['telefone']) && is_array($post['telefone'])) {
-                foreach ($post['telefone'] as $telefone) {
-                    $telefoneData = [
-                        'aluno_id' => strip_tags($post['matricula']),
-                        'telefone' => trim(str_replace(['(', ')', ' ', '-', '+'], '', $telefone)),
-                        'status'   => 'ativo'
-                    ];
-                    $alunoTelefoneModel->insert($telefoneData);
+            // Coleta e insere os telefones
+            $telefones = $post['telefone'] ?? [];
+            foreach ($telefones as $telefone) {
+                $telefoneData = ['aluno_id' => $alunoData['matricula'], 'telefone' => trim(str_replace(['(', ')', ' ', '-', '+'], '', $telefone)), 'status' => 'ativo'];
+                if (!$alunoTelefoneModel->validate($telefoneData) || !$alunoTelefoneModel->insert($telefoneData)) {
+                    $alunoModel->db->transRollback();
+                    return $this->redirectToBaseRoute($alunoTelefoneModel->errors() ?? ['Erro ao inserir telefone.']);
                 }
             }
-
-            //$this->saveAssociatedData($alunoEmailModel, $post['email'] ?? [], $alunoData['matricula'], 'email', $alunoData['status']);
-            //$this->saveAssociatedData($alunoTelefoneModel, $post['telefone'] ?? [], $alunoData['matricula'], 'telefone', $alunoData['status']);
-
             $alunoModel->db->transCommit();
-            session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones cadastrados com sucesso!');
+            session()->setFlashdata('sucesso', 'Aluno cadastrado com sucesso!');
             return $this->redirectToBaseRoute();
         } catch (Exception $e) {
             $alunoModel->db->transRollback();
-            return $this->redirectToBaseRoute(['Ocorreu um erro ao cadastrar o aluno, e-mails e/ou telefones!']);
+            log_message('error', 'Erro ao criar aluno: ' . $e->getMessage());
+            return $this->redirectToBaseRoute(['Ocorreu um erro inesperado. Tente novamente.']);
         }
     }
 

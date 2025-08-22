@@ -12,14 +12,8 @@ class AlunoTelefoneModel extends Model
     protected $returnType     = 'array';
     protected $useSoftDeletes = false;
     protected $protectFields  = true;
-    protected $allowedFields  = [
-        'aluno_id',
-        'telefone',
-        'status',
-    ];
-
+    protected $allowedFields  = ['aluno_id', 'telefone', 'status'];
     protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
 
     // Dates
     protected $useTimestamps = false;
@@ -27,29 +21,16 @@ class AlunoTelefoneModel extends Model
     // Validation
     protected $validationRules = [
         'aluno_id' => 'required|numeric',
-        'telefone' => 'required|min_length[8]|max_length[20]|is_unique[alunos_telefones.telefone,aluno_id,{aluno_id}]',
+        'telefone' => 'required|min_length[8]|max_length[20]|is_unique[alunos_telefones.telefone]',
         'status'   => 'required|in_list[ativo,inativo]',
     ];
 
     protected $validationMessages = [
-        'aluno_id' => [
-            'required' => 'O ID do aluno é obrigatório.',
-            'numeric'  => 'O ID do aluno deve ser um número.',
-        ],
         'telefone' => [
             'required'   => 'O telefone é obrigatório.',
-            'min_length' => 'O telefone é muito curto.',
-            'max_length' => 'O telefone é muito longo.',
             'is_unique'  => 'Este telefone já está cadastrado para outro aluno.',
         ],
-        'status' => [
-            'required' => 'O status é obrigatório.',
-            'in_list'  => 'O status deve ser "ativo" ou "inativo".',
-        ],
     ];
-
-    protected $skipValidation = false;
-    protected $cleanValidationRules = true;
     
     protected $beforeInsert = ['convertStatusToInteger'];
     protected $beforeUpdate = ['convertStatusToInteger'];

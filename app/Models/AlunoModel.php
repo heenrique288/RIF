@@ -13,26 +13,20 @@ class AlunoModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = ['matricula', 'nome', 'turma_id', 'status'];
-
     protected bool $allowEmptyInserts = false;
 
     // Dates
     protected $useTimestamps = false;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
 
     // Validation
-    // A regra `is_unique` com o placeholder `{id}` funciona tanto para a inserção (onde o ID é nulo) quanto para a atualização.
-    protected $validationRules      = [
-        'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula,matricula,{id}]',
-        'nome'      => 'required|min_length[3]|max_length[255]',
-        //'turma_id'  => 'numeric',
+    protected $validationRules = [
+        'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula]',
+        'nome'      => 'required|min_length[3]|max_length[255]|is_unique[alunos.nome]',
+        'turma_id'  => 'required|numeric',
         'status'    => 'required|in_list[ativo,inativo]',
     ];
 
-    protected $validationMessages   = [
+    protected $validationMessages = [
         'matricula' => [
             'required'   => 'A matrícula é obrigatória.',
             'numeric'    => 'A matrícula deve conter apenas números.',
@@ -44,9 +38,10 @@ class AlunoModel extends Model
             'required'   => 'O nome é obrigatório.',
             'min_length' => 'O nome deve ter pelo menos 3 caracteres.',
             'max_length' => 'O nome deve ter no máximo 255 caracteres.',
+            'is_unique'  => 'Este nome de aluno já existe.',
         ],
         'turma_id' => [
-            //'numeric'  => 'O ID da turma deve ser um número.',
+            'required' => 'A turma é obrigatória.',
         ],
         'status' => [
             'required' => 'O status é obrigatório.',
@@ -54,10 +49,6 @@ class AlunoModel extends Model
         ],
     ];
     
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
-    
-    // CORREÇÃO: Adicionamos a conversão do status tanto para antes da inserção como para antes da atualização.
     protected $beforeInsert = ['convertStatusToInteger'];
     protected $beforeUpdate = ['convertStatusToInteger'];
 

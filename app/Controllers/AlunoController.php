@@ -55,47 +55,47 @@ class AlunoController extends BaseController
         $alunoEmailModel = new AlunoEmailModel();
         $alunoTelefoneModel = new AlunoTelefoneModel();
         $post = $this->request->getPost();
-
-        $alunoData = [
-            'matricula' => strip_tags($post['matricula']),
-            'nome'      => strip_tags($post['nome']),
-            'turma_id'  => (int)strip_tags($post['turma_id']),
-            'status'    => strip_tags($post['status']),
-        ];
-
-        // Se a validação do aluno falhar (matrícula ou nome duplicados)
-        if (!$alunoModel->validate($alunoData)) {
-            return $this->redirectToBaseRoute($alunoModel->errors());
-        }
-
+        
         $alunoModel->db->transBegin();
-
+        
         try {
-            $alunoModel->insert($alunoData);
+            $alunoData = [
+                'matricula' => strip_tags($post['matricula']),
+                'nome'      => strip_tags($post['nome']),
+                'turma_id'  => (int)strip_tags($post['turma_id']),
+                'status'    => strip_tags($post['status']),
+            ];
+
+            if (!$alunoModel->insert($alunoData)) {
+                $alunoModel->db->transRollback();
+                return $this->redirectToBaseRoute($alunoModel->errors());
+            }
+
             // Coleta e insere os e-mails
             $emails = $post['email'] ?? [];
             foreach ($emails as $email) {
                 $emailData = ['aluno_id' => $alunoData['matricula'], 'email' => trim($email), 'status' => 'ativo'];
-                if (!$alunoEmailModel->validate($emailData) || !$alunoEmailModel->insert($emailData)) {
+                if (!$alunoEmailModel->insert($emailData)) {
                     $alunoModel->db->transRollback();
                     return $this->redirectToBaseRoute($alunoEmailModel->errors() ?? ['Erro ao inserir e-mail.']);
                 }
             }
+
             // Coleta e insere os telefones
             $telefones = $post['telefone'] ?? [];
             foreach ($telefones as $telefone) {
                 $telefoneData = ['aluno_id' => $alunoData['matricula'], 'telefone' => trim(str_replace(['(', ')', ' ', '-', '+'], '', $telefone)), 'status' => 'ativo'];
-                if (!$alunoTelefoneModel->validate($telefoneData) || !$alunoTelefoneModel->insert($telefoneData)) {
+                if (!$alunoTelefoneModel->insert($telefoneData)) {
                     $alunoModel->db->transRollback();
                     return $this->redirectToBaseRoute($alunoTelefoneModel->errors() ?? ['Erro ao inserir telefone.']);
                 }
             }
+
             $alunoModel->db->transCommit();
-            session()->setFlashdata('sucesso', 'Aluno cadastrado com sucesso!');
+            session()->setFlashdata('sucesso', 'Aluno, e-mails e telefones cadastrados com sucesso!');
             return $this->redirectToBaseRoute();
         } catch (Exception $e) {
             $alunoModel->db->transRollback();
-            log_message('error', 'Erro ao criar aluno: ' . $e->getMessage());
             return $this->redirectToBaseRoute(['Ocorreu um erro inesperado. Tente novamente.']);
         }
     }
@@ -112,33 +112,34 @@ class AlunoController extends BaseController
         $alunoModel->db->transBegin();
         
         try {
+            $alunoOriginal = $alunoModel->find($matricula);
             $alunoData = [
                 'nome'      => strip_tags($post['nome']),
                 'turma_id'  => (int)strip_tags($post['turma_id']),
                 'status'    => strip_tags($post['status']),
             ];
 
+            if ($alunoOriginal && $alunoOriginal['nome'] === $alunoData['nome']) {
+                unset($alunoData['nome']);
+            }   
+
             if (!$alunoModel->update($matricula, $alunoData)) {
                 $alunoModel->db->transRollback();
                 return $this->redirectToBaseRoute($alunoModel->errors());
             }
+            
 
             if (!empty($post['email'])) {
-                // pega todos do banco
                 $emailsExistentes = $alunoEmailModel->where('aluno_id', $matricula)->findAll();
-                
-                // pega os id dos emails enviados do form
                 $idsDeEmailsEnviados = $post['email_id'] ?? [];
                 $idsDeEmailsEnviados = array_filter($idsDeEmailsEnviados);
 
-                // deleta os do banco que não foram enviados do form
                 foreach ($emailsExistentes as $emailExistente) {
                     if (!in_array($emailExistente['id'], $idsDeEmailsEnviados)) {
                         $alunoEmailModel->delete($emailExistente['id']);
                     }
                 }
                 
-                // Salva ou seta os vieram do form
                 foreach ($post['email'] as $i => $email) {
                     $emailId = $post['email_id'][$i] ?? null;
 
@@ -157,21 +158,16 @@ class AlunoController extends BaseController
             }
 
             if (!empty($post['telefone'])) {
-                // pega todos do banco
                 $telefonesExistentes = $alunoTelefoneModel->where('aluno_id', $matricula)->findAll();
-                
-                // pega os id dos telefones enviados do form
                 $idsDeTelefonesEnviados = $post['telefone_id'] ?? [];
                 $idsDeTelefonesEnviados = array_filter($idsDeTelefonesEnviados); 
 
-                // deleta os do banco que não foram enviados do form
                 foreach ($telefonesExistentes as $telefoneExistente) {
                     if (!in_array($telefoneExistente['id'], $idsDeTelefonesEnviados)) {
                         $alunoTelefoneModel->delete($telefoneExistente['id']);
                     }
                 }
                 
-                // Salva ou seta os vieram do form
                 foreach ($post['telefone'] as $i => $telefone) {
                     $telefoneId = $post['telefone_id'][$i] ?? null;
 

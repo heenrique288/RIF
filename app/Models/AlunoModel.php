@@ -19,9 +19,9 @@ class AlunoModel extends Model
     protected $useTimestamps = false;
 
     // Validation
-    protected $validationRules = [
-        'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula]',
-        'nome'      => 'required|min_length[3]|max_length[255]|is_unique[alunos.nome]',
+    protected $validationRules      = [
+        'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula,matricula,{id}]',
+        'nome'      => 'required|min_length[3]|max_length[255]|is_unique[alunos.nome,nome,{id}]', 
         'status'    => 'required|in_list[ativo,inativo]',
     ];
 
@@ -30,7 +30,7 @@ class AlunoModel extends Model
             'required'   => 'A matrícula é obrigatória.',
             'numeric'    => 'A matrícula deve conter apenas números.',
             'min_length' => 'A matrícula deve ter pelo menos 5 dígitos.',
-            'max_length' => 'A matrícula deve ter no máximo 10 dígitos.',
+            'max_length' => 'A matrícula deve ter no máximo 15 dígitos.',
             'is_unique'  => 'Esta matrícula já existe.',
         ],
         'nome' => [
@@ -50,8 +50,8 @@ class AlunoModel extends Model
 
     protected function convertStatusToInteger(array $data)
     {
-        if (isset($data['data']['status'])) {
-            $data['data']['status'] = ($data['data']['status'] === 'ativo') ? 1 : 0;
+        if (isset($data['status'])) {
+            $data['status'] = ($data['status'] === 'ativo') ? 1 : 0;
         }
         return $data;
     }

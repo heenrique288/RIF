@@ -288,6 +288,22 @@ class AlunoController extends BaseController
         $sheet = $spreadsheet->getActiveSheet(); //Pega a 1° aba
         $dataRows = [];
         $primeiraLinha = true;
+        $cabecalho = $sheet->toArray(null, false, true, false)[0];
+
+        $mapeiaCabecalho = [
+            'matricula'      => array_search('Matrícula', $cabecalho ),
+            'nome'           => array_search('Nome', $cabecalho ),
+            'email_academico' => array_search('Email Acadêmico', $cabecalho ),
+            'email_pessoal'   => array_search('Email Pessoal', $cabecalho ),
+            'email_responsavel' => array_search('Email do Responsável', $cabecalho ),
+            'status'         => array_search('Situação no Curso', $cabecalho ),
+            'telefone'       => array_search('Telefone', $cabecalho ),
+        ];
+
+        if (in_array(false, $mapeiaCabecalho, true)) {
+            session()->setFlashdata('erros', ['A planilha não contém todas as colunas necessárias (Matrícula, Nome, Email Acadêmico e/ou Email Pessoal e/ou Email do Responsável, Situação no Curso e Telefone).']);
+            return redirect()->to(base_url('sys/alunos'));
+        }
 
         foreach ($sheet->getRowIterator() as $row) 
         {
@@ -307,32 +323,29 @@ class AlunoController extends BaseController
                 $rowData[] = $cell->getValue(); //pega os dados da linha
             }
 
-            $matricula = $rowData[1];
+            $matricula = $rowData[$mapeiaCabecalho['matricula']];
             $matricula_limpa = preg_replace('/[^0-9]/', '', $matricula);
 
-            $nome = $rowData[2];
+            $nome = $rowData[$mapeiaCabecalho['nome']];
             $email = []; //academico, pessoal, responsavel
 
-            // coluna G 
-            if (!empty($rowData[6])) {
-                $email[] = $rowData[6];
+            if (isset($rowData[$mapeiaCabecalho['email_academico']]) && !empty($rowData[$mapeiaCabecalho['email_academico']])) {
+                $email[] = $rowData[$mapeiaCabecalho['email_academico']];
             }
-            // coluna I 
-            if (!empty($rowData[8])) {
-                $email[] = $rowData[8];
+            if (isset($rowData[$mapeiaCabecalho['email_pessoal']]) && !empty($rowData[$mapeiaCabecalho['email_pessoal']])) {
+                $email[] = $rowData[$mapeiaCabecalho['email_pessoal']];
             }
-            // coluna J 
-            if (!empty($rowData[9])) {
-                $email[] = $rowData[9];
-            }
-                            
-            $status = $rowData[10];
-            $status_padrao = (strtolower($status) === 'Matriculado') ? 'ativo' : 'inativo';
+            if (isset($rowData[$mapeiaCabecalho['email_responsavel']]) && !empty($rowData[$mapeiaCabecalho['email_responsavel']])) {
+                $email[] = $rowData[$mapeiaCabecalho['email_responsavel']];
+            }     
+
+            $status = $rowData[$mapeiaCabecalho['status']];
+            $status_padrao = ($status === 'Matriculado' || $status === 'Matrícula Vínculo Institucional') ? 'ativo' : 'inativo';
 
             $telefone =[];
 
-            if (isset($rowData[12])) {
-                $telefones = explode(', ', $rowData[12]); //separa eles
+            if (isset($rowData[$mapeiaCabecalho['telefone']])) {
+                $telefones = explode(', ', $rowData[$mapeiaCabecalho['telefone']]); //separa eles
                 foreach ($telefones as $tel) {
                     $tel = trim($tel);
                     if (!empty($tel)) {

@@ -138,6 +138,18 @@ class TurmaController extends BaseController
         $sheet = $spreadsheet->getActiveSheet(); //Pega a 1° aba
         $dataRows = [];
         $primeiraLinha = true;
+        $cabecalho = $sheet->toArray(null, false, true, false)[0];
+
+        $mapeiaCabecalho = [
+            'matricula'      => array_search('Matrícula', $cabecalho ),
+            'nome'           => array_search('Aluno', $cabecalho ),
+            'status'         => array_search('Situação no Curso', $cabecalho ),
+        ];
+
+        if (in_array(false, $mapeiaCabecalho, true)) {
+            session()->setFlashdata('erros', ['A planilha não contém todas as colunas necessárias (Matrícula, Aluno, Situação no Curso).']);
+            return redirect()->to(base_url('sys/turmas'));
+        }
 
         foreach ($sheet->getRowIterator() as $row) 
         {
@@ -157,11 +169,11 @@ class TurmaController extends BaseController
                 $rowData[] = $cell->getValue(); //pega os dados da linha
             }
 
-            $nomeAluno = $rowData[2];
-            $matricula = $rowData[3];
-            $status = $rowData[4];
-
-            $status_padrao = (strtolower($status) === 'Matriculado') ? 'Ativo' : (empty($status) ? 'Inativo' : $status);
+            $nomeAluno = $rowData[$mapeiaCabecalho['nome']];
+            $matricula = $rowData[$mapeiaCabecalho['matricula']];
+            
+            $status = $rowData[$mapeiaCabecalho['status']];
+            $status_padrao = ($status === 'Matriculado' || $status === 'Matrícula Vínculo Institucional') ? 'ativo' : 'inativo';
 
             $dataRows[] = [
                 'nome'      => $nomeAluno,

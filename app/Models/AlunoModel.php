@@ -22,7 +22,6 @@ class AlunoModel extends Model
     protected $validationRules = [
         'matricula' => 'required|numeric|min_length[5]|max_length[15]|is_unique[alunos.matricula]',
         'nome'      => 'required|min_length[3]|max_length[255]|is_unique[alunos.nome]',
-        'turma_id'  => 'required|numeric',
         'status'    => 'required|in_list[ativo,inativo]',
     ];
 
@@ -39,9 +38,6 @@ class AlunoModel extends Model
             'min_length' => 'O nome deve ter pelo menos 3 caracteres.',
             'max_length' => 'O nome deve ter no máximo 255 caracteres.',
             'is_unique'  => 'Este nome de aluno já existe.',
-        ],
-        'turma_id' => [
-            'required' => 'A turma é obrigatória.',
         ],
         'status' => [
             'required' => 'O status é obrigatório.',

@@ -83,7 +83,7 @@
 						<ul class="nav flex-column sub-menu">
 
 							<li class="nav-item">
-								<a class="nav-link" href="<?php echo base_url('#'); ?>">
+								<a class="nav-link" href="<?php echo base_url('sys/agendamento'); ?>">
 									<span class="menu-icon">
 										<i class="mdi mdi-calendar-month-outline"></i>
 									</span>

@@ -72,10 +72,11 @@ $routes->group('sys', function ($routes) {
     // Rotas de Agendamento
     //==============================================================
     $routes->group('agendamento', static function ($routes) {
-        $routes->post('admin/gravar', 'AgendamentoController::gravarPorAdmin');
-        $routes->post('aluno/confirmar', 'AgendamentoController::confirmarPorAluno');
-        $routes->post('solicitante/solicitar', 'AgendamentoController::solicitarExcecao');
-        $routes->put('admin/aprovar/(:num)', 'AgendamentoController::aprovarSolicitacao/$1');
+        $routes->get('', 'AgendamentoController::index');
+        $routes->post('admin/create', 'AgendamentoController::create');
+        $routes->get('admin/getAlunosByTurma/(:num)', 'AgendamentoController::getAlunosByTurma/$1');
+        $routes->post('admin/update', 'AgendamentoController::update');
+        $routes->post('admin/delete', 'AgendamentoController::delete');
     });
 
     //==============================================================

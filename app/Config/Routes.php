@@ -30,7 +30,7 @@ $routes->group('sys', function ($routes) {
         $routes->get('', 'TurmaController::index');
         $routes->post('create', 'TurmaController::create');
         $routes->post('update', 'TurmaController::update');
-        $routes->delete('delete', 'TurmaController::delete');
+        $routes->post('delete', 'TurmaController::delete');
         $routes->post('import', 'TurmaController::import');
         $routes->post('importProcess', 'TurmaController::importProcess'); 
     });

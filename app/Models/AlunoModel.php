@@ -50,8 +50,8 @@ class AlunoModel extends Model
 
     protected function convertStatusToInteger(array $data)
     {
-        if (isset($data['status'])) {
-            $data['status'] = ($data['status'] === 'ativo') ? 1 : 0;
+        if (isset($data['data']['status'])) {
+            $data['data']['status'] = ($data['data']['status'] === 'ativo') ? 1 : 0;
         }
         return $data;
     }

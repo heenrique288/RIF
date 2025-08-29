@@ -96,4 +96,4 @@ $routes->group('sys', function ($routes) {
         $routes->get('nao-servidos', 'RelatorioController::refeicoesNaoServidas');
         $routes->get('confirmados', 'RelatorioController::confirmados');
     });
-}); // <--- Esta chave de fechamento estava faltando
+});

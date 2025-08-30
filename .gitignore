@@ -128,10 +128,3 @@ nb-configuration.xml
 
 /.php-cs-fixer.php
 .qodo
-
-#-------------------------
-# Authentication Files
-#-------------------------
-app/Config/Auth.php
-app/Config/AuthGroups.php
-app/Config/AuthToken.php

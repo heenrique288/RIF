@@ -251,7 +251,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                                 <div class="navbar-profile">
-                                    <p class="mb-0 d-none d-sm-block navbar-profile-name"><?php //echo auth()->user()->username;
+                                    <p class="mb-0 d-none d-sm-block navbar-profile-name"><?php echo auth()->user()->username;
                                                                                                 ?></p>
                                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                                 </div>

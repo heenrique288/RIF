@@ -49,6 +49,18 @@ class AuthGroups extends ShieldAuthGroups
             'title'       => 'Admin',
             'description' => 'Day to day administrators of the site.',
         ],
+        'solicitante' => [
+            'title' => 'Solicitante',
+            'description' => 'Pode solicitar refeições.',
+        ],
+        'restaurante' => [
+            'title' => 'Restaurante',
+            'description' => 'Pode visulizar relatórios de refeições.',
+        ],
+        'aluno' => [
+            'title' => 'Aluno',
+            'description' => 'Pode confirmar refeições.',
+        ],
         'developer' => [
             'title'       => 'Developer',
             'description' => 'Site programmers.',
@@ -78,6 +90,7 @@ class AuthGroups extends ShieldAuthGroups
         'users.create'        => 'Can create new non-admin users',
         'users.edit'          => 'Can edit existing non-admin users',
         'users.delete'        => 'Can delete existing non-admin users',
+        'solicitante.view'    => 'Pode visualizar a lista de solicitações', //exemplo de permissão
         'beta.access'         => 'Can access beta-level features',
     ];
 
@@ -101,6 +114,19 @@ class AuthGroups extends ShieldAuthGroups
             'users.edit',
             'users.delete',
             'beta.access',
+        ],
+        'solicitante' => [
+            'solicitacoes.view',
+            'solicitacoes.create',
+            'solicitacoes.delete',
+            'solicitacoes.edit',
+        ],
+        'restaurante' => [
+            'relatorios.view',
+        ],
+        'aluno' => [
+            'confirmacao.view',
+            'confirmacao.create',
         ],
         'developer' => [
             'admin.access',

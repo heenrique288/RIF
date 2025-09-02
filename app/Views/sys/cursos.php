@@ -12,6 +12,7 @@
         </button>
     </div>
 
+    <?php if (isset($cursos) && !empty($cursos)): ?>
     <table class="table mb-4" id="listagem-cursos">
         <thead>
             <tr>
@@ -20,52 +21,92 @@
                 <th>Ações</th>
             </tr>
         </thead>
-
         <tbody>
-            <?php if (isset($cursos) && !empty($cursos)): ?>
-                <?php foreach ($cursos as $curso): ?>
-                    <tr>
-                        <td><?= esc($curso['id']) ?></td>
-                        <td><?= esc($curso['nome']) ?></td>
-                        <td>
-                            <div class="d-flex">
-                                <span data-bs-toggle="tooltip" data-placement="top" title="Atualizar dados do curso">
-                                    <button
-                                        type="button"
-                                        class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modal-editar-curso"
-                                        data-id="<?php echo esc($curso['id']); ?>"
-                                        data-nome="<?php echo esc($curso['nome']); ?>">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                </span>
-
-                                <span data-bs-toggle="tooltip" data-placement="top" title="Excluir curso">
-                                    <button
-                                        type="button"
-                                        class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modal-deletar-curso"
-                                        data-id="<?php echo esc($curso['id']); ?>"
-                                        data-nome="<?php echo esc($curso['nome']); ?>">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </span>
-
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
+            </tbody>
     </table>
+    <?php else: ?>
+        <p>Nenhum curso encontrado no banco de dados.</p>
+    <?php endif; ?>
 
 </div>
 
 <script>
+    const dataTableLangUrl = "<?php echo base_url('assets/js/traducao-dataTable/pt_br.json'); ?>";
+    const cursosData = <?= json_encode($cursos ?? []) ?>;
+
     $(document).ready(function() {
 
+        const initTooltips = () => {
+            $('[data-bs-toggle="tooltip"]').each(function() {
+                const tooltipInstance = bootstrap.Tooltip.getInstance(this);
+                if (tooltipInstance) {
+                    tooltipInstance.dispose();
+                }
+                new bootstrap.Tooltip(this, {
+                    container: 'body',
+                    customClass: 'tooltip-on-top',
+                    offset: [0, 10]
+                });
+            });
+        };
+
+        if (cursosData.length > 0) {
+            $('#listagem-cursos').DataTable({
+                data: cursosData,
+                columns: [
+                    { data: 'id' },
+                    { data: 'nome' },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex">
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Atualizar dados do curso">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-editar-curso"
+                                            data-id="${data.id}"
+                                            data-nome="${data.nome}">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir curso">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-deletar-curso"
+                                            data-id="${data.id}"
+                                            data-nome="${data.nome}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                language: {
+                    search: "Pesquisar:",
+                    url: dataTableLangUrl
+                },
+                ordering: true,
+                aLengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Todos"],
+                ],
+                initComplete: function(settings, json) {
+                    initTooltips();
+                },
+                drawCallback: function() {
+                    initTooltips();
+                }
+            });
+        }
+    
+        // Lógica de notificação
         <?php if (session()->has('erros')): ?>
             <?php foreach (session('erros') as $erro): ?>
                 $.toast({
@@ -89,6 +130,5 @@
                 position: 'top-center'
             });
         <?php endif; ?>
-
     });
 </script>

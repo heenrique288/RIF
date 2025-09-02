@@ -14,80 +14,117 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Nome</th>
-                    <th>Curso</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($turmas)): ?>
-                    <?php foreach ($turmas as $turma) : ?>
-                        <tr>
-                            <td><?= esc($turma['id']) ?></td>
-                            <td><?= esc($turma['nome']) ?></td>
-                            <td><?= esc($turma['curso_nome'] ?? 'Sem Curso') ?></td>
-                            <td>
-                                <div class="d-flex">
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
-                                        <button
-                                            type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modal-editar-turma"
-                                            data-id="<?php echo esc($turma['id']); ?>"
-                                            data-nome="<?php echo esc($turma['nome']); ?>"
-                                            data-curso_id="<?php echo esc($turma['curso_id']); ?>">
-                                            <i class="fa fa-edit"></i>
-                                        </button>
-                                    </span>
-
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
-                                        <button
-                                            type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modal-deletar-turma"
-                                            data-id="<?php echo esc($turma['id']); ?>"
-                                            data-nome="<?php echo esc($turma['nome']); ?>">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </span>
-
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Importar Lista de alunos">
-                                        <button
-                                            type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-info button-trans-info btn-icon me-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modal-importar-alunos-turma"
-                                            data-id="<?php echo esc($turma['id']); ?>"
-                                            data-nome="<?php echo esc($turma['nome']); ?>"
-                                            data-curso_nome="<?php echo esc($turma['curso_nome']); ?>"
-                                            data-curso_id="<?php echo esc($turma['curso_id']); ?>">
-
-                                            <i class="fa fa-upload"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
+        <?php if (!empty($turmas)): ?>
+            <table class="table mb-4" id="tabela-turmas">
+                <thead>
                     <tr>
-                        <td colspan="4" class="text-center">Nenhuma turma encontrada.</td>
+                        <th style="width: 4%; min-width: 45px;">Id</th>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th class="text-nowrap" style="width: 12%; min-width: 100px;">Ações</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        <?php else: ?>
+            <p>Nenhuma turma encontrada no banco de dados.</p>
+        <?php endif; ?>
     </div>
 </div>
 
 <script>
+    const dataTableLangUrl = "<?php echo base_url('assets/js/traducao-dataTable/pt_br.json'); ?>";
+    const turmasData = <?= json_encode($turmas ?? []) ?>;
+
     $(document).ready(function() {
 
+        const initTooltips = () => {
+            $('[data-bs-toggle="tooltip"]').each(function() {
+                const tooltipInstance = bootstrap.Tooltip.getInstance(this);
+                if (tooltipInstance) {
+                    tooltipInstance.dispose();
+                }
+                new bootstrap.Tooltip(this, {
+                    container: 'body',
+                    customClass: 'tooltip-on-top',
+                    offset: [0, 10]
+                });
+            });
+        };
+
+        if (turmasData.length > 0) {
+            $('#tabela-turmas').DataTable({
+                data: turmasData,
+                columns: [
+                    { data: 'id' },
+                    { data: 'nome' },
+                    { data: 'curso_nome' },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-flex">
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-success button-trans-success btn-icon me-1 edit-turma-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-editar-turma"
+                                            data-id="${data.id}"
+                                            data-nome="${data.nome}"
+                                            data-curso_id="${data.curso_id}">
+                                            <i class="fa fa-edit"></i>
+                                        </button>
+                                    </span>
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Excluir">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1 delete-turma-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-deletar-turma"
+                                            data-id="${data.id}"
+                                            data-nome="${data.nome}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </span>
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Importar Lista de alunos">
+                                        <button
+                                            type="button"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-info button-trans-info btn-icon me-1 import-alunos-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-importar-alunos-turma"
+                                            data-id="${data.id}"
+                                            data-nome="${data.nome}"
+                                            data-curso_nome="${data.curso_nome}"
+                                            data-curso_id="${data.curso_id}">
+                                            <i class="fa fa-upload"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                language: {
+                    search: "Pesquisar:",
+                    url: dataTableLangUrl
+                },
+                ordering: true,
+                aLengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Todos"],
+                ],
+                initComplete: function(settings, json) {
+                    initTooltips();
+                },
+                drawCallback: function() {
+                    initTooltips();
+                }
+            });
+        }
+    
+        // Lógica de notificação
         <?php if (session()->has('erros')): ?>
             <?php foreach (session('erros') as $erro): ?>
                 $.toast({
@@ -111,7 +148,41 @@
                 position: 'top-center'
             });
         <?php endif; ?>
+        
+        // Lógica para preencher o modal de edição
+        $('#modal-editar-turma').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var nome = button.data('nome');
+            var curso_id = button.data('curso_id');
+            var modal = $(this);
+            modal.find('#edit-turma-id').val(id);
+            modal.find('#edit-turma-nome').val(nome);
+            modal.find('#edit-curso-id').val(curso_id);
+        });
 
+        // Lógica para preencher o modal de exclusão
+        $('#modal-deletar-turma').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var nome = button.data('nome');
+            var modal = $(this);
+            modal.find('#deletar-id').val(id);
+            modal.find('#deletar-nome').html('<b>' + nome + '</b>');
+        });
+
+        // Lógica para preencher o modal de importar alunos
+        $('#modal-importar-alunos-turma').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var nome = button.data('nome');
+            var cursoNome = button.data('curso_nome');
+            var cursoId = button.data('curso_id');
+            var modal = $(this);
+            modal.find('#importar-turma-id').val(id);
+            modal.find('#importar-turma-nome').text(nome);
+            modal.find('#importar-curso-id').val(cursoId);
+            modal.find('#importar-curso-nome').text(cursoNome);
+        });
     });
-
 </script>

@@ -55,7 +55,11 @@ $routes->group('sys', function ($routes) {
         $routes->put('update', 'AlunoController::update');
         $routes->delete('delete', 'AlunoController::delete');
         $routes->post('import', 'AlunoController::import');
-        $routes->post('importProcess', 'AlunoController::importProcess'); 
+        $routes->post('importProcess', 'AlunoController::importProcess');
+        
+        //provisorio
+        $routes->get('sendEmail', 'AlunoController::enviarEmail'); 
+        
     });
 
     //==============================================================

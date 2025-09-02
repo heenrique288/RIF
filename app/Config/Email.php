@@ -6,44 +6,40 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = '';
-    public string $fromName   = '';
-    public string $recipients = '';
+    public string $fromEmail  = 'notifica@ifrocalama.com';  // E-mail de remetente
+    public string $fromName   = 'Ifro Calama';              // Nome do remetente
+    public string $recipients = '';   // Deixe vazio ou coloque destinatário por padrão
+    
 
     /**
-     * The "user agent"
+     * O protocolo para envio de e-mail (mail, sendmail, smtp)
      */
-    public string $userAgent = 'CodeIgniter';
+    public string $protocol = 'smtp';
 
     /**
-     * The mail sending protocol: mail, sendmail, smtp
-     */
-    public string $protocol = 'mail';
-
-    /**
-     * The server path to Sendmail.
+     * O caminho do Sendmail. No caso de SMTP não será usado.
      */
     public string $mailPath = '/usr/sbin/sendmail';
 
     /**
      * SMTP Server Hostname
      */
-    public string $SMTPHost = '';
+    public string $SMTPHost = 'mail.smtp2go.com'; // Servidor SMTP do SMTP2Go
 
     /**
      * SMTP Username
      */
-    public string $SMTPUser = '';
+    public string $SMTPUser = 'notifica@ifrocalama.com'; // Seu e-mail de autenticação
 
     /**
      * SMTP Password
      */
-    public string $SMTPPass = '';
+    public string $SMTPPass; // Senha de autenticação (será carregada do .env)
 
     /**
      * SMTP Port
      */
-    public int $SMTPPort = 25;
+    public int $SMTPPort = 8025; // Porta SMTP (você pode usar 2525, 8025, 587, 80 ou 25)
 
     /**
      * SMTP Timeout (in seconds)
@@ -57,12 +53,9 @@ class Email extends BaseConfig
 
     /**
      * SMTP Encryption.
-     *
-     * @var string '', 'tls' or 'ssl'. 'tls' will issue a STARTTLS command
-     *             to the server. 'ssl' means implicit SSL. Connection on port
-     *             465 should set this to ''.
+     * Defina como 'tls' para a comunicação segura.
      */
-    public string $SMTPCrypto = 'tls';
+    public string $SMTPCrypto = 'tls';  // Use 'tls' para criptografia
 
     /**
      * Enable word-wrap
@@ -77,7 +70,7 @@ class Email extends BaseConfig
     /**
      * Type of mail, either 'text' or 'html'
      */
-    public string $mailType = 'text';
+    public string $mailType = 'html'; // Use 'html' para e-mails com formatação
 
     /**
      * Character set (utf-8, iso-8859-1, etc.)
@@ -118,4 +111,12 @@ class Email extends BaseConfig
      * Enable notify message from server
      */
     public bool $DSN = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Carrega a senha do SMTP do arquivo .env
+        $this->SMTPPass = env('SMTP_PASSWORD', ''); // O segundo parâmetro é um valor padrão caso a variável não exista
+    }
 }

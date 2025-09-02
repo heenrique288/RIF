@@ -460,4 +460,34 @@ class AlunoController extends BaseController
         
         return redirect()->to($this->baseRoute);
     }
+
+    // provisoriamente aqui 
+    public function enviarEmail(){
+        $email = \Config\Services::email();
+
+        $destino = 'isatereza.07@gmail.com';
+        $nome = 'Isabella';
+
+        $data = date('d/m/Y', strtotime('+2 days')); //se for 48h de antecedencia
+
+        $link = 'link.provisorio.com.br';
+
+        $mensagem = "Prezado(a) {$nome},<br><br>";
+        $mensagem .= "Clique no link abaixo para confirmar o almoço do dia **{$data}**, caso não irá utilizar o benefício no mesmo link marque a opção que não irá fazer uso nesse dia.<br><br>";
+        $mensagem .= "<a href='{$link}'>Clique aqui</a><br><br>";
+        $mensagem .= "Sua resposta é de extrema importância para o planejamento das refeições do campus, ao não responder o link, você estará sujeito a perder o benefício. Qualquer problema entrar em contato com o DEPAE.<br><br>";
+        $mensagem .= "Atenciosamente, DEPAE. <br>";
+
+
+        $email->setTo($destino);
+        $email->setSubject("Confirme a refeição do dia {$data}");
+        $email->setMessage($mensagem);
+
+        if ($email->send()) {
+            echo "Operação concluída e e-mail de confirmação enviado.";
+        } else{
+            echo "Operação concluída, mas falha ao enviar o e-mail.";
+            echo $email->printDebugger();
+        }
+    }
 }

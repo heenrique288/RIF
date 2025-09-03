@@ -110,4 +110,20 @@ $routes->group('sys', function ($routes) {
         $routes->get('nao-servidos', 'RelatorioController::refeicoesNaoServidas');
         $routes->get('confirmados', 'RelatorioController::confirmados');
     });
+
+    //==============================================================
+    // Rotas do Admin para o gerenciamento de usuários
+    //==============================================================
+
+    $routes->group('admin', function ($routes) {
+        $routes->get('/', 'AdminController::index'); // Página inicial da admin
+        $routes->post('alterar-grupo', 'AdminController::alterarGrupoUsuario'); // Atribuir a um grupo de usuários
+        $routes->post('atualizar-usuario', 'AdminController::atualizarUsuario'); 
+        $routes->post('resetar-senha', 'AdminController::resetarSenha'); // Atualizar senha
+        $routes->post('desativar-usuario', 'AdminController::desativarUsuario');
+        $routes->post('registrar-usuario', 'AdminController::registrarUsuario');
+        $routes->get('usuarios-inativos', 'AdminController::usuariosInativos');
+        $routes->post('reativar-usuario', 'AdminController::reativarUsuario');
+        $routes->post('excluir-permanentemente', 'AdminController::excluirPermanentemente');
+    });
 });

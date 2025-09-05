@@ -12,6 +12,28 @@ class AgendamentoController extends BaseController
         $turmas = new TurmaModel();
         $alunos = new AlunoModel();
 
+        $agendamentos = [
+            [
+                'id' => 1,
+                'turma_aluno' => 'João',
+                'data' => '2025-08-27',
+                'crc' => '123456',
+                'codigo' => '7890',
+                'justificativa' => 'Refeição especial',
+                'alunos' => ['João', 'Maria']
+            ],
+            [
+                'id' => 2,
+                'turma_aluno' => 'Turma A',
+                'data' => '2025-08-28',
+                'crc' => '654321',
+                'codigo' => '0987',
+                'justificativa' => 'Evento escolar',
+                'alunos' => [] // Pode ser vazio se for agendamento para a turma toda
+            ],
+        ];
+
+        $data['agendamentos'] = $agendamentos;
         $data['alunos'] = $alunos->orderBy('nome')->findAll();
         $data['turmas'] = $turmas->orderBy('nome')->findAll();
         $data['content'] = view('sys/agendamento', $data);

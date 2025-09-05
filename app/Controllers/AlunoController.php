@@ -7,6 +7,7 @@ use App\Models\AlunoModel;
 use App\Models\AlunoEmailModel;
 use App\Models\AlunoTelefoneModel;
 use App\Models\TurmaModel;
+use App\Libraries\EvolutionAPI;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
@@ -249,7 +250,20 @@ class AlunoController extends BaseController
         return $this->response->setJSON($aluno);
     }
 
+    /**
+     * Função utilizada dentro do importProcess
+     */
+    public function enviarWhatsapp($destino, $mensagem){
+        $wpp = new EvolutionAPI();
 
+        try {
+            $wpp->sendMessage($destino, $mensagem);
+            echo "Mensagem enviada com sucesso!";
+        }
+        catch(\Exception $e){
+            echo "Erro ao enviar a mensagem: " . $e->getMessage();
+        } 
+    }
 
     /**
      * @route POST /alunos/import
@@ -383,6 +397,8 @@ class AlunoController extends BaseController
         $emailModel = new AlunoEmailModel();
         $telefoneModel = new AlunoTelefoneModel();
         
+        $testar_enviar_telefone = 0; //pra testar sem lotar de mensagem por enquanto
+        
         $insertedCount = 0;
         $errors = [];
 
@@ -418,6 +434,8 @@ class AlunoController extends BaseController
                     }
                 }
 
+                $destino = null; //destino vai ser o primeiro telefone a tentar ser validado
+
                 //Faz a inserção dos telefones
                 if (!empty($alunoData['telefone'])) {
                     foreach ($alunoData['telefone'] as $telefone) {
@@ -425,16 +443,44 @@ class AlunoController extends BaseController
 
                             $telefonePadrao = str_replace(['(', ')', ' ', '-'], '', $telefone);
                             
+                            //pega o telefone a ser validado
+                            if($destino === null){
+                                $destino = $telefonePadrao;
+                            }
+
                             $telefoneModel->insert([
                                 'aluno_id' => $alunoId,
                                 'telefone' => $telefonePadrao,
-                                'status' => 'ativo' //deixar assim por enquanto até verificar como será validado
+                                'status' => 'inativo' //todos por padrão vão começar inativos
                             ]);
                         }
                     }
                 }
 
 
+                /**
+                * Carrega os parâmetros pra função
+                */
+                if ($testar_enviar_telefone == 0){ //esse if é só pra testar sem enviar um monte
+
+                    $destino = "69992599048"; // pra não enviar pros telefones reais da planilha
+
+                    $nome = $alunoData['nome']; 
+
+                    $mensagem = "Prezado(a) {$nome},\n\n";
+                    $mensagem .= "Você foi cadastrado no Sistema de Refeições do IFRO. Clique aqui para validar seu número e receber os Qr Codes. \n\n";
+                    $mensagem .= "Esse é o seu número principal para receber as mensagens?\n\n";
+                    $mensagem .= "Futuro Botão 1 e Futuro Botão 2\n\n";
+
+                    //será o footer mais pra frente
+                    $mensagem .= "Se esse número de telefone não pertence a {$nome}, por favor desconsidere esse mensagem\n\n";
+                    $mensagem .= "Atenciosamente, DEPAE.";
+
+                    $testar_enviar_telefone += 1;
+
+                    $this->enviarWhatsapp($destino, $mensagem);
+
+                }
             }
         }
 
@@ -490,4 +536,5 @@ class AlunoController extends BaseController
             echo $email->printDebugger();
         }
     }
+
 }

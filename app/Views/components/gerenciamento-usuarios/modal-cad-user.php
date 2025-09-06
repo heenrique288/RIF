@@ -53,7 +53,7 @@
                             <option value="admin" <?= old('grupo') == 'admin' ? 'selected' : '' ?>>Administrador</option>
                             <option value="solicitante" <?= old('grupo') == 'solicitante' || old('grupo') == '' ? 'selected' : '' ?>>Solicitante</option>
                             <option value="aluno" <?= old('grupo') == 'aluno' || old('grupo') == '' ? 'selected' : '' ?>>Aluno</option>
-                            <option value="developer" <?= old('grupo') == 'developer' || old('grupo') == '' ? 'selected' : '' ?>>Desenvolvedor</option>
+                            <option value="restaurante" <?= old('grupo') == 'restaurante' || old('grupo') == '' ? 'selected' : '' ?>>Restaurante</option>
                         </select>
                     </div>
                 </form>

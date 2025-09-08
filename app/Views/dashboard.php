@@ -42,42 +42,47 @@
         }
 
         /* Estilo para os cards de estatísticas */
-        .statistics-details > div {
-            background-color: #202124; /* Fundo preto sólido para alto contraste */
+        .statistics-details>div {
+            background-color: #202124;
+            /* Fundo preto sólido para alto contraste */
             padding: 15px;
             border-radius: 8px;
-            flex-grow: 1; /* Para que ocupem o espaço disponível */
-            margin-right: 15px; /* Adiciona espaçamento entre os cards */
+            flex-grow: 1;
+            /* Para que ocupem o espaço disponível */
+            margin-right: 15px;
+            /* Adiciona espaçamento entre os cards */
         }
 
         /* Remover a margem direita do último item */
-        .statistics-details > div:last-child {
+        .statistics-details>div:last-child {
             margin-right: 0;
         }
 
         /* Adicionar espaçamento entre a linha de cards de estatísticas e os gráficos */
         .statistics-details {
-            margin-bottom: 25px; /* Adiciona margem inferior para separar dos gráficos */
+            margin-bottom: 25px;
+            /* Adiciona margem inferior para separar dos gráficos */
         }
 
         /* Fundo para os cards de gráficos */
         .card.card-rounded {
-            background-color: #202124; /* Fundo preto sólido para alto contraste */
+            background-color: #202124;
+            /* Fundo preto sólido para alto contraste */
             border-radius: 8px;
         }
     </style>
 
     <?php if (isset($graficoPassado) && isset($graficoFuturo)) : ?>
-    <script>
-        var graficoPassadoData = <?= json_encode($graficoPassado) ?>;
-        var graficoFuturoData = <?= json_encode($graficoFuturo) ?>;
-    </script>
+        <script>
+            var graficoPassadoData = <?= json_encode($graficoPassado) ?>;
+            var graficoFuturoData = <?= json_encode($graficoFuturo) ?>;
+        </script>
     <?php endif; ?>
 
 </head>
 
 <body>
-    <div class="container-scroller">
+    <div class="container-scroller min-vh-100">
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
                 <a href="<?php echo base_url("/") ?>">
@@ -252,7 +257,7 @@
                             <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                                 <div class="navbar-profile">
                                     <p class="mb-0 d-none d-sm-block navbar-profile-name"><?php echo auth()->user()->username;
-                                                                                                ?></p>
+                                                                                            ?></p>
                                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                                 </div>
                             </a>
@@ -293,67 +298,72 @@
                     <?php if (isset($content)) : ?>
                         <?php echo $content; ?>
                     <?php else : ?>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="home-tab">
-                                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                                    <ul class="nav nav-tabs" role="tablist">
-                                        <li class="nav-item">
-                                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Visão Geral</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="tab-content tab-content-basic">
-                                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="statistics-details d-flex align-items-center justify-content-between">
-                                                    <div> <p class="statistics-title">Turmas Hoje</p>
-                                                        <h3 class="rate-percentage"><?= $turmasHoje ?></h3>
-                                                    </div>
-                                                    <div> <p class="statistics-title">Alunos Confirmados</p>
-                                                        <h3 class="rate-percentage"><?= $alunosConfirmados ?></h3>
-                                                    </div>
-                                                    <div> <p class="statistics-title">Solicitações Pendentes</p>
-                                                        <h3 class="rate-percentage"><?= $solicitacoesPendentes ?></h3>
-                                                    </div>
-                                                    <div class="d-none d-md-block"> <p class="statistics-title">Não Retiraram Refeição (30 dias)</p>
-                                                        <h3 class="rate-percentage"><?= $naoRetiradasUltimos30Dias ?></h3>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="home-tab">
+                                    <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                                        <ul class="nav nav-tabs" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Visão Geral</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content tab-content-basic">
+                                        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="statistics-details d-flex align-items-center justify-content-between">
+                                                        <div>
+                                                            <p class="statistics-title">Turmas Hoje</p>
+                                                            <h3 class="rate-percentage"><?= $turmasHoje ?></h3>
+                                                        </div>
+                                                        <div>
+                                                            <p class="statistics-title">Alunos Confirmados</p>
+                                                            <h3 class="rate-percentage"><?= $alunosConfirmados ?></h3>
+                                                        </div>
+                                                        <div>
+                                                            <p class="statistics-title">Solicitações Pendentes</p>
+                                                            <h3 class="rate-percentage"><?= $solicitacoesPendentes ?></h3>
+                                                        </div>
+                                                        <div class="d-none d-md-block">
+                                                            <p class="statistics-title">Não Retiraram Refeição (30 dias)</p>
+                                                            <h3 class="rate-percentage"><?= $naoRetiradasUltimos30Dias ?></h3>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-6 d-flex flex-column">
-                                                <div class="row flex-grow">
-                                                    <div class="col-12 col-lg-4 col-lg-12">
-                                                        <div class="card card-rounded">
-                                                            <div class="card-body">
-                                                                <div class="d-sm-flex justify-content-between align-items-start">
-                                                                    <div>
-                                                                        <h4 class="card-title card-title-dash text-light">Gráfico - Últimos 7 Dias</h4>
+                                            <div class="row">
+                                                <div class="col-lg-6 d-flex flex-column">
+                                                    <div class="row flex-grow">
+                                                        <div class="col-12 col-lg-4 col-lg-12">
+                                                            <div class="card card-rounded">
+                                                                <div class="card-body">
+                                                                    <div class="d-sm-flex justify-content-between align-items-start">
+                                                                        <div>
+                                                                            <h4 class="card-title card-title-dash text-light">Gráfico - Últimos 7 Dias</h4>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
-                                                                    <canvas id="graficoPassado"></canvas>
+                                                                    <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
+                                                                        <canvas id="graficoPassado"></canvas>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-6 d-flex flex-column">
-                                                <div class="row flex-grow">
-                                                    <div class="col-12 col-lg-4 col-lg-12">
-                                                        <div class="card card-rounded">
-                                                            <div class="card-body">
-                                                                <div class="d-sm-flex justify-content-between align-items-start">
-                                                                    <div>
-                                                                        <h4 class="card-title card-title-dash text-light">Gráfico - Próximos 7 Dias</h4>
+                                                <div class="col-lg-6 d-flex flex-column">
+                                                    <div class="row flex-grow">
+                                                        <div class="col-12 col-lg-4 col-lg-12">
+                                                            <div class="card card-rounded">
+                                                                <div class="card-body">
+                                                                    <div class="d-sm-flex justify-content-between align-items-start">
+                                                                        <div>
+                                                                            <h4 class="card-title card-title-dash text-light">Gráfico - Próximos 7 Dias</h4>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
-                                                                    <canvas id="graficoFuturo"></canvas>
+                                                                    <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
+                                                                        <canvas id="graficoFuturo"></canvas>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -365,7 +375,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                     <?php endif; ?>
                 </div>
                 <footer class="footer">
@@ -387,9 +396,9 @@
 
                     </div>
                 </footer>
-                </div>
             </div>
         </div>
+    </div>
     <script src="<?php echo base_url("assets/vendors/chart.js/chart.umd.js"); ?>"></script>
     <script src="<?php echo base_url("assets/vendors/progressbar.js/progressbar.min.js"); ?>"></script>
     <script src="<?php echo base_url("assets/vendors/jvectormap/jquery-jvectormap.min.js"); ?>"></script>
@@ -414,75 +423,75 @@
     <script src="<?php echo base_url("assets/js/dashboards/dashboards.js"); ?>"></script>
 
     <?php if (isset($graficoPassado) && isset($graficoFuturo)) : ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurações globais para os gráficos
-            Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
-            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Configurações globais para os gráficos
+                Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
 
-            // Gráfico passado - Últimos 7 dias (GRÁFICO DE BARRAS)
-            var ctxPassado = document.getElementById('graficoPassado').getContext('2d');
-            new Chart(ctxPassado, {
-                type: 'bar',
-                data: {
-                    labels: graficoPassadoData.labels,
-                    datasets: [{
-                        label: 'Refeições Previstas',
-                        data: graficoPassadoData.previstas,
-                        backgroundColor: '#FFD700', // COR AMARELA
-                    }, {
-                        label: 'Refeições Confirmadas',
-                        data: graficoPassadoData.confirmadas,
-                        backgroundColor: '#0090e7',
-                    }, {
-                        label: 'Refeições Servidas',
-                        data: graficoPassadoData.servidas,
-                        backgroundColor: '#00d25b',
-                    }, {
-                        label: 'Refeições Canceladas',
-                        data: graficoPassadoData.canceladas,
-                        backgroundColor: '#fc424a',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                // Gráfico passado - Últimos 7 dias (GRÁFICO DE BARRAS)
+                var ctxPassado = document.getElementById('graficoPassado').getContext('2d');
+                new Chart(ctxPassado, {
+                    type: 'bar',
+                    data: {
+                        labels: graficoPassadoData.labels,
+                        datasets: [{
+                            label: 'Refeições Previstas',
+                            data: graficoPassadoData.previstas,
+                            backgroundColor: '#FFD700', // COR AMARELA
+                        }, {
+                            label: 'Refeições Confirmadas',
+                            data: graficoPassadoData.confirmadas,
+                            backgroundColor: '#0090e7',
+                        }, {
+                            label: 'Refeições Servidas',
+                            data: graficoPassadoData.servidas,
+                            backgroundColor: '#00d25b',
+                        }, {
+                            label: 'Refeições Canceladas',
+                            data: graficoPassadoData.canceladas,
+                            backgroundColor: '#fc424a',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
+                });
 
-            // Gráfico futuro - Próximos 7 dias (GRÁFICO DE BARRAS)
-            var ctxFuturo = document.getElementById('graficoFuturo').getContext('2d');
-            new Chart(ctxFuturo, {
-                type: 'bar',
-                data: {
-                    labels: graficoFuturoData.labels,
-                    datasets: [{
-                        label: 'Refeições Previstas',
-                        data: graficoFuturoData.previstas,
-                        backgroundColor: '#FFD700', // COR AMARELA
-                    }, {
-                        label: 'Refeições Confirmadas',
-                        data: graficoFuturoData.confirmadas,
-                        backgroundColor: '#0090e7',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                // Gráfico futuro - Próximos 7 dias (GRÁFICO DE BARRAS)
+                var ctxFuturo = document.getElementById('graficoFuturo').getContext('2d');
+                new Chart(ctxFuturo, {
+                    type: 'bar',
+                    data: {
+                        labels: graficoFuturoData.labels,
+                        datasets: [{
+                            label: 'Refeições Previstas',
+                            data: graficoFuturoData.previstas,
+                            backgroundColor: '#FFD700', // COR AMARELA
+                        }, {
+                            label: 'Refeições Confirmadas',
+                            data: graficoFuturoData.confirmadas,
+                            backgroundColor: '#0090e7',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
+                });
             });
-        });
-    </script>
+        </script>
     <?php endif; ?>
 
     <script>

@@ -112,132 +112,139 @@
                     <div class="collapse" id="refeicoes">
                         <ul class="nav flex-column sub-menu">
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/agendamento'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-calendar-month-outline"></i>
-                                    </span>
-                                    <span class="menu-title">Agendamentos</span>
-                                </a>
-                            </li>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/agendamento'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-calendar-month-outline"></i>
+                                        </span>
+                                        <span class="menu-title">Agendamentos</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/solicitacoes'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-chart-line"></i>
-                                    </span>
-                                    <span class="menu-title">Solicitações</span>
-                                </a>
-                            </li>
+                            <?php if (auth()->user()->inGroup('admin', 'solicitante')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/solicitacoes'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-chart-line"></i>
+                                        </span>
+                                        <span class="menu-title">Solicitações</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('#'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-license"></i>
-                                    </span>
-                                    <span class="menu-title">Entregas</span>
-                                </a>
-                            </li>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('#'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-license"></i>
+                                        </span>
+                                        <span class="menu-title">Entregas</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
-                        <span class="menu-icon">
-                            <i class="fa fa-database" style="color: #8f5fe8"></i>
-                        </span>
-                        <span class="menu-title">Cadastros</span>
-                        <i class="menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="cadastros">
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
-                        <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
+                            <span class="menu-icon">
+                                <i class="fa fa-database" style="color: #8f5fe8"></i>
+                            </span>
+                            <span class="menu-title">Cadastros</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="cadastros">
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/usuarios'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-account"></i>
-                                    </span>
-                                    <span class="menu-title">Usuários</span>
-                                </a>
-                            </li>
+                            <ul class="nav flex-column sub-menu">
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/alunos'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-account-group"></i>
-                                    </span>
-                                    <span class="menu-title">Alunos</span>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/usuarios'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-account"></i>
+                                        </span>
+                                        <span class="menu-title">Usuários</span>
+                                    </a>
+                                </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/cursos'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-school"></i>
-                                    </span>
-                                    <span class="menu-title">Cursos</span>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/alunos'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-account-group"></i>
+                                        </span>
+                                        <span class="menu-title">Alunos</span>
+                                    </a>
+                                </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/turmas'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-account-group"></i>
-                                    </span>
-                                    <span class="menu-title">Turmas</span>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/cursos'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-school"></i>
+                                        </span>
+                                        <span class="menu-title">Cursos</span>
+                                    </a>
+                                </li>
 
-                        </ul>
-                    </div>
-                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/turmas'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-account-group"></i>
+                                        </span>
+                                        <span class="menu-title">Turmas</span>
+                                    </a>
+                                </li>
 
-                <?php //if (auth()->user()->inGroup('admin')):
-                ?>
+                            </ul>
+                        </div>
+                    </li>
+                <?php endif; ?>
 
-                <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
-                        <span class="menu-icon">
-                            <i class="fa fa-gears" style="color: #fc424a"></i>
-                        </span>
-                        <span class="menu-title">Avançado</span>
-                        <i class="menu-arrow"></i>
-                    </a>
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
-                    <div class="collapse" id="op_avancadas">
-                        <ul class="nav flex-column sub-menu">
-                            <li class="nav-item">
-                                <a class="nav-link" href="<?php echo base_url('sys/admin'); ?>">
-                                    <span class="menu-icon">
-                                        <i class="fa fa-users"></i>
-                                    </span>
-                                    <span class="menu-title">Usuários do Sistema</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    <span class="menu-icon">
-                                        <i class="mdi mdi-backup-restore"></i>
-                                    </span>
-                                    <span class="menu-title">Backup</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    <span class="menu-icon">
-                                        <i class="fa fa-trash"></i>
-                                    </span>
-                                    <span class="menu-title">Limpeza</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
+                            <span class="menu-icon">
+                                <i class="fa fa-gears" style="color: #fc424a"></i>
+                            </span>
+                            <span class="menu-title">Avançado</span>
+                            <i class="menu-arrow"></i>
+                        </a>
 
-                <?php //endif;
-                ?>
+                        <div class="collapse" id="op_avancadas">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/admin'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="fa fa-users"></i>
+                                        </span>
+                                        <span class="menu-title">Usuários do Sistema</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-backup-restore"></i>
+                                        </span>
+                                        <span class="menu-title">Backup</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">
+                                        <span class="menu-icon">
+                                            <i class="fa fa-trash"></i>
+                                        </span>
+                                        <span class="menu-title">Limpeza</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                <?php endif; ?>
 
             </ul>
         </nav>
@@ -524,6 +531,10 @@
                 }
             }
         });
+    </script>
+
+    <script>
+
     </script>
 </body>
 

@@ -4,9 +4,7 @@
 
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-cadastrar-agendamento-label">Cadastrar Novo Agendamento</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="form-cadastrar-agendamento" class="forms-sample" method="post" action="<?php echo base_url('sys/agendamento/admin/create'); ?>">
@@ -26,12 +24,11 @@
                     <div class="mb-3">
                         <label class="form-label">Aluno(s)</label>
                         <div id="alunos-container">
-                            </div>
-
+                        </div>
                         <div id="alunos-selecionados" class="mt-2">
                             <label>Selecionados:</label>
-                            <ul id="lista-alunos" class="list-group">
-                                </ul>
+                            <ul id="lista-alunos" class="list-unstyled">
+                            </ul>
                         </div>
                     </div>
 
@@ -45,27 +42,28 @@
 
                     <div class="mb-3 d-flex gap-3">
                         <div class="flex-fill">
-                            <label for="crc" class="form-label">Código CRC</label>
-                            <input type="text" class="form-control" id="crc" name="crc" placeholder="Digite o código CRC" required>
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select py-2" id="status" name="status" required>
+                                <option value="" selected disabled>Selecione o Status</option>
+                                <option value="0">Disponível</option>
+                                <option value="1">Confirmada</option>
+                                <option value="2">Retirada</option>
+                                <option value="3">Cancelada</option>
+                            </select>
                         </div>
                         <div class="flex-fill">
-                            <label for="codigo" class="form-label">Código Verificador</label>
-                            <input type="number" class="form-control" id="codigo" name="codigo" placeholder="Digite o código verificador" required>
+                            <label for="motivo" class="form-label">Motivo</label>
+                            <select class="form-select py-2" id="motivo" name="motivo" required>
+                                <option value="" selected disabled>Selecione o motivo</option>
+                                <option value="0">Contraturno</option>
+                                <option value="1">Estágio</option>
+                                <option value="2">Treino</option>
+                                <option value="3">Projeto</option>
+                                <option value="4">Visita Técnica</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="justificativa" class="form-label">Justificativa</label>
-                        <textarea
-                            name="justificativa"
-                            id="justificativa"
-                            class="form-control"
-                            rows="3"
-                            minlength="8"
-                            maxlength="255"
-                            style="min-height: 80px;"
-                            required></textarea>
-                    </div>
                 </div>
 
                 <div class="modal-footer">

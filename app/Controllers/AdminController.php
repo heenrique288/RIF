@@ -160,4 +160,91 @@ class AdminController extends BaseController
         return redirect()->to('/sys/admin')->with('success', 'Usuário registrado com sucesso.');
 
     }
+
+    public function excluirPermanentemente() 
+    {
+        $request = service('request');
+
+        $userId = $request->getPost('user_id');
+        $adminPassword = $request->getPost('admin_password');
+
+        if(!$userId || !$adminPassword) {
+            return redirect()->back()->with('error', ['Dados inválidos']);
+        }
+
+        $admin = auth()->user();
+
+        if(!$admin) {
+            return redirect()->back()->with('error', ['Você precisa estar autenticado para excluir um usuário']);
+        }
+
+        if(!password_verify($adminPassword, $admin->password_hash)) {
+            return redirect()->back()->with('error', ['Senha incorreta! A exclusão foi cancelada']);
+        }
+
+        $userModel = new \CodeIgniter\Shield\Models\UserModel();
+        $user = $userModel->find($userId);
+
+        if(!$user) {
+            return redirect()->back()->with('error', ['Usuário não encontrado']);
+        }
+
+        $userModel->delete($userId, true); // Exclusão permanente
+
+        return redirect()->back()->with('success', ['Usuário excluído permanentemente com sucesso.']);
+    }
+
+    // Método para alterar o grupo de um usuário
+    public function alterarGrupoUsuario()
+    {
+        $userId = $this->request->getPost('user_id');
+        $novoGrupo = $this->request->getPost('novo_grupo');
+
+        log_message('info', "Tentando alterar grupo do usuário ID: $userId para $novoGrupo");
+
+        if (!$userId || !$novoGrupo) {
+            return redirect()->to('/sys/admin/')->with('error', 'Usuário ou grupo inválido.');
+        }
+
+        $db = \Config\Database::connect();
+        $builderGrupos = $db->table('auth_groups_users');
+        $builderGroups = $db->table('auth_groups');
+
+        // Verifica se o usuário já pertence ao grupo
+        $userGroup = $builderGrupos
+            ->where('user_id', $userId)
+            ->where('group', $novoGrupo)
+            ->get()
+            ->getRow();
+
+        // Se o usuário já pertence ao grupo, nada precisa ser feito
+        if ($userGroup) {
+            log_message('info', "Usuário $userId já pertence ao grupo '$novoGrupo'. Nenhuma alteração necessária.");
+            return redirect()->to('/sys/admin/')->with('info', 'Usuário já pertence ao grupo.');
+        }
+
+        // Pega o grupo atual do usuário
+        $userCurrentGroup = $builderGrupos
+            ->where('user_id', $userId)
+            ->get()
+            ->getRow();
+
+        // Remove o usuário de todos os grupos antes de adicionar ao novo grupo
+        $builderGrupos->where('user_id', $userId)->delete();
+
+        // Adiciona o usuário ao novo grupo
+        $result = $builderGrupos->insert([
+            'user_id'    => $userId,
+            'group'      => $novoGrupo,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        if (!$result) {
+            log_message('error', "Falha ao alterar grupo do usuário: $userId para $novoGrupo");
+            return redirect()->to('/sys/admin/')->with('error', 'Erro ao atualizar grupo do usuário.');
+        }
+
+        log_message('info', "Grupo do usuário $userId alterado para $novoGrupo com sucesso.");
+        return redirect()->to('/sys/admin/')->with('success', 'Grupo do usuário alterado com sucesso!');
+    }
 }

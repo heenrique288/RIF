@@ -160,4 +160,37 @@ class AdminController extends BaseController
         return redirect()->to('/sys/admin')->with('success', 'Usuário registrado com sucesso.');
 
     }
+
+    public function excluirPermanentemente() 
+    {
+        $request = service('request');
+
+        $userId = $request->getPost('user_id');
+        $adminPassword = $request->getPost('admin_password');
+
+        if(!$userId || !$adminPassword) {
+            return redirect()->back()->with('error', ['Dados inválidos']);
+        }
+
+        $admin = auth()->user();
+
+        if(!$admin) {
+            return redirect()->back()->with('error', ['Você precisa estar autenticado para excluir um usuário']);
+        }
+
+        if(!password_verify($adminPassword, $admin->password_hash)) {
+            return redirect()->back()->with('error', ['Senha incorreta! A exclusão foi cancelada']);
+        }
+
+        $userModel = new \CodeIgniter\Shield\Models\UserModel();
+        $user = $userModel->find($userId);
+
+        if(!$user) {
+            return redirect()->back()->with('error', ['Usuário não encontrado']);
+        }
+
+        $userModel->delete($userId, true); // Exclusão permanente
+
+        return redirect()->back()->with('success', ['Usuário excluído permanentemente com sucesso.']);
+    }
 }

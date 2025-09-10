@@ -148,7 +148,7 @@
                     </div>
                 </li>
 
-                <?php //if (auth()->user()->inGroup('admin')): ?>
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
@@ -201,9 +201,9 @@
                             </ul>
                         </div>
                     </li>
-                <?php //endif; ?>
+                <?php endif; ?>
 
-                <?php //if (auth()->user()->inGroup('admin')): ?>
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
@@ -244,7 +244,7 @@
                         </div>
                     </li>
 
-                <?php //endif; ?>
+                <?php endif; ?>
 
             </ul>
         </nav>

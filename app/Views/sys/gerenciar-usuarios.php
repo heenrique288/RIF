@@ -1,5 +1,6 @@
 <?php echo view('components/gerenciamento-usuarios/modal-cad-user.php'); ?>
 <?php echo view('components/gerenciamento-usuarios/modal-excluir-permanentemente.php'); ?>
+<?php echo view('components/gerenciamento-usuarios/modal-alterar-grupo.php'); ?>
 
 <!-- mostrar ALERT em caso de erro -->
 <?php if (session()->has('error')): ?>
@@ -75,6 +76,16 @@
                                                         <i class="mdi mdi-delete"></i>
                                                     </button>
                                                 </span>
+
+                                                <!-- Botão Alterar Grupo -->
+                                                <span data-bs-toggle="tooltip" data-placement="top" title="Alterar grupo">
+                                                    <button type="button" class="btn button-trans-info btn-icon me-1 d-flex align-items-center justify-content-center"
+                                                        data-bs-toggle="modal" data-bs-target="#modal-alterar-grupo"
+                                                        data-user-id="<?php echo $usuario->id; ?>"
+                                                        data-grupo-atual="<?php echo !empty($usuario->grupos) ? esc($usuario->grupos[0]) : 'Nenhum'; ?>">
+                                                        <i class="fa fa-users"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </td>
                                     </tr>
@@ -89,15 +100,28 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const excluirBtns = document.querySelectorAll(".btn-excluir-permanentemente");
-    const inputUserId = document.getElementById("excluir-permanentemente-user-id");
+    document.addEventListener("DOMContentLoaded", function() {
+        const excluirBtns = document.querySelectorAll(".btn-excluir-permanentemente");
+        const inputUserId = document.getElementById("excluir-permanentemente-user-id");
 
-    excluirBtns.forEach(btn => {
-        btn.addEventListener("click", function() {
-            const userId = this.getAttribute("data-user-id");
-            inputUserId.value = userId;
+        excluirBtns.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const userId = this.getAttribute("data-user-id");
+                inputUserId.value = userId;
+            });
         });
     });
-});
+
+    $(document).ready(function() {
+        // Passa o ID e o Grupo Atual do usuário para o modal de alteração de grupo
+        $('#modal-alterar-grupo').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Botão que acionou o modal
+            var userId = button.data('user-id'); // Captura o ID do usuário
+            var grupoAtual = button.data('grupo-atual'); // Captura o grupo atual
+
+            // Preenche os campos no modal
+            $(this).find('input[name="user_id"]').val(userId);
+            $(this).find('input[name="grupo_atual"]').val(grupoAtual);
+        });
+    });
 </script>

@@ -42,4 +42,12 @@ class AlunoTelefoneModel extends Model
         }
         return $data;
     }
+
+    //Método utilizado no processSendMessages do Controller do AgendamentoController
+    public function getTelefoneAtivoByAlunoId($aluno_id): ?array
+    {
+        return $this->where('aluno_id', $aluno_id)
+                    ->where('status', 1) 
+                    ->first();
+    }
 }

@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\TurmaModel;
 use App\Models\AlunoModel;
+use App\Models\AlunoTelefoneModel;
+use App\Models\EnviarMensagensModel;
 
 class AgendamentoController extends BaseController
 {
@@ -82,5 +84,37 @@ class AgendamentoController extends BaseController
             ->findAll();
 
         return $this->response->setJSON($alunos);
+    }
+
+    public function createSendMessages(array $matriculas, array $datasSelecionadas)
+    {
+        $alunoModel = new AlunoModel(); 
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+        $enviarMensagensModel = new EnviarMensagensModel();
+        
+        foreach ($matriculas as $matricula) {
+            $aluno = $alunoModel->find($matricula);
+            $telefoneAluno = $alunoTelefoneModel->getTelefoneAtivoByAlunoId($matricula);
+        
+            if ($aluno && $telefoneAluno) {
+                foreach ($datasSelecionadas as $dataRefeicao) {
+                    
+                    $nomeAluno = $aluno['nome'];
+                    //$destinatario = $telefoneAluno['telefone'];
+                    $destinatario = '69992599048'; 
+
+                    $mensagem = "Prezado(o) {$nomeAluno}\n";
+                    $mensagem .= "Confirme sua refeição para o dia {$dataRefeicao}\n";
+                    $mensagem .= "*Digite 1* para sim, irei utilizar o beneficio no dia informado\n";
+                    $mensagem .= "*Digite 2* para não, não irei utilizar o beneficio no dia informado";
+
+                    $enviarMensagensModel->insert([
+                        'destinatario' => $destinatario,
+                        'mensagem'     => $mensagem,
+                        'status'       => 0, // Pendente
+                    ]);
+                }
+            }
+        }
     }
 }

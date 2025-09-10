@@ -16,7 +16,9 @@
                         <select id="turma_id" name="turma_id" class="form-select py-2" required>
                             <option value="">Selecione a turma</option>
                             <?php foreach ($turmas as $turma): ?>
-                                <option value="<?php echo $turma['id'] ?>"><?= esc($turma['nome']) ?></option>
+                                <option value="<?php echo $turma['id'] ?>">
+                                    <?= esc($turma['nome_turma']) . ' - ' . esc($turma['nome_curso']) ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -28,7 +30,7 @@
                         <div id="alunos-selecionados" class="mt-2">
                             <label>Selecionados:</label>
                             <ul id="lista-alunos" class="list-unstyled">
-                            </ul>
+</ul>
                         </div>
                     </div>
 

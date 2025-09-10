@@ -72,8 +72,15 @@ class AgendamentoController extends BaseController
 
             if ($turmaIdDoGrupo && count($idsAlunosDoGrupo) > 1) {
                 $tipo = 'turma';
-                $turma = $turmaModel->find($turmaIdDoGrupo);
-                $turmaOuAluno = $turma ? $turma['nome'] : 'Turma Desconhecida';
+                $turmaComCurso = $turmaModel
+                    ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
+                    ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+                    ->find($turmaIdDoGrupo);
+                if ($turmaComCurso) {
+                    $turmaOuAluno = $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'];
+                } else {
+                    $turmaOuAluno = 'Turma Desconhecida';
+                }
             }
 
             $datasFormatadas = array_map(fn($dateStr) => $dateStr ? (new \DateTime($dateStr))->format('d/m/Y') : '', $agrupado['datas_refeicao']);
@@ -90,7 +97,11 @@ class AgendamentoController extends BaseController
 
         $data['agendamentos'] = $agendamentosParaTabela;
         $data['alunos'] = $alunoModel->orderBy('nome')->findAll();
-        $data['turmas'] = $turmaModel->orderBy('nome')->findAll();
+        $data['turmas'] = $turmaModel
+            ->select('turmas.id, turmas.nome as nome_turma, cursos.nome as nome_curso')
+            ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+            ->orderBy('turmas.nome')
+            ->findAll();
         $data['content'] = view('sys/agendamento', $data);
 
         return view('dashboard', $data);

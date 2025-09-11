@@ -1,14 +1,16 @@
 <?php echo view('components/gerenciamento-usuarios/modal-cad-user.php'); ?>
+<?php echo view('components/gerenciamento-usuarios/modal-excluir-permanentemente.php'); ?>
+<?php echo view('components/gerenciamento-usuarios/modal-alterar-grupo.php'); ?>
 
 <!-- mostrar ALERT em caso de erro -->
-<?php if (session()->has('erros')): ?>
+<?php if (session()->has('error')): ?>
     <div class="row">
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <div class="alert alert-danger">
                         <ul>
-                            <?php foreach (session('erros') as $erro): ?>
+                            <?php foreach (session('error') as $erro): ?>
                                 <li> <i class="mdi mdi-alert-circle"></i><?php echo esc($erro); ?></li>
                             <?php endforeach; ?>
                         </ul>
@@ -63,23 +65,15 @@
                                                         data-bs-toggle="modal" data-bs-target="#modal-atualizar-usuario"
                                                         data-user-id="<?php echo $usuario->id; ?>" data-username="<?php echo esc($usuario->username); ?>"
                                                         data-email="<?php echo esc($usuario->email); ?>">
-                                                        <i class="fa fa-edit"></i>
+                                                        <i class="mdi mdi-pencil"></i>
                                                     </button>
                                                 </span>
 
-                                                <!-- Botão Resetar Senha -->
-                                                <span data-bs-toggle="tooltip" data-placement="top" title="Resetar senha do usuário">
-                                                    <button type="button" class="btn button-trans-warning btn-icon me-1 btn-reset-senha d-flex align-items-center justify-content-center"
-                                                        data-user-id="<?php echo $usuario->id; ?>" data-bs-toggle="modal" data-bs-target="#modal-resetar-senha">
-                                                        <i class="fa fa-key"></i>
-                                                    </button>
-                                                </span>
-
-                                                <!-- Botão Desativar -->
-                                                <span data-bs-toggle="tooltip" data-placement="top" title="Desativar usuário">
-                                                    <button type="button" class="btn button-trans-danger btn-icon me-1 btn-desativar-usuario d-flex align-items-center justify-content-center"
-                                                        data-user-id="<?php echo $usuario->id; ?>" data-bs-toggle="modal" data-bs-target="#modal-confirmar-desativacao">
-                                                        <i class="fa fa-user-times"></i>
+                                                <!-- Botão Excluir -->
+                                                <span data-bs-toggle="tooltip" data-placement="top" title="Excluir usuário">
+                                                    <button type="button" class="btn button-trans-danger btn-icon me-1 btn-excluir-permanentemente d-flex align-items-center justify-content-center"
+                                                        data-user-id="<?php echo $usuario->id; ?>" data-bs-toggle="modal" data-bs-target="#modal-excluir-permanentemente">
+                                                        <i class="mdi mdi-delete"></i>
                                                     </button>
                                                 </span>
 
@@ -104,3 +98,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const excluirBtns = document.querySelectorAll(".btn-excluir-permanentemente");
+        const inputUserId = document.getElementById("excluir-permanentemente-user-id");
+
+        excluirBtns.forEach(btn => {
+            btn.addEventListener("click", function() {
+                const userId = this.getAttribute("data-user-id");
+                inputUserId.value = userId;
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        // Passa o ID e o Grupo Atual do usuário para o modal de alteração de grupo
+        $('#modal-alterar-grupo').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Botão que acionou o modal
+            var userId = button.data('user-id'); // Captura o ID do usuário
+            var grupoAtual = button.data('grupo-atual'); // Captura o grupo atual
+
+            // Preenche os campos no modal
+            $(this).find('input[name="user_id"]').val(userId);
+            $(this).find('input[name="grupo_atual"]').val(grupoAtual);
+        });
+    });
+</script>

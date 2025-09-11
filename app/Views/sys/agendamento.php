@@ -31,7 +31,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Alunos do Agendamento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <ul id="lista-alunos-modal" class="list-group"></ul>
@@ -163,7 +163,7 @@
                     render: function(data, type, row) {
                         const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
                         if (row.tipo === 'turma') {
-                            return `<a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'>${data}</a>`;
+                            return `<a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'><u>${data}</u></a>`;
                         } else if (row.alunos && row.alunos.length > 1) {
                             return `${data} <a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'>+ ${row.alunos.length - 1} aluno(s)</a>`;
                         }

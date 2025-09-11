@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\TurmaModel;
 use App\Models\AlunoModel;
-use App\Models\ControleRefeicoesModel;
 use App\Models\AlunoTelefoneModel;
 use App\Models\EnviarMensagensModel;
 use App\Models\ControleRefeicoesModel;
@@ -116,13 +115,12 @@ class AgendamentoController extends BaseController
         $post = $this->request->getPost();
 
         $turma_id = (int) strip_tags($post['turma_id']);
-        $alunosSelecionados = $post['matriculas']; // array de matrículas
+        $alunosSelecionados = $post['matriculas'];
         $datasSelecionadas = $post['datas'];
 
         $controleRefeicoesModel = new ControleRefeicoesModel();
         $alunoModel = new AlunoModel();
 
-        // Se selecionou "todos"
         if (in_array('todos', $alunosSelecionados)) {
             $alunos = $alunoModel->where('turma_id', $turma_id)->findAll();
             $matriculas = array_column($alunos, 'matricula');
@@ -137,7 +135,7 @@ class AgendamentoController extends BaseController
                     $dadosControle[] = [
                         'aluno_id' => $matricula,
                         'data_refeicao' => $dataRefeicao,
-                        'status' => 0, // disponivel
+                        'status' => 0,
                     ];
                 }
             }

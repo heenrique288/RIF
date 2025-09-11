@@ -191,7 +191,7 @@ class AdminController extends BaseController
 
         $userModel->delete($userId, true); // Exclusão permanente
 
-        return redirect()->back()->with('success', ['Usuário excluído permanentemente com sucesso.']);
+        return redirect()->back()->with('success', 'Usuário excluído permanentemente com sucesso.');
     }
 
     // Método para alterar o grupo de um usuário
@@ -246,5 +246,82 @@ class AdminController extends BaseController
 
         log_message('info', "Grupo do usuário $userId alterado para $novoGrupo com sucesso.");
         return redirect()->to('/sys/admin/')->with('success', 'Grupo do usuário alterado com sucesso!');
+    }
+
+    public function atualizarUsuario()
+    {
+        $request = service('request');
+
+        // Captura os dados do formulário
+        $userId         = $request->getPost('user_id');
+        $username       = $request->getPost('username');
+        $email          = $request->getPost('email');
+        $adminPassword  = $request->getPost('admin_password');
+
+        // Valida se os campos foram preenchidos
+        if (!$userId || !$username || !$email || !$adminPassword) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Todos os campos são obrigatórios.']);
+        }
+
+        // Obtém o usuário logado (admin)
+        $admin = auth()->user();
+
+        if (!$admin) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Usuário não autenticado.']);
+        }
+
+        // Verifica se a senha do admin está correta
+        if (!password_verify($adminPassword, $admin->password_hash)) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Senha do administrador incorreta.']);
+        }
+
+        // Busca o usuário no banco de dados
+        $user = $this->userModel->find($userId);
+        if (!$user) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Usuário não encontrado.']);
+        }
+
+        // Verifica se já existe um usuário com o mesmo username (exceto o próprio usuário)
+        $existingUsername = $this->userModel
+            ->where('username', $username)
+            ->where('id !=', $userId)
+            ->first();
+
+        // Verifica se já existe um usuário com o mesmo e-mail (exceto o próprio usuário)
+        $existingEmail = $this->userModel->db->table('auth_identities')
+            ->where('type', 'email_password')
+            ->where('secret', $email)
+            ->where('user_id !=', $userId)
+            ->get()
+            ->getRow();
+
+        // Verifica se há conflitos de username ou e-mail
+        if ($existingUsername && $existingEmail) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Já existe um usuário com este username e e-mail.']);
+        } elseif ($existingUsername) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Já existe um usuário com este username.']);
+        } elseif ($existingEmail) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Já existe um usuário com este e-mail.']);
+        }
+
+        // Atualiza os dados do usuário
+        $user->username = $username;
+        $user->email = $email;
+
+        // Tenta salvar as alterações
+        if (!$this->userModel->save($user)) {
+            return redirect()->to('/sys/admin/')
+                ->with('error', ['Erro ao atualizar usuário.']);
+        }
+
+        return redirect()->to('/sys/admin/')
+            ->with('success', 'Usuário atualizado com sucesso!');
     }
 }

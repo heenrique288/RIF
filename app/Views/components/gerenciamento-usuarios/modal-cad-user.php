@@ -12,10 +12,10 @@
                     <?= csrf_field() ?>
 
                     <!-- Exibir Mensagens de Erro -->
-                    <?php if (session('errors')): ?>
+                    <?php if (session('error')): ?>
                         <div class="alert alert-danger" role="alert">
                             <ul>
-                                <?php foreach (session('errors') as $error): ?>
+                                <?php foreach (session('error') as $error): ?>
                                     <li><?= esc($error) ?></li>
                                 <?php endforeach ?>
                             </ul>

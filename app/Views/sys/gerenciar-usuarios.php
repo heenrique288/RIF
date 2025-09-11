@@ -1,6 +1,7 @@
 <?php echo view('components/gerenciamento-usuarios/modal-cad-user.php'); ?>
 <?php echo view('components/gerenciamento-usuarios/modal-excluir-permanentemente.php'); ?>
 <?php echo view('components/gerenciamento-usuarios/modal-alterar-grupo.php'); ?>
+<?php echo view('components/gerenciamento-usuarios/modal-atualizar-usuario.php'); ?>
 
 <!-- mostrar ALERT em caso de erro -->
 <?php if (session()->has('error')): ?>
@@ -122,6 +123,34 @@
             // Preenche os campos no modal
             $(this).find('input[name="user_id"]').val(userId);
             $(this).find('input[name="grupo_atual"]').val(grupoAtual);
+        });
+
+        // Ativa os tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+
+        // Exibe mensagem de sucesso se o flashdata estiver com 'sucesso'
+        <?php if (session()->getFlashdata('success')) : ?>
+            $.toast({
+                heading: 'Sucesso',
+                text: '<?php echo session()->getFlashdata('success'); ?>',
+                showHideTransition: 'slide',
+                icon: 'success',
+                loaderBg: '#f96868',
+                position: 'top-center'
+            });
+        <?php endif; ?>
+
+        // Passa o ID, username e email do usuário para o modal de atualização de usuário
+        $('#modal-atualizar-usuario').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Botão que acionou o modal
+            var userId = button.data('user-id');
+            var username = button.data('username');
+            var email = button.data('email');
+
+            // Define os valores no modal
+            $(this).find('input[name="user_id"]').val(userId);
+            $(this).find('input[name="username"]').val(username);
+            $(this).find('input[name="email"]').val(email);
         });
     });
 </script>

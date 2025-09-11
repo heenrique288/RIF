@@ -77,3 +77,248 @@
         </div>
     </div>
 </div>
+
+<!--Uso do Flatpickr-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<style>
+    /* Estilo da lista de alunos selecionados */
+    #lista-alunos li {
+        background-color: #2a3038;
+        /* Azul clarinho */
+        color: #ffffff;
+        /* Texto preto para melhor contraste */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    #lista-alunos li .remove-aluno {
+        cursor: pointer;
+        color: #dc3545;
+        /* vermelho */
+        font-weight: bold;
+        margin-left: 1rem;
+    }
+
+    #lista-alunos li .remove-aluno:hover {
+        color: #a71d2a;
+    }
+
+    /* Fundo geral do calendário */
+    .flatpickr-calendar {
+        background-color: #2a3038 !important;
+        color: #fff !important;
+        border: 1px solid #444 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Cabeçalho - dias da semana */
+    .flatpickr-weekdaycontainer {
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        text-align: center !important;
+    }
+
+    .flatpickr-weekday {
+        color: #fff !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        font-weight: 600 !important;
+    }
+
+    /* Dias do mês */
+    .flatpickr-days .dayContainer {
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        grid-auto-rows: 42px !important;
+        justify-items: center !important;
+        /* Força centralizar na célula */
+        align-items: center !important;
+        /* Centraliza vertical */
+    }
+
+    .flatpickr-day {
+        color: #fff !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        border-radius: 50% !important;
+        transition: background 0.2s ease !important;
+    }
+
+    /* Hover em um dia */
+    .flatpickr-day:hover {
+        background: #3a4048 !important;
+    }
+
+    /* Dia selecionado */
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange {
+        background: #007bff !important;
+        /* azul igual do botão */
+        color: #fff !important;
+    }
+
+    /* Dia atual (hoje) */
+    .flatpickr-day.today {
+        border: 1px solid #007bff !important;
+    }
+
+    .flatpickr-current-month {
+        color: #fff !important;
+    }
+
+    .ver-justificativa {
+        color: #ffffffff;
+        text-decoration: none;
+        
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .ver-justificativa:hover {
+        color: #0056b3;
+    }
+    
+</style>
+
+<script>
+    // Lógica de seleção de alunos
+    document.getElementById('turma_id').addEventListener('change', function() {
+        let turmaId = this.value;
+        let container = document.getElementById('alunos-container');
+        container.innerHTML = 'Carregando...';
+
+        if (turmaId) {
+            fetch('<?= base_url('sys/agendamento/admin/getAlunosByTurma') ?>/' + turmaId)
+                .then(res => res.json())
+                .then(data => {
+                    container.innerHTML = '';
+
+                    if (data.length > 0) {
+                        // Botão "Selecionar todos"
+                        let btnTodos = document.createElement('button');
+                        btnTodos.type = 'button';
+                        btnTodos.className = 'btn btn-success btn-sm m-1';
+                        btnTodos.textContent = 'Selecionar todos';
+                        container.appendChild(btnTodos);
+
+                        btnTodos.addEventListener('click', function() {
+                            data.forEach(aluno => selecionarAluno(aluno));
+                        });
+                    }
+
+                    // Botões individuais de alunos
+                    data.forEach(aluno => {
+                        let btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'btn btn-outline-primary btn-sm m-1';
+                        btn.textContent = aluno.nome;
+                        btn.dataset.matricula = aluno.matricula;
+
+                        btn.addEventListener('click', function() {
+                            selecionarAluno(aluno);
+                        });
+
+                        container.appendChild(btn);
+                    });
+
+                    // Função que adiciona aluno à lista
+                    function selecionarAluno(aluno) {
+                        let lista = document.getElementById('lista-alunos');
+                        if (!document.querySelector(`#lista-alunos li[data-matricula="${aluno.matricula}"]`)) {
+                            let li = document.createElement('li');
+                            li.dataset.matricula = aluno.matricula;
+                            li.innerHTML = `
+                                <span>${aluno.nome}</span>
+                                <span class="remove-aluno">&times;</span>
+                            `;
+                            lista.appendChild(li);
+
+                            let hidden = document.getElementById('matriculas-hidden');
+                            let values = hidden.value ? hidden.value.split(',') : [];
+                            values.push(aluno.matricula);
+                            hidden.value = values.join(',');
+
+                            // Remover aluno
+                            li.querySelector('.remove-aluno').addEventListener('click', function() {
+                                li.remove();
+                                let values = hidden.value.split(',').filter(m => m != aluno.matricula);
+                                hidden.value = values.join(',');
+                            });
+                        }
+                    }
+                })
+                .catch(() => container.innerHTML = 'Erro ao carregar alunos');
+        } else {
+            container.innerHTML = '';
+        }
+    });
+
+    //
+    //
+
+    // Lógica para adicionar mais campos de data
+    let datasSelecionadas = [];
+
+    flatpickr("#inline-datepicker", {
+        inline: true, // mostra o calendário dentro do modal
+        mode: "multiple", // permite selecionar várias datas
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates, dateStr, instance) {
+            // Atualiza o hidden input com as datas selecionadas
+            datasSelecionadas = selectedDates.map(d => instance.formatDate(d, "Y-m-d"));
+            document.getElementById('datas-hidden').value = datasSelecionadas.join(',');
+        }
+    });
+
+
+    //
+    //
+
+    // Lógica para ver mais alunos no modal
+
+    document.addEventListener("click", function(e) {
+        if (e.target.classList.contains("ver-mais-alunos")) {
+            e.preventDefault();
+
+            let alunos = JSON.parse(e.target.dataset.alunos);
+            let ul = document.getElementById("lista-alunos-modal");
+            ul.innerHTML = "";
+            alunos.forEach(nome => {
+                let li = document.createElement("li"); // Aqui ele faz a listagem dos alunos que foram "cadastrados"
+                li.className = "list-group-item";
+                li.textContent = nome;
+                ul.appendChild(li);
+            });
+
+            let modal = new bootstrap.Modal(document.getElementById("modal-ver-alunos"));
+            modal.show();
+        }
+    });
+
+
+    // Lógica para ver justificativa no modal
+
+    document.addEventListener("click", function(e) {
+        if (e.target.classList.contains("ver-justificativa")) {
+            e.preventDefault();
+
+            let justificativa = e.target.dataset.justificativa;
+            document.getElementById("texto-justificativa").textContent = justificativa;
+
+            let modal = new bootstrap.Modal(document.getElementById("modal-ver-justificativa"));
+            modal.show();
+        }
+    });
+</script>

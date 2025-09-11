@@ -7,6 +7,7 @@ use App\Models\AlunoModel;
 use App\Models\ControleRefeicoesModel;
 use App\Models\AlunoTelefoneModel;
 use App\Models\EnviarMensagensModel;
+use App\Models\ControleRefeicoesModel;
 
 class AgendamentoController extends BaseController
 {
@@ -113,50 +114,42 @@ class AgendamentoController extends BaseController
     {
         $this->response->setContentType('application/json');
         $post = $this->request->getPost();
-        
-        $turma_id = !empty($post['turma_id']) ? (int) strip_tags($post['turma_id']) : null;
-        
-        $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
-        $datasString = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
-        
-        $status = strip_tags($post['status']);
-        $motivo = strip_tags($post['motivo']);
-        
-        $matriculas = explode(',', $matriculasString);
-        $datas = explode(',', $datasString);
 
-        if (empty($matriculasString) || empty($datasString)) {
-             return $this->response->setJSON(['success' => false, 'message' => 'Selecione pelo menos um aluno e uma data.']);
+        $turma_id = (int) strip_tags($post['turma_id']);
+        $alunosSelecionados = $post['matriculas']; // array de matrículas
+        $datasSelecionadas = $post['datas'];
+
+        $controleRefeicoesModel = new ControleRefeicoesModel();
+        $alunoModel = new AlunoModel();
+
+        // Se selecionou "todos"
+        if (in_array('todos', $alunosSelecionados)) {
+            $alunos = $alunoModel->where('turma_id', $turma_id)->findAll();
+            $matriculas = array_column($alunos, 'matricula');
+        } else {
+            $matriculas = $alunosSelecionados;
         }
 
-        $controleModel = new \App\Models\ControleRefeicoesModel();
-
+        $dadosControle = [];
         foreach ($matriculas as $matricula) {
-            $matricula = trim($matricula);
-
-            if (empty($matricula) || !is_numeric($matricula)) {
-                continue; 
-            }
-
-            foreach ($datas as $data) {
-                $data = trim($data);
-                if (empty($data)) {
-                    continue;
+            foreach ($datasSelecionadas as $dataRefeicao) {
+                if (!empty($dataRefeicao)) {
+                    $dadosControle[] = [
+                        'aluno_id' => $matricula,
+                        'data_refeicao' => $dataRefeicao,
+                        'status' => 0, // disponivel
+                    ];
                 }
-
-                $agendamento = [
-                    'aluno_id' => $matricula,
-                    'data_refeicao' => $data,
-                    'status' => $status,
-                    'motivo' => $motivo,
-                ];
-
-                $controleModel->insert($agendamento);
             }
         }
+
+        if (!empty($dadosControle )) {
+            $controleRefeicoesModel->insertBatch($dadosControle );
+            $this->createSendMessages($alunosSelecionados, $datasSelecionadas); 
+        }
         
-        session()->setFlashdata('sucesso', 'Agendamento(s) criado(s) com sucesso!');
-        return $this->response->setJSON(['success' => true]);
+        session()->setFlashdata('sucesso', 'Agendamento(s) processado(s) com sucesso!');
+        return redirect()->back();
     }
 
     public function getAlunosByTurma($turma_id)

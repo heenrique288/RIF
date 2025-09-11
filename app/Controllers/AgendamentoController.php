@@ -6,6 +6,7 @@ use App\Models\TurmaModel;
 use App\Models\AlunoModel;
 use App\Models\AlunoTelefoneModel;
 use App\Models\EnviarMensagensModel;
+use App\Models\ControleRefeicoesModel;
 
 class AgendamentoController extends BaseController
 {
@@ -47,29 +48,38 @@ class AgendamentoController extends BaseController
     {
         $post = $this->request->getPost();
         $turma_id = (int) strip_tags($post['turma_id']);
-        $alunosSelecionados = $post['matricula']; // array de matrículas
+        $alunosSelecionados = $post['matriculas']; // array de matrículas
+        $datasSelecionadas = $post['datas'];
+
+        $controleRefeicoesModel = new ControleRefeicoesModel();
+        $alunoModel = new AlunoModel();
 
         // Se selecionou "todos"
         if (in_array('todos', $alunosSelecionados)) {
-            $alunoModel = new AlunoModel();
             $alunos = $alunoModel->where('turma_id', $turma_id)->findAll();
             $matriculas = array_column($alunos, 'matricula');
         } else {
             $matriculas = $alunosSelecionados;
         }
 
-        // Aqui você pode processar os agendamentos sem salvar
+        $dadosControle = [];
         foreach ($matriculas as $matricula) {
-            // Exemplo: gerar um array para envio ou exibição
-            $agendamento = [
-                'turma_id' => $turma_id,
-                'matricula' => $matricula,
-                'data_refeicao' => strip_tags($post['data_refeicao'])
-            ];
-            // Pode salvar em sessão, enviar para PDF, ou fazer o que precisar
-            session()->push('agendamentos_temp', $agendamento);
+            foreach ($datasSelecionadas as $dataRefeicao) {
+                if (!empty($dataRefeicao)) {
+                    $dadosControle[] = [
+                        'aluno_id' => $matricula,
+                        'data_refeicao' => $dataRefeicao,
+                        'status' => 0, // disponivel
+                    ];
+                }
+            }
         }
 
+        if (!empty($dadosControle )) {
+            $controleRefeicoesModel->insertBatch($dadosControle );
+            $this->createSendMessages($alunosSelecionados, $datasSelecionadas); 
+        }
+        
         session()->setFlashdata('sucesso', 'Agendamento(s) processado(s) com sucesso!');
         return redirect()->back();
     }

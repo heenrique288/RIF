@@ -162,6 +162,9 @@
     .ver-alunos-link:hover {
         color: #0056b3;
     }
+    .tooltip-on-top {
+        z-index: 9999 !important;
+    }
 </style>
 
 <script>
@@ -434,5 +437,27 @@
         modal.find('#deleteAgendamentoNome').text(nome);
         
         modal.find('#deleteAgendamentoInfo').val(JSON.stringify(deleteInfo));
+    });
+
+    $(document).ready(function() {
+        $(document).on('mouseover', '.flatpickr-day.flatpickr-disabled', function() {
+            const el = this;
+            const tooltip = new bootstrap.Tooltip(el, {
+                html: true,
+                title: `<i class="fa fa-exclamation-triangle text-warning" style="margin-right: 6px;"></i> A data do Agendamento não pode ser anterior à de hoje`,
+                trigger: 'manual',
+                container: 'body',
+                customClass: 'tooltip-on-top'
+            });
+            tooltip.show();
+        });
+
+        $(document).on('mouseout', '.flatpickr-day.flatpickr-disabled', function() {
+            const el = this;
+            const tooltip = bootstrap.Tooltip.getInstance(el);
+            if (tooltip) {
+                tooltip.dispose();
+            }
+        });
     });
 </script>

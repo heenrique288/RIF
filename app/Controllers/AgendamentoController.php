@@ -112,42 +112,64 @@ class AgendamentoController extends BaseController
     public function create()
     {
         $this->response->setContentType('application/json');
-        $post = $this->request->getPost();
 
-        $turma_id = (int) strip_tags($post['turma_id']);
-        $alunosSelecionados = $post['matriculas'];
-        $datasSelecionadas = $post['datas'];
+        try {
+            $post = $this->request->getPost();
 
-        $controleRefeicoesModel = new ControleRefeicoesModel();
-        $alunoModel = new AlunoModel();
+            $turma_id = !empty($post['turma_id']) ? (int) strip_tags($post['turma_id']) : null;
+            $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
+            $datasString = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
+            $status = strip_tags($post['status']);
+            $motivo = strip_tags($post['motivo']);
 
-        if (in_array('todos', $alunosSelecionados)) {
-            $alunos = $alunoModel->where('turma_id', $turma_id)->findAll();
-            $matriculas = array_column($alunos, 'matricula');
-        } else {
-            $matriculas = $alunosSelecionados;
-        }
+            if (empty($matriculasString) || empty($datasString)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Selecione pelo menos um aluno e uma data.']);
+            }
 
-        $dadosControle = [];
-        foreach ($matriculas as $matricula) {
-            foreach ($datasSelecionadas as $dataRefeicao) {
-                if (!empty($dataRefeicao)) {
-                    $dadosControle[] = [
+            $matriculas = explode(',', $matriculasString);
+            $datas = explode(',', $datasString);
+
+            $controleModel = new \App\Models\ControleRefeicoesModel();
+            $dadosParaInserir = [];
+
+            foreach ($matriculas as $matricula) {
+                $matricula = trim($matricula);
+                if (empty($matricula) || !is_numeric($matricula)) {
+                    continue;
+                }
+
+                foreach ($datas as $data) {
+                    $data = trim($data);
+                    if (empty($data)) {
+                        continue;
+                    }
+
+                    $dadosParaInserir[] = [
                         'aluno_id' => $matricula,
-                        'data_refeicao' => $dataRefeicao,
-                        'status' => 0,
+                        'data_refeicao' => $data,
+                        'status' => $status,
+                        'motivo' => $motivo,
                     ];
                 }
             }
-        }
 
-        if (!empty($dadosControle )) {
-            $controleRefeicoesModel->insertBatch($dadosControle );
-            $this->createSendMessages($alunosSelecionados, $datasSelecionadas); 
+            if (!empty($dadosParaInserir)) {
+                $controleModel->insertBatch($dadosParaInserir);
+                // Se a funcionalidade de mensagens estiver pronta, pode descomentar
+                // $this->createSendMessages($matriculas, $datas);
+            }
+            
+            session()->setFlashdata('sucesso', 'Agendamento(s) criado(s) com sucesso!');
+            return $this->response->setJSON(['success' => true]);
+
+        } catch (\Exception $e) {
+            log_message('error', '[AgendamentoController] Erro em create: ' . $e->getMessage() . ' na linha ' . $e->getLine());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Ocorreu um erro inesperado no servidor. Verifique os logs para mais detalhes.'
+            ]);
         }
-        
-        session()->setFlashdata('sucesso', 'Agendamento(s) processado(s) com sucesso!');
-        return redirect()->back();
     }
 
     public function getAlunosByTurma($turma_id)

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="<?php echo base_url("assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css"); ?>">
     <link rel="stylesheet" href="<?php echo base_url("assets/vendors/jquery-toast-plugin/jquery.toast.min.css"); ?>">
     <link rel="stylesheet" href="<?php echo base_url("assets/css/custom.css"); ?>">
+    <link rel="stylesheet" href="<?php echo base_url("assets/css/flatpickr.min.css"); ?>">
 
     <link rel="shortcut icon" href="<?php echo base_url("assets/images/logo-ifro-mini.png"); ?>" />
 
@@ -24,6 +25,8 @@
     <script src="<?php echo base_url("assets/vendors/select2/select2.min.js"); ?>"></script>
     <script src="<?php echo base_url('assets/vendors/typeahead.js/typeahead.bundle.min.js') ?>"></script>
     <script src="<?php echo base_url('assets/js/typeahead.js') ?>"></script>
+    <script src="<?php echo base_url('assets/js/flatpickr.js') ?>"></script>
+    
 
     <style>
         /* Ajuste para o texto digitado ficar cinza */

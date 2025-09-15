@@ -88,15 +88,17 @@
     .flatpickr-days .dayContainer {
         display: grid !important;
         grid-template-columns: repeat(7, 1fr) !important;
-        grid-auto-rows: 42px !important;
+        grid-auto-rows: 38px !important; /* ALTERADO: de 42px para 38px para diminuir a altura da linha */
         justify-items: center !important;
         align-items: center !important;
     }
 
     .flatpickr-day {
         color: #fff !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px !important;     /* ALTERADO: de 36px para 32px */
+        height: 32px !important;    /* ALTERADO: de 36px para 32px */
+        font-size: 0.85rem !important; /* ADICIONADO: para diminuir a fonte do número */
+        line-height: 32px !important;  /* ADICIONADO: para centralizar o número verticalmente */
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -318,6 +320,8 @@
             inline: true,
             mode: "multiple",
             dateFormat: "Y-m-d",
+            minDate: "today",
+            locale: "pt",
             onChange: function(selectedDates, dateStr, instance) {
                 let datasSelecionadas = selectedDates.map(d => instance.formatDate(d, "Y-m-d"));
                 document.getElementById('datas-hidden').value = datasSelecionadas.join(',');

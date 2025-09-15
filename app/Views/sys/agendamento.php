@@ -1,4 +1,5 @@
 <?php echo view('components/agendamentos/modal_cadastrar_agendamento', ["turmas" => $turmas], ["alunos" => $alunos]) ?>
+<?php echo view('components/agendamentos/modal_deletar_agendamento');?>
 
 <h1>Agendamento de Refeição</h1>
 <div class="my-4">
@@ -63,6 +64,32 @@
         color: #a71d2a;
     }
 
+    #lista-alunos-modal .list-group-item {
+        background-color: #2a3038;
+        color: #ffffff;
+        border-color: #444;
+        border-width: 0 0 1px 0;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    #lista-alunos-modal .list-group-item:first-child {
+        border-top-width: 1px;
+    }
+
+    #lista-alunos-modal .turma-header {
+        background-color: #212529;
+        font-weight: bold;
+        font-size: 1.05em;
+    }
+
+    #lista-alunos-modal .aluno-item {
+        padding-left: 2rem;
+    }
+
+    #lista-alunos-modal .list-group-item:last-child {
+        border-bottom-width: 0;
+    }
     .flatpickr-calendar {
         background-color: #2a3038 !important;
         color: #fff !important;
@@ -88,15 +115,17 @@
     .flatpickr-days .dayContainer {
         display: grid !important;
         grid-template-columns: repeat(7, 1fr) !important;
-        grid-auto-rows: 42px !important;
+        grid-auto-rows: 38px !important; 
         justify-items: center !important;
         align-items: center !important;
     }
 
     .flatpickr-day {
         color: #fff !important;
-        width: 36px !important;
-        height: 36px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.85rem !important;
+        line-height: 32px !important; 
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -133,6 +162,9 @@
     .ver-alunos-link:hover {
         color: #0056b3;
     }
+    .tooltip-on-top {
+        z-index: 9999 !important;
+    }
 </style>
 
 <script>
@@ -158,14 +190,25 @@
                 columns: [{
                     data: 'turma_aluno',
                     render: function(data, type, row) {
-                        const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
-                        if (row.tipo === 'turma') {
-                            return `<a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'><u>${data}</u></a>`;
-                        } else if (row.alunos && row.alunos.length > 1) {
-                            return `${data} <a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'>+ ${row.alunos.length - 1} aluno(s)</a>`;
-                        }
-                        return data;
+                    const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
+                    const turmasAlunosJson = JSON.stringify(row.alunos_por_turma).replace(/'/g, "&apos;");
+                    
+                    if (row.tipo === 'turma') {
+                        return `<a href="#" 
+                                class="ver-alunos-link" 
+                                data-bs-toggle="tooltip" 
+                                title="Ver Alunos" 
+                                data-alunos='${alunosJson}'><u>${data}</u></a>`;
+                    
+                    } else if (row.tipo === 'multi_turma') {
+                        return `<a href="#" 
+                                class="ver-alunos-link" 
+                                data-bs-toggle="tooltip" 
+                                title="Ver Turmas e Alunos" 
+                                data-turmas-alunos='${turmasAlunosJson}'><u>${data}</u></a>`;
                     }
+                    return data;
+                }
                 }, {
                     data: 'data'
                 }, {
@@ -177,13 +220,23 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
+                        const deleteInfoAttr = JSON.stringify(row.delete_info).replace(/'/g, '&apos;');
+
                         return `
                             <div class="d-flex">
                                 <span data-bs-toggle="tooltip" title="Editar agendamento">
                                     <button type="button" class="btn btn-inverse-success btn-icon me-1"><i class="fa fa-edit"></i></button>
                                 </span>
                                 <span data-bs-toggle="tooltip" title="Excluir agendamento">
-                                    <button type="button" class="btn btn-inverse-danger btn-icon me-1"><i class="fa fa-trash"></i></button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-inverse-danger btn-icon me-1 btn-excluir-agendamento" 
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal-deletar-agendamento"
+                                        data-nome="${row.turma_aluno}"
+                                        data-delete-info='${deleteInfoAttr}'>
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                                 </span>
                             </div>
                         `;
@@ -208,15 +261,25 @@
         }
     });
 
-    $('#listagem-agendamentos tbody').on('click', '.ver-alunos-turma', function(e) {
+    $('#listagem-agendamentos tbody').on('click', '.ver-alunos-link', function(e) {
         e.preventDefault();
-        const alunos = $(this).data('alunos');
         const ul = $("#lista-alunos-modal");
         ul.empty();
 
-        if (Array.isArray(alunos) && alunos.length > 0) {
+        const alunos = $(this).data('alunos');
+        const turmasAlunos = $(this).data('turmas-alunos');
+
+        if (turmasAlunos && Object.keys(turmasAlunos).length > 0) {
+            for (const nomeTurma in turmasAlunos) {
+                ul.append(`<li class="list-group-item turma-header">${nomeTurma}</li>`);
+                
+                turmasAlunos[nomeTurma].forEach(nomeAluno => {
+                    ul.append(`<li class="list-group-item aluno-item">${nomeAluno}</li>`);
+                });
+            }
+        } else if (Array.isArray(alunos) && alunos.length > 0) {
             alunos.forEach(nome => {
-                ul.append(`<li class="list-group-item" style="background-color: #2a3038; color: #ffffff;">${nome}</li>`);
+                ul.append(`<li class="list-group-item">${nome}</li>`);
             });
         } else {
             ul.append('<li class="list-group-item">Nenhum aluno encontrado.</li>');
@@ -318,6 +381,8 @@
             inline: true,
             mode: "multiple",
             dateFormat: "Y-m-d",
+            minDate: "today",
+            locale: "pt",
             onChange: function(selectedDates, dateStr, instance) {
                 let datasSelecionadas = selectedDates.map(d => instance.formatDate(d, "Y-m-d"));
                 document.getElementById('datas-hidden').value = datasSelecionadas.join(',');
@@ -363,4 +428,36 @@
                 });
         });
     }
+    $('#listagem-agendamentos').on('click', '.btn-excluir-agendamento', function() {
+        const button = $(this);
+        const nome = button.data('nome');
+        const deleteInfo = button.data('delete-info');
+
+        const modal = $('#modal-deletar-agendamento');
+        modal.find('#deleteAgendamentoNome').text(nome);
+        
+        modal.find('#deleteAgendamentoInfo').val(JSON.stringify(deleteInfo));
+    });
+
+    $(document).ready(function() {
+        $(document).on('mouseover', '.flatpickr-day.flatpickr-disabled', function() {
+            const el = this;
+            const tooltip = new bootstrap.Tooltip(el, {
+                html: true,
+                title: `<i class="fa fa-exclamation-triangle text-warning" style="margin-right: 6px;"></i> A data do Agendamento não pode ser anterior à de hoje`,
+                trigger: 'manual',
+                container: 'body',
+                customClass: 'tooltip-on-top'
+            });
+            tooltip.show();
+        });
+
+        $(document).on('mouseout', '.flatpickr-day.flatpickr-disabled', function() {
+            const el = this;
+            const tooltip = bootstrap.Tooltip.getInstance(el);
+            if (tooltip) {
+                tooltip.dispose();
+            }
+        });
+    });
 </script>

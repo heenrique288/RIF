@@ -26,6 +26,7 @@
     <script src="<?php echo base_url('assets/vendors/typeahead.js/typeahead.bundle.min.js') ?>"></script>
     <script src="<?php echo base_url('assets/js/typeahead.js') ?>"></script>
     <script src="<?php echo base_url('assets/js/flatpickr.js') ?>"></script>
+    <script src="<?php echo base_url('assets/js/flatpickr.ptbr.js') ?>"></script>
     
 
     <style>

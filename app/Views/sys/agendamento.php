@@ -64,6 +64,32 @@
         color: #a71d2a;
     }
 
+    #lista-alunos-modal .list-group-item {
+        background-color: #2a3038;
+        color: #ffffff;
+        border-color: #444;
+        border-width: 0 0 1px 0;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    #lista-alunos-modal .list-group-item:first-child {
+        border-top-width: 1px;
+    }
+
+    #lista-alunos-modal .turma-header {
+        background-color: #212529;
+        font-weight: bold;
+        font-size: 1.05em;
+    }
+
+    #lista-alunos-modal .aluno-item {
+        padding-left: 2rem;
+    }
+
+    #lista-alunos-modal .list-group-item:last-child {
+        border-bottom-width: 0;
+    }
     .flatpickr-calendar {
         background-color: #2a3038 !important;
         color: #fff !important;
@@ -162,10 +188,14 @@
                     data: 'turma_aluno',
                     render: function(data, type, row) {
                         const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
+                        const turmasAlunosJson = JSON.stringify(row.alunos_por_turma).replace(/'/g, "&apos;");
+                        
                         if (row.tipo === 'turma') {
-                            return `<a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'><u>${data}</u></a>`;
-                        } else if (row.alunos && row.alunos.length > 1) {
-                            return `${data} <a href="#" class="ver-alunos-turma ver-alunos-link" data-alunos='${alunosJson}'>+ ${row.alunos.length - 1} aluno(s)</a>`;
+                            return `<a href="#" class="ver-alunos-link" data-alunos='${alunosJson}'><u>${data}</u></a>`;
+                        
+                        } else if (row.tipo === 'multi_turma') {
+                            return `<a href="#" class="ver-alunos-link" data-turmas-alunos='${turmasAlunosJson}'><u>${data}</u></a>`;
+
                         }
                         return data;
                     }
@@ -221,15 +251,25 @@
         }
     });
 
-    $('#listagem-agendamentos tbody').on('click', '.ver-alunos-turma', function(e) {
+    $('#listagem-agendamentos tbody').on('click', '.ver-alunos-link', function(e) {
         e.preventDefault();
-        const alunos = $(this).data('alunos');
         const ul = $("#lista-alunos-modal");
         ul.empty();
 
-        if (Array.isArray(alunos) && alunos.length > 0) {
+        const alunos = $(this).data('alunos');
+        const turmasAlunos = $(this).data('turmas-alunos');
+
+        if (turmasAlunos && Object.keys(turmasAlunos).length > 0) {
+            for (const nomeTurma in turmasAlunos) {
+                ul.append(`<li class="list-group-item turma-header">${nomeTurma}</li>`);
+                
+                turmasAlunos[nomeTurma].forEach(nomeAluno => {
+                    ul.append(`<li class="list-group-item aluno-item">${nomeAluno}</li>`);
+                });
+            }
+        } else if (Array.isArray(alunos) && alunos.length > 0) {
             alunos.forEach(nome => {
-                ul.append(`<li class="list-group-item" style="background-color: #2a3038; color: #ffffff;">${nome}</li>`);
+                ul.append(`<li class="list-group-item">${nome}</li>`);
             });
         } else {
             ul.append('<li class="list-group-item">Nenhum aluno encontrado.</li>');

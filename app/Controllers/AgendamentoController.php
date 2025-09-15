@@ -17,92 +17,143 @@ class AgendamentoController extends BaseController
         $controleModel = new ControleRefeicoesModel();
 
         $statusMap = [
-            0 => 'Disponível', 1 => 'Confirmada', 2 => 'Retirada', 3 => 'Cancelada',
+            0 => 'Disponível', 
+            1 => 'Confirmada', 
+            2 => 'Retirada', 
+            3 => 'Cancelada',
         ];
         $motivoMap = [
-            0 => 'Contraturno', 1 => 'Estágio', 2 => 'Treino', 3 => 'Projeto', 4 => 'Visita Técnica',
+            0 => 'Contraturno', 
+            1 => 'Estágio', 
+            2 => 'Treino', 
+            3 => 'Projeto', 
+            4 => 'Visita Técnica',
         ];
 
-        $agendamentosDoBanco = $controleModel->findAll();
+        $agendamentosDoBanco = $controleModel->orderBy('data_refeicao', 'ASC')->findAll();
         
         $alunoIds = array_unique(array_column($agendamentosDoBanco, 'aluno_id'));
-        $alunoTurmaMap = [];
+        $alunosData = [];
         if (!empty($alunoIds)) {
             $alunos = $alunoModel->whereIn('matricula', $alunoIds)->findAll();
             foreach ($alunos as $aluno) {
-                $alunoTurmaMap[$aluno['matricula']] = $aluno['turma_id'] ?? null;
+                $alunosData[$aluno['matricula']] = $aluno;
             }
+        }
+
+        $agendamentosPorAluno = [];
+        foreach ($agendamentosDoBanco as $agendamento) {
+            $alunoId = $agendamento['aluno_id'];
+            $motivo = $agendamento['motivo'];
+            $status = $agendamento['status'];
+            
+            $chaveAlunoMotivo = $alunoId . '|' . $motivo;
+
+            if (!isset($agendamentosPorAluno[$chaveAlunoMotivo])) {
+                $agendamentosPorAluno[$chaveAlunoMotivo] = [
+                    'aluno_id' => $alunoId,
+                    'motivo'   => $motivo,
+                    'status'   => $status,
+                    'datas'    => []
+                ];
+            }
+            $agendamentosPorAluno[$chaveAlunoMotivo]['datas'][] = $agendamento['data_refeicao'];
         }
 
         $agendamentosAgrupados = [];
+        foreach ($agendamentosPorAluno as $dadosAluno) {
+            sort($dadosAluno['datas']);
+            $datasString = implode(',', $dadosAluno['datas']);
 
-        foreach ($agendamentosDoBanco as $agendamento) {
-            $alunoId = $agendamento['aluno_id'];
-            $turmaId = $alunoTurmaMap[$alunoId] ?? 'sem_turma';
-            $motivo = $agendamento['motivo'] ?? 'sem_motivo';
-            
-            $chave = md5($turmaId . '|' . $motivo);
+            $chaveFinal = md5($datasString . '|' . $dadosAluno['motivo']);
 
-            if (!isset($agendamentosAgrupados[$chave])) {
-                $agendamentosAgrupados[$chave] = [
-                    'aluno_ids' => [],
-                    'datas_refeicao' => [],
-                    'status' => $agendamento['status'],
-                    'motivo' => $agendamento['motivo'],
-                    'turma_id' => ($turmaId === 'sem_turma') ? null : $turmaId,
+            if (!isset($agendamentosAgrupados[$chaveFinal])) {
+                $agendamentosAgrupados[$chaveFinal] = [
+                    'aluno_ids'      => [],
+                    'datas_refeicao' => $dadosAluno['datas'],
+                    'status'         => $dadosAluno['status'],
+                    'motivo'         => $dadosAluno['motivo'],
                 ];
             }
-            
-            if (!in_array($alunoId, $agendamentosAgrupados[$chave]['aluno_ids'])) {
-                $agendamentosAgrupados[$chave]['aluno_ids'][] = $alunoId;
-            }
-            if (!in_array($agendamento['data_refeicao'], $agendamentosAgrupados[$chave]['datas_refeicao'])) {
-                $agendamentosAgrupados[$chave]['datas_refeicao'][] = $agendamento['data_refeicao'];
-            }
+            $agendamentosAgrupados[$chaveFinal]['aluno_ids'][] = $dadosAluno['aluno_id'];
         }
 
         $agendamentosParaTabela = [];
+        $turmasInfoCache = [];
+
         foreach ($agendamentosAgrupados as $agrupado) {
             $idsAlunosDoGrupo = $agrupado['aluno_ids'];
-            $nomesAlunosDoGrupo = !empty($idsAlunosDoGrupo)
-                ? $alunoModel->whereIn('matricula', $idsAlunosDoGrupo)->findColumn('nome') ?? []
-                : [];
-            
-            $turmaIdDoGrupo = $agrupado['turma_id'];
+            $turmasDoGrupo = [];
+            $alunosPorTurma = [];
+
+            foreach ($idsAlunosDoGrupo as $alunoId) {
+                if (isset($alunosData[$alunoId])) {
+                    $aluno = $alunosData[$alunoId];
+                    $turmaId = $aluno['turma_id'] ?? 'sem_turma';
+                    $turmasDoGrupo[$turmaId][] = $aluno['nome'];
+                }
+            }
+
+            $nomesAlunosDoGrupo = array_reduce($turmasDoGrupo, 'array_merge', []);
+            $qtdTurmasUnicas = count($turmasDoGrupo);
             $tipo = 'aluno';
             $turmaOuAluno = $nomesAlunosDoGrupo[0] ?? 'Aluno não encontrado';
+            $alunosParaModal = [];
 
-            if ($turmaIdDoGrupo && count($idsAlunosDoGrupo) > 1) {
-                $tipo = 'turma';
-                $turmaComCurso = $turmaModel
-                    ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
-                    ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
-                    ->find($turmaIdDoGrupo);
-                if ($turmaComCurso) {
-                    $turmaOuAluno = $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'];
-                } else {
-                    $turmaOuAluno = 'Turma Desconhecida';
+            if ($qtdTurmasUnicas > 1) {
+                $tipo = 'multi_turma';
+                $turmaOuAluno = count($turmasDoGrupo) . " turmas selecionadas";
+                
+                foreach ($turmasDoGrupo as $turmaId => $nomesAlunos) {
+                    if ($turmaId === 'sem_turma') {
+                        $nomeTurmaFormatado = 'Alunos sem Turma';
+                    } else {
+                        if (!isset($turmasInfoCache[$turmaId])) {
+                            $turmaComCurso = $turmaModel
+                                ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
+                                ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+                                ->find($turmaId);
+                            $turmasInfoCache[$turmaId] = $turmaComCurso ? $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'] : 'Turma Desconhecida';
+                        }
+                        $nomeTurmaFormatado = $turmasInfoCache[$turmaId];
+                    }
+                    $alunosParaModal[$nomeTurmaFormatado] = $nomesAlunos;
+                }
+
+            } elseif ($qtdTurmasUnicas === 1) {
+                // Lógica para TURMA ÚNICA (ou um aluno só)
+                $turmaIdDoGrupo = key($turmasDoGrupo);
+                if (count($idsAlunosDoGrupo) > 1 && $turmaIdDoGrupo !== 'sem_turma') {
+                    $tipo = 'turma';
+                    if (!isset($turmasInfoCache[$turmaIdDoGrupo])) {
+                        $turmaComCurso = $turmaModel
+                            ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
+                            ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+                            ->find($turmaIdDoGrupo);
+                        $turmasInfoCache[$turmaIdDoGrupo] = $turmaComCurso ? $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'] : 'Turma Desconhecida';
+                    }
+                    $turmaOuAluno = $turmasInfoCache[$turmaIdDoGrupo];
                 }
             }
 
             $datasFormatadas = array_map(fn($dateStr) => $dateStr ? (new \DateTime($dateStr))->format('d/m/Y') : '', $agrupado['datas_refeicao']);
 
             $agendamentosParaTabela[] = [
-                'tipo' => $tipo,
-                'turma_aluno' => $turmaOuAluno,
-                'data' => implode('<br>', $datasFormatadas),
-                'status' => $statusMap[$agrupado['status']] ?? 'Desconhecido',
-                'motivo' => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
-                'alunos' => $nomesAlunosDoGrupo,
+                'tipo'              => $tipo,
+                'turma_aluno'       => $turmaOuAluno,
+                'data'              => implode('<br>', $datasFormatadas),
+                'status'            => $statusMap[$agrupado['status']] ?? 'Desconhecido',
+                'motivo'            => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
+                'alunos'            => $nomesAlunosDoGrupo, // Para o modal de turma única
+                'alunos_por_turma'  => $alunosParaModal, // Para o modal de múltiplas turmas
                 'delete_info' => [
-                    'tipo' => $tipo,
-                    'id' => ($tipo === 'turma') ? $turmaIdDoGrupo : ($idsAlunosDoGrupo[0] ?? null),
-                    'motivo' => $agrupado['motivo'],
-                    'datas' => $agrupado['datas_refeicao']
+                    'aluno_ids' => $agrupado['aluno_ids'], // Envia todos os IDs para exclusão
+                    'motivo'    => $agrupado['motivo'],
+                    'datas'     => $agrupado['datas_refeicao']
                 ]
             ];
         }
-
+        
         $data['agendamentos'] = $agendamentosParaTabela;
         $data['alunos'] = $alunoModel->orderBy('nome')->findAll();
         $data['turmas'] = $turmaModel
@@ -189,24 +240,22 @@ class AgendamentoController extends BaseController
         }
 
         $controleModel = new ControleRefeicoesModel();
-        $alunoModel = new AlunoModel();
-
-        $controleModel->db->transBegin();
-
+        
         try {
+            $controleModel->db->transBegin();
+
             $query = $controleModel
                 ->where('motivo', $deleteInfo['motivo'])
                 ->whereIn('data_refeicao', $deleteInfo['datas']);
 
-            if ($deleteInfo['tipo'] === 'turma') {
-                $alunoIds = $alunoModel->where('turma_id', $deleteInfo['id'])->findColumn('matricula') ?? [];
-                if (!empty($alunoIds)) {
-                    $query->whereIn('aluno_id', $alunoIds);
-                }
+            // lógica usa sempre 'aluno_ids' que contém todas as matrículas do grupo
+            if (!empty($deleteInfo['aluno_ids'])) {
+                $query->whereIn('aluno_id', $deleteInfo['aluno_ids']);
             } else {
-                $query->where('aluno_id', $deleteInfo['id']);
+                // Fallback caso algo dê errado, para não apagar a tabela toda
+                throw new \Exception("Nenhum ID de aluno fornecido para exclusão.");
             }
-
+            
             $query->delete();
 
             if ($controleModel->db->transStatus() === false) {

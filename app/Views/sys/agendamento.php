@@ -1,4 +1,5 @@
 <?php echo view('components/agendamentos/modal_cadastrar_agendamento', ["turmas" => $turmas], ["alunos" => $alunos]) ?>
+<?php echo view('components/agendamentos/modal_deletar_agendamento');?>
 
 <h1>Agendamento de Refeição</h1>
 <div class="my-4">
@@ -88,17 +89,17 @@
     .flatpickr-days .dayContainer {
         display: grid !important;
         grid-template-columns: repeat(7, 1fr) !important;
-        grid-auto-rows: 38px !important; /* ALTERADO: de 42px para 38px para diminuir a altura da linha */
+        grid-auto-rows: 38px !important; 
         justify-items: center !important;
         align-items: center !important;
     }
 
     .flatpickr-day {
         color: #fff !important;
-        width: 32px !important;     /* ALTERADO: de 36px para 32px */
-        height: 32px !important;    /* ALTERADO: de 36px para 32px */
-        font-size: 0.85rem !important; /* ADICIONADO: para diminuir a fonte do número */
-        line-height: 32px !important;  /* ADICIONADO: para centralizar o número verticalmente */
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.85rem !important;
+        line-height: 32px !important; 
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -179,13 +180,23 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
+                        const deleteInfoAttr = JSON.stringify(row.delete_info).replace(/'/g, '&apos;');
+
                         return `
                             <div class="d-flex">
                                 <span data-bs-toggle="tooltip" title="Editar agendamento">
                                     <button type="button" class="btn btn-inverse-success btn-icon me-1"><i class="fa fa-edit"></i></button>
                                 </span>
                                 <span data-bs-toggle="tooltip" title="Excluir agendamento">
-                                    <button type="button" class="btn btn-inverse-danger btn-icon me-1"><i class="fa fa-trash"></i></button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-inverse-danger btn-icon me-1 btn-excluir-agendamento" 
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modal-deletar-agendamento"
+                                        data-nome="${row.turma_aluno}"
+                                        data-delete-info='${deleteInfoAttr}'>
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                                 </span>
                             </div>
                         `;
@@ -367,4 +378,14 @@
                 });
         });
     }
+    $('#listagem-agendamentos').on('click', '.btn-excluir-agendamento', function() {
+        const button = $(this);
+        const nome = button.data('nome');
+        const deleteInfo = button.data('delete-info');
+
+        const modal = $('#modal-deletar-agendamento');
+        modal.find('#deleteAgendamentoNome').text(nome);
+        
+        modal.find('#deleteAgendamentoInfo').val(JSON.stringify(deleteInfo));
+    });
 </script>

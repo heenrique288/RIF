@@ -94,6 +94,12 @@ class AgendamentoController extends BaseController
                 'status' => $statusMap[$agrupado['status']] ?? 'Desconhecido',
                 'motivo' => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
                 'alunos' => $nomesAlunosDoGrupo,
+                'delete_info' => [
+                    'tipo' => $tipo,
+                    'id' => ($tipo === 'turma') ? $turmaIdDoGrupo : ($idsAlunosDoGrupo[0] ?? null),
+                    'motivo' => $agrupado['motivo'],
+                    'datas' => $agrupado['datas_refeicao']
+                ]
             ];
         }
 
@@ -172,6 +178,53 @@ class AgendamentoController extends BaseController
         }
     }
 
+    public function delete()
+    {
+        $post = $this->request->getPost();
+        
+        $deleteInfo = json_decode($post['delete_info'], true);
+
+        if (empty($deleteInfo)) {
+            return redirect()->back()->with('erros', ['Dados para exclusão não fornecidos.']);
+        }
+
+        $controleModel = new ControleRefeicoesModel();
+        $alunoModel = new AlunoModel();
+
+        $controleModel->db->transBegin();
+
+        try {
+            $query = $controleModel
+                ->where('motivo', $deleteInfo['motivo'])
+                ->whereIn('data_refeicao', $deleteInfo['datas']);
+
+            if ($deleteInfo['tipo'] === 'turma') {
+                $alunoIds = $alunoModel->where('turma_id', $deleteInfo['id'])->findColumn('matricula') ?? [];
+                if (!empty($alunoIds)) {
+                    $query->whereIn('aluno_id', $alunoIds);
+                }
+            } else {
+                $query->where('aluno_id', $deleteInfo['id']);
+            }
+
+            $query->delete();
+
+            if ($controleModel->db->transStatus() === false) {
+                $controleModel->db->transRollback();
+                return redirect()->back()->with('erros', ['Erro ao deletar o agendamento.']);
+            }
+
+            $controleModel->db->transCommit();
+            session()->setFlashdata('sucesso', 'Agendamento deletado com sucesso!');
+            return redirect()->back();
+
+        } catch (\Exception $e) {
+            $controleModel->db->transRollback();
+            log_message('error', '[AgendamentoController] Erro em delete: ' . $e->getMessage());
+            return redirect()->back()->with('erros', ['Ocorreu um erro interno ao deletar o agendamento.']);
+        }
+    }
+    
     public function getAlunosByTurma($turma_id)
     {
         $alunoModel = new AlunoModel();

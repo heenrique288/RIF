@@ -187,18 +187,25 @@
                 columns: [{
                     data: 'turma_aluno',
                     render: function(data, type, row) {
-                        const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
-                        const turmasAlunosJson = JSON.stringify(row.alunos_por_turma).replace(/'/g, "&apos;");
-                        
-                        if (row.tipo === 'turma') {
-                            return `<a href="#" class="ver-alunos-link" data-alunos='${alunosJson}'><u>${data}</u></a>`;
-                        
-                        } else if (row.tipo === 'multi_turma') {
-                            return `<a href="#" class="ver-alunos-link" data-turmas-alunos='${turmasAlunosJson}'><u>${data}</u></a>`;
-
-                        }
-                        return data;
+                    const alunosJson = JSON.stringify(row.alunos).replace(/'/g, "&apos;");
+                    const turmasAlunosJson = JSON.stringify(row.alunos_por_turma).replace(/'/g, "&apos;");
+                    
+                    if (row.tipo === 'turma') {
+                        return `<a href="#" 
+                                class="ver-alunos-link" 
+                                data-bs-toggle="tooltip" 
+                                title="Ver Alunos" 
+                                data-alunos='${alunosJson}'><u>${data}</u></a>`;
+                    
+                    } else if (row.tipo === 'multi_turma') {
+                        return `<a href="#" 
+                                class="ver-alunos-link" 
+                                data-bs-toggle="tooltip" 
+                                title="Ver Turmas e Alunos" 
+                                data-turmas-alunos='${turmasAlunosJson}'><u>${data}</u></a>`;
                     }
+                    return data;
+                }
                 }, {
                     data: 'data'
                 }, {

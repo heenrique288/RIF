@@ -18,4 +18,43 @@ class UserModel extends ShieldUserModel
             // 'first_name',
         ];
     }
+
+    public function getUsuariosComGrupos() // Seleciona todos os usuários com grupos OBS: Se não tiver grupo, também aparece na view "Nenhum grupo atribuído"
+    {
+        
+        $usuarios = $this->select('id, username')->findAll();
+
+        $userGroupModel = model(UserGroupModel::class);
+
+        foreach ($usuarios as &$usuario) {
+            $grupos = $userGroupModel->getUserGroups($usuario->id);
+            $usuario->grupos = array_column($grupos, 'group');
+        }
+
+        return $usuarios;
+    }
+
+    public function findByUsername(string $username, ?int $ignoreUserId = null) // Procura o nome do Usuário
+    {
+        $builder = $this->where('username', $username);
+        if ($ignoreUserId) {
+            $builder->where('id !=', $ignoreUserId);
+        }
+        return $builder->first();   
+    }
+
+    public function findByEmail(string $email, ?int $ignoreUserId = null) // Procura o E-mail do usuário
+    {
+        $builder = $this->db->table('auth_identities')
+            ->where('type', 'email_password')
+            ->where('secret', $email);
+
+        if ($ignoreUserId) {
+            $builder->where('user_id !=', $ignoreUserId);
+        }
+
+        return $builder->get()->getRow();
+    }
+
+
 }

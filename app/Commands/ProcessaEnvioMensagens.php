@@ -17,35 +17,42 @@ class ProcessaEnvioMensagens extends BaseCommand
     {
         $enviarMensagensModel = new EnviarMensagensModel();
 
-        $mensagem = $enviarMensagensModel
+        $mensagens = $enviarMensagensModel
                         ->where('status', 0)
-                        ->first();
+                        ->orderBy('data_cadastro', 'ASC')
+                        ->limit(3)
+                        ->findAll();
 
-         if (empty($mensagem)) {
+         if (empty($mensagens)) {
             return; //Se não tiver nenhuma
         }
 
         CLI::write('Iniciando o processamento do envio da mensagem');
+        $wpp = new EvolutionAPI();
 
-        try {
-            
-            $wpp = new EvolutionAPI();
-            $wpp->sendMessage($mensagem['destinatario'], $mensagem['mensagem']);
-            
-            $enviarMensagensModel->update($mensagem['id'], [
-                'status'     => 1, 
-                'data_envio' => date('Y-m-d H:i:s'),
-            ]);
-            CLI::write("Sucesso");
-            
+        foreach ($mensagens as $mensagem) {
 
-        } catch (\Exception $e) {
-            
-            $enviarMensagensModel->update($mensagem['id'], [
-                'status' => 0, // retorna p/ não enviada
-            ]);
+            try {
+                
+                $wpp->sendMessage($mensagem['destinatario'], $mensagem['mensagem']);
+                
+                $enviarMensagensModel->update($mensagem['id'], [
+                    'status'     => 1, 
+                    'data_envio' => date('Y-m-d H:i:s'),
+                ]);
+                CLI::write("Sucesso");
+                
 
-            CLI::write("Erro ao processar mensagem");
+            } catch (\Exception $e) {
+                
+                $enviarMensagensModel->update($mensagem['id'], [
+                    'status' => 0, // retorna p/ não enviada
+                ]);
+
+                CLI::write("Erro ao processar mensagem");
+            }
+
+            sleep(20);
         }
 
     }

@@ -12,7 +12,7 @@ class EnviarMensagensModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['destinatario', 'mensagem', 'status', 'data_envio'];
+    protected $allowedFields    = ['destinatario', 'mensagem', 'status', 'data_envio', 'data_cadastro'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -21,11 +21,11 @@ class EnviarMensagensModel extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    protected $createdField  = 'data_cadastro';
+    protected $updatedField  = '';
+    protected $deletedField  = '';
 
     // Validation
     protected $validationRules      = [
@@ -33,6 +33,7 @@ class EnviarMensagensModel extends Model
         'destinatario'  => 'required|max_length[11]',
         'mensagem'      => 'required',
         'status'        => 'required|in_list[0,1]',
+        'data_cadastro' => 'permit_empty|valid_date',
     ];
     
     protected $validationMessages   = [
@@ -46,6 +47,9 @@ class EnviarMensagensModel extends Model
         'status' => [
             'required' => 'O campo status é obrigatório.',
             'in_list'  => 'O status deve ser 0 (pendente) ou 1 (enviado).',
+        ],
+        'data_cadastro' => [
+            'valid_date' => 'O campo data de cadastro deve ser uma data válida.',
         ],
     ];
 

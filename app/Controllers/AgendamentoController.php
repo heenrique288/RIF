@@ -212,8 +212,7 @@ class AgendamentoController extends BaseController
 
             if (!empty($dadosParaInserir)) {
                 $controleModel->insertBatch($dadosParaInserir);
-                // Se a funcionalidade de mensagens estiver pronta, pode descomentar
-                // $this->createSendMessages($matriculas, $datas);
+                $this->createSendMessages($matriculas, $datas);
             }
             
             session()->setFlashdata('sucesso', 'Agendamento(s) criado(s) com sucesso!');

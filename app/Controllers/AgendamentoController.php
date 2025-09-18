@@ -228,6 +228,66 @@ class AgendamentoController extends BaseController
         }
     }
 
+    public function update()
+    {
+        $this->response->setContentType('application/json');
+        $controleModel = new ControleRefeicoesModel();
+        $post = $this->request->getPost();
+
+        $originalAlunoIds = explode(',', $post['original_aluno_ids']);
+        $originalDatas = explode(',', $post['original_datas']);
+        $originalMotivo = strip_tags($post['original_motivo']);
+
+        $newMatriculasString = is_array($post['matriculas']) ? $post['matriculas'][0] : '';
+        $newDatasString = is_array($post['datas']) ? $post['datas'][0] : '';
+        $newMatriculas = !empty($newMatriculasString) ? explode(',', $newMatriculasString) : [];
+        $newDatas = !empty($newDatasString) ? explode(',', $newDatasString) : [];
+        $newStatus = strip_tags($post['status']);
+        $newMotivo = strip_tags($post['motivo']);
+
+        if (empty($newMatriculas) || empty($newDatas)) {
+            session()->setFlashdata('erros', ['Para editar, é preciso selecionar pelo menos um aluno e uma data.']);
+            return redirect()->back();
+        }
+
+        $controleModel->db->transBegin();
+        try {
+            $controleModel->where('motivo', $originalMotivo)
+                        ->whereIn('data_refeicao', $originalDatas)
+                        ->whereIn('aluno_id', $originalAlunoIds)
+                        ->delete();
+            $dadosParaInserir = [];
+            foreach ($newMatriculas as $matricula) {
+                foreach ($newDatas as $data) {
+                    $dadosParaInserir[] = [
+                        'aluno_id'      => trim($matricula),
+                        'data_refeicao' => trim($data),
+                        'status'        => $newStatus,
+                        'motivo'        => $newMotivo,
+                    ];
+                }
+            }
+
+            if (!empty($dadosParaInserir)) {
+                $controleModel->insertBatch($dadosParaInserir);
+            }
+
+            if ($controleModel->db->transStatus() === false) {
+                $controleModel->db->transRollback();
+                session()->setFlashdata('erros', ['Ocorreu um erro ao salvar as alterações.']);
+            } else {
+                $controleModel->db->transCommit();
+                session()->setFlashdata('sucesso', 'Agendamento atualizado com sucesso!');
+            }
+        } catch (\Exception $e) {
+            $controleModel->db->transRollback();
+            log_message('error', '[AgendamentoController] Erro em update: ' . $e->getMessage());
+            session()->setFlashdata('erros', ['Ocorreu um erro inesperado no servidor.']);
+        }
+        
+        return redirect()->to(site_url('sys/agendamento/admin'));
+    }
+
     public function delete()
     {
         $post = $this->request->getPost();

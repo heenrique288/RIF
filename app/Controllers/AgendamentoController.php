@@ -285,7 +285,7 @@ class AgendamentoController extends BaseController
             session()->setFlashdata('erros', ['Ocorreu um erro inesperado no servidor.']);
         }
         
-        return redirect()->to(site_url('sys/agendamento/admin'));
+        return redirect()->to(site_url('sys/agendamento/'));
     }
 
     public function delete()

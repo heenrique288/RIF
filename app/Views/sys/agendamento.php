@@ -14,11 +14,11 @@
 <table class="table mb-4" id="listagem-agendamentos">
     <thead>
         <tr>
-            <th>Turma ou Aluno</th>
-            <th>Data</th>
-            <th>Status</th>
-            <th>Motivo</th>
-            <th style="text-align: center; width: 10%; min-width: 100px;">Ações</th>
+            <th><strong>Turma ou Aluno</strong></th>
+            <th><strong>Data</strong></th>
+            <th><strong>Status</strong></th>
+            <th><strong>Motivo</strong></th>
+            <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
         </tr>
     </thead>
     <tbody>
@@ -525,7 +525,7 @@
             alunosSelecionadosEdit.delete(String(matricula));
             atualizarListaAlunosEdit();
         });
-        
+
         $(document).on('mouseover', '.flatpickr-day.flatpickr-disabled', function() {
             const el = this;
             let tooltipTitle = '';

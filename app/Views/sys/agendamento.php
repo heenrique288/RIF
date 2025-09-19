@@ -351,17 +351,33 @@
                 alunosSelecionadosEdit.set(String(deleteInfo.aluno_ids[index]), nome);
             });
             atualizarListaAlunosEdit();
-            
-            if (flatpickrEditInstance) { flatpickrEditInstance.destroy(); }
+            const dataMaisAntiga = deleteInfo.datas[0]; 
+
+            $('#modal-editar-agendamento').data('datas-para-selecionar', deleteInfo.datas);
+            $('#modal-editar-agendamento').data('min-date-para-editar', dataMaisAntiga);
+            $('#edit_datas-hidden').val(deleteInfo.datas.join(','));    
+        });
+
+        // Função pra puxar as datas selecionadas
+        $('#modal-editar-agendamento').on('shown.bs.modal', function () {
+            const datasParaSelecionar = $(this).data('datas-para-selecionar');
+            const minDateParaEditar = $(this).data('min-date-para-editar');
+            if (flatpickrEditInstance) {
+                flatpickrEditInstance.destroy();
+            }
             flatpickrEditInstance = flatpickr("#edit-datepicker", {
-                inline: true, mode: "multiple", dateFormat: "Y-m-d", locale: "pt", minDate: "today",
-                defaultDate: deleteInfo.datas,
-                onChange: function(selectedDates) {
-                    const datas = selectedDates.map(d => this.formatDate(d, "Y-m-d"));
+                inline: true,
+                mode: "multiple",
+                dateFormat: "Y-m-d",
+                locale: "pt",
+                // minDate: "today",
+                minDate: minDateParaEditar,
+                defaultDate: datasParaSelecionar,
+                onChange: function(selectedDates, dateStr, instance) {
+                    const datas = selectedDates.map(d => instance.formatDate(d, "Y-m-d"));
                     $('#edit_datas-hidden').val(datas.join(','));
                 }
             });
-            $('#edit_datas-hidden').val(deleteInfo.datas.join(','));
         });
 
         if (document.getElementById('form-cadastrar-agendamento')) {
@@ -509,12 +525,21 @@
             alunosSelecionadosEdit.delete(String(matricula));
             atualizarListaAlunosEdit();
         });
+        
         $(document).on('mouseover', '.flatpickr-day.flatpickr-disabled', function() {
             const el = this;
+            let tooltipTitle = '';
+            if ($(el).closest('#modal-editar-agendamento').length) {
+                tooltipTitle = `<i class="fa fa-exclamation-triangle text-warning" style="margin-right: 6px;"></i> A data não pode ser inferior à data já cadastrada`;
+            } else {
+                tooltipTitle = `<i class="fa fa-exclamation-triangle text-warning" style="margin-right: 6px;"></i> A data não pode ser anterior à de hoje`;
+            }
             const tooltip = new bootstrap.Tooltip(el, {
                 html: true,
-                title: `<i class="fa fa-exclamation-triangle text-warning" style="margin-right: 6px;"></i> A data não pode ser anterior à de hoje`,
-                trigger: 'manual', container: 'body', customClass: 'tooltip-on-top'
+                title: tooltipTitle,
+                trigger: 'manual',
+                container: 'body',
+                customClass: 'tooltip-on-top'
             });
             tooltip.show();
         });

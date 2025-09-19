@@ -18,7 +18,7 @@
             <th>Data</th>
             <th>Status</th>
             <th>Motivo</th>
-            <th>Ações</th>
+            <th style="text-align: center; width: 10%; min-width: 100px;">Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -105,7 +105,7 @@
     #listagem-agendamentos td:last-child {
         width: 1%;
         white-space: nowrap;
-        padding: 8px 12px !important; /* Adiciona 8px de respiro em cima/baixo e 12px nas laterais */
+        padding: 8px 12px !important;
     }
     .flatpickr-calendar {
         background-color: #2a3038 !important;
@@ -267,7 +267,7 @@
                         const editInfoAttr = JSON.stringify(row);
 
                         return `
-                            <div class="d-flex">
+                            <div class="d-flex justify-content-center">
                                 <span data-bs-toggle="tooltip" title="Editar agendamento">
                                     <button type="button" class="btn btn-inverse-success btn-icon me-1 btn-editar-agendamento d-flex align-items-center justify-content-center"
                                         data-bs-toggle="modal" data-bs-target="#modal-editar-agendamento"

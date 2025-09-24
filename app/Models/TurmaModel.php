@@ -61,4 +61,22 @@ class TurmaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    protected array $turmasCache = []; // Cache interno para pegar as turmas com curso
+
+    // Função para pegar nome das turma com curso, função que será chamada lá no AgendamentoController.php
+    public function getNomeTurmaComCurso(int $turmaId): string
+    {
+        if (isset($this->turmasCache[$turmaId])) {
+            return $this->turmasCache[$turmaId];
+        }
+
+        $turma = $this->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
+                    ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+                    ->find($turmaId);
+
+        $nome = $turma ? "{$turma['nome_turma']} - {$turma['nome_curso']}" : 'Turma Desconhecida';
+        $this->turmasCache[$turmaId] = $nome;
+        return $nome;
+    }
+
 }

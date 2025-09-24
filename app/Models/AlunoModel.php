@@ -55,4 +55,27 @@ class AlunoModel extends Model
         }
         return $data;
     }
+
+    // Função para pegar os alunos por ID, que será usado no AgendamentoController.php
+    public function getAlunosByIds(array $alunoIds): array
+    {
+        if (empty($alunoIds)) return [];
+        $alunos = $this->whereIn('matricula', $alunoIds)->findAll();
+        $result = [];
+        foreach ($alunos as $aluno) {
+            $result[$aluno['matricula']] = $aluno;
+        }
+        return $result;
+    }
+
+    //
+    // FUNÇÃO DO MÉTODO GETALUNOSBYTURMA() DO CONTROLLER --> AgendamentoController.php
+    //
+    
+    public function getAtivosByTurma(int $turmaId): array
+    {
+        return $this->where('turma_id', $turmaId)
+                    ->where('status', 1)
+                    ->findAll();
+    }
 }

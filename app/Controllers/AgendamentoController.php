@@ -12,159 +12,13 @@ class AgendamentoController extends BaseController
 {
     public function index()
     {
-        $turmaModel = new TurmaModel();
-        $alunoModel = new AlunoModel();
         $controleModel = new ControleRefeicoesModel();
-
-        $statusMap = [
-            0 => 'Disponível', 
-            1 => 'Confirmada', 
-            2 => 'Retirada', 
-            3 => 'Cancelada',
-        ];
-        $motivoMap = [
-            0 => 'Contraturno', 
-            1 => 'Estágio', 
-            2 => 'Treino', 
-            3 => 'Projeto', 
-            4 => 'Visita Técnica',
-        ];
-
-        $agendamentosDoBanco = $controleModel->orderBy('data_refeicao', 'ASC')->findAll();
+        $data = $controleModel->getViewData(new AlunoModel(), new TurmaModel());
         
-        $alunoIds = array_unique(array_column($agendamentosDoBanco, 'aluno_id'));
-        $alunosData = [];
-        if (!empty($alunoIds)) {
-            $alunos = $alunoModel->whereIn('matricula', $alunoIds)->findAll();
-            foreach ($alunos as $aluno) {
-                $alunosData[$aluno['matricula']] = $aluno;
-            }
-        }
-
-        $agendamentosPorAluno = [];
-        foreach ($agendamentosDoBanco as $agendamento) {
-            $alunoId = $agendamento['aluno_id'];
-            $motivo = $agendamento['motivo'];
-            $status = $agendamento['status'];
-            
-            $chaveAlunoMotivo = $alunoId . '|' . $motivo;
-
-            if (!isset($agendamentosPorAluno[$chaveAlunoMotivo])) {
-                $agendamentosPorAluno[$chaveAlunoMotivo] = [
-                    'aluno_id' => $alunoId,
-                    'motivo'   => $motivo,
-                    'status'   => $status,
-                    'datas'    => []
-                ];
-            }
-            $agendamentosPorAluno[$chaveAlunoMotivo]['datas'][] = $agendamento['data_refeicao'];
-        }
-
-        $agendamentosAgrupados = [];
-        foreach ($agendamentosPorAluno as $dadosAluno) {
-            sort($dadosAluno['datas']);
-            $datasString = implode(',', $dadosAluno['datas']);
-
-            $chaveFinal = md5($datasString . '|' . $dadosAluno['motivo']);
-
-            if (!isset($agendamentosAgrupados[$chaveFinal])) {
-                $agendamentosAgrupados[$chaveFinal] = [
-                    'aluno_ids'      => [],
-                    'datas_refeicao' => $dadosAluno['datas'],
-                    'status'         => $dadosAluno['status'],
-                    'motivo'         => $dadosAluno['motivo'],
-                ];
-            }
-            $agendamentosAgrupados[$chaveFinal]['aluno_ids'][] = $dadosAluno['aluno_id'];
-        }
-
-        $agendamentosParaTabela = [];
-        $turmasInfoCache = [];
-
-        foreach ($agendamentosAgrupados as $agrupado) {
-            $idsAlunosDoGrupo = $agrupado['aluno_ids'];
-            $turmasDoGrupo = [];
-            $alunosPorTurma = [];
-
-            foreach ($idsAlunosDoGrupo as $alunoId) {
-                if (isset($alunosData[$alunoId])) {
-                    $aluno = $alunosData[$alunoId];
-                    $turmaId = $aluno['turma_id'] ?? 'sem_turma';
-                    $turmasDoGrupo[$turmaId][] = $aluno['nome'];
-                }
-            }
-
-            $nomesAlunosDoGrupo = array_reduce($turmasDoGrupo, 'array_merge', []);
-            $qtdTurmasUnicas = count($turmasDoGrupo);
-            $tipo = 'aluno';
-            $turmaOuAluno = $nomesAlunosDoGrupo[0] ?? 'Aluno não encontrado';
-            $alunosParaModal = [];
-
-            if ($qtdTurmasUnicas > 1) {
-                $tipo = 'multi_turma';
-                $turmaOuAluno = count($turmasDoGrupo) . " turmas selecionadas";
-                
-                foreach ($turmasDoGrupo as $turmaId => $nomesAlunos) {
-                    if ($turmaId === 'sem_turma') {
-                        $nomeTurmaFormatado = 'Alunos sem Turma';
-                    } else {
-                        if (!isset($turmasInfoCache[$turmaId])) {
-                            $turmaComCurso = $turmaModel
-                                ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
-                                ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
-                                ->find($turmaId);
-                            $turmasInfoCache[$turmaId] = $turmaComCurso ? $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'] : 'Turma Desconhecida';
-                        }
-                        $nomeTurmaFormatado = $turmasInfoCache[$turmaId];
-                    }
-                    $alunosParaModal[$nomeTurmaFormatado] = $nomesAlunos;
-                }
-
-            } elseif ($qtdTurmasUnicas === 1) {
-                // Lógica para TURMA ÚNICA (ou um aluno só)
-                $turmaIdDoGrupo = key($turmasDoGrupo);
-                if (count($idsAlunosDoGrupo) > 1 && $turmaIdDoGrupo !== 'sem_turma') {
-                    $tipo = 'turma';
-                    if (!isset($turmasInfoCache[$turmaIdDoGrupo])) {
-                        $turmaComCurso = $turmaModel
-                            ->select('turmas.nome as nome_turma, cursos.nome as nome_curso')
-                            ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
-                            ->find($turmaIdDoGrupo);
-                        $turmasInfoCache[$turmaIdDoGrupo] = $turmaComCurso ? $turmaComCurso['nome_turma'] . ' - ' . $turmaComCurso['nome_curso'] : 'Turma Desconhecida';
-                    }
-                    $turmaOuAluno = $turmasInfoCache[$turmaIdDoGrupo];
-                }
-            }
-
-            $datasFormatadas = array_map(fn($dateStr) => $dateStr ? (new \DateTime($dateStr))->format('d/m/Y') : '', $agrupado['datas_refeicao']);
-
-            $agendamentosParaTabela[] = [
-                'tipo'              => $tipo,
-                'turma_aluno'       => $turmaOuAluno,
-                'data'              => implode('<br>', $datasFormatadas),
-                'status'            => $statusMap[$agrupado['status']] ?? 'Desconhecido',
-                'motivo'            => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
-                'alunos'            => $nomesAlunosDoGrupo, // Para o modal de turma única
-                'alunos_por_turma'  => $alunosParaModal, // Para o modal de múltiplas turmas
-                'delete_info' => [
-                    'aluno_ids' => $agrupado['aluno_ids'], // Envia todos os IDs para exclusão
-                    'motivo'    => $agrupado['motivo'],
-                    'datas'     => $agrupado['datas_refeicao']
-                ]
-            ];
-        }
-        
-        $data['agendamentos'] = $agendamentosParaTabela;
-        $data['alunos'] = $alunoModel->orderBy('nome')->findAll();
-        $data['turmas'] = $turmaModel
-            ->select('turmas.id, turmas.nome as nome_turma, cursos.nome as nome_curso')
-            ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
-            ->orderBy('turmas.nome')
-            ->findAll();
         $data['content'] = view('sys/agendamento', $data);
-
         return view('dashboard', $data);
     }
+
     
     public function create()
     {
@@ -173,53 +27,33 @@ class AgendamentoController extends BaseController
         try {
             $post = $this->request->getPost();
 
-            $turma_id = !empty($post['turma_id']) ? (int) strip_tags($post['turma_id']) : null;
             $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
-            $datasString = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
-            $status = strip_tags($post['status']);
-            $motivo = strip_tags($post['motivo']);
+            $datasString      = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
+            $status           = strip_tags($post['status']);
+            $motivo           = strip_tags($post['motivo']);
 
             if (empty($matriculasString) || empty($datasString)) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Selecione pelo menos um aluno e uma data.']);
+                return $this->response->setJSON([
+                    'success' => false, 
+                    'message' => 'Selecione pelo menos um aluno e uma data.'
+                ]);
             }
 
             $matriculas = explode(',', $matriculasString);
-            $datas = explode(',', $datasString);
+            $datas      = explode(',', $datasString);
 
-            $controleModel = new \App\Models\ControleRefeicoesModel();
-            $dadosParaInserir = [];
+            $controleModel = new ControleRefeicoesModel();
+            $inserido = $controleModel->createAgendamentos($matriculas, $datas, $status, $motivo);
 
-            foreach ($matriculas as $matricula) {
-                $matricula = trim($matricula);
-                if (empty($matricula) || !is_numeric($matricula)) {
-                    continue;
-                }
-
-                foreach ($datas as $data) {
-                    $data = trim($data);
-                    if (empty($data)) {
-                        continue;
-                    }
-
-                    $dadosParaInserir[] = [
-                        'aluno_id' => $matricula,
-                        'data_refeicao' => $data,
-                        'status' => $status,
-                        'motivo' => $motivo,
-                    ];
-                }
-            }
-
-            if (!empty($dadosParaInserir)) {
-                $controleModel->insertBatch($dadosParaInserir);
+            if ($inserido) {
                 $this->createSendMessages($matriculas, $datas);
+                session()->setFlashdata('sucesso', 'Agendamento(s) criado(s) com sucesso!');
             }
-            
-            session()->setFlashdata('sucesso', 'Agendamento(s) criado(s) com sucesso!');
-            return $this->response->setJSON(['success' => true]);
+
+            return $this->response->setJSON(['success' => (bool) $inserido]);
 
         } catch (\Exception $e) {
-            log_message('error', '[AgendamentoController] Erro em create: ' . $e->getMessage() . ' na linha ' . $e->getLine());
+            log_message('error', '[AgendamentoController] Erro em create: ' . $e->getMessage());
 
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,
@@ -228,119 +62,82 @@ class AgendamentoController extends BaseController
         }
     }
 
+
     public function update()
     {
-        $this->response->setContentType('application/json');
-        $controleModel = new ControleRefeicoesModel();
         $post = $this->request->getPost();
 
         $originalAlunoIds = explode(',', $post['original_aluno_ids']);
-        $originalDatas = explode(',', $post['original_datas']);
-        $originalMotivo = strip_tags($post['original_motivo']);
+        $originalDatas    = explode(',', $post['original_datas']);
+        $originalMotivo   = strip_tags($post['original_motivo']);
 
         $newMatriculasString = is_array($post['matriculas']) ? $post['matriculas'][0] : '';
-        $newDatasString = is_array($post['datas']) ? $post['datas'][0] : '';
-        $newMatriculas = !empty($newMatriculasString) ? explode(',', $newMatriculasString) : [];
-        $newDatas = !empty($newDatasString) ? explode(',', $newDatasString) : [];
-        $newStatus = strip_tags($post['status']);
-        $newMotivo = strip_tags($post['motivo']);
+        $newDatasString      = is_array($post['datas']) ? $post['datas'][0] : '';
+        $newMatriculas       = !empty($newMatriculasString) ? explode(',', $newMatriculasString) : [];
+        $newDatas            = !empty($newDatasString) ? explode(',', $newDatasString) : [];
+        $newStatus           = strip_tags($post['status']);
+        $newMotivo           = strip_tags($post['motivo']);
 
         if (empty($newMatriculas) || empty($newDatas)) {
             session()->setFlashdata('erros', ['Para editar, é preciso selecionar pelo menos um aluno e uma data.']);
             return redirect()->back();
         }
 
-        $controleModel->db->transBegin();
-        try {
-            $controleModel->where('motivo', $originalMotivo)
-                        ->whereIn('data_refeicao', $originalDatas)
-                        ->whereIn('aluno_id', $originalAlunoIds)
-                        ->delete();
-            $dadosParaInserir = [];
-            foreach ($newMatriculas as $matricula) {
-                foreach ($newDatas as $data) {
-                    $dadosParaInserir[] = [
-                        'aluno_id'      => trim($matricula),
-                        'data_refeicao' => trim($data),
-                        'status'        => $newStatus,
-                        'motivo'        => $newMotivo,
-                    ];
-                }
-            }
+        $controleModel = new ControleRefeicoesModel();
+        $sucesso = $controleModel->updateAgendamentos(
+            $originalAlunoIds,
+            $originalDatas,
+            $originalMotivo,
+            $newMatriculas,
+            $newDatas,
+            $newStatus,
+            $newMotivo
+        );
 
-            if (!empty($dadosParaInserir)) {
-                $controleModel->insertBatch($dadosParaInserir);
-            }
-
-            if ($controleModel->db->transStatus() === false) {
-                $controleModel->db->transRollback();
-                session()->setFlashdata('erros', ['Ocorreu um erro ao salvar as alterações.']);
-            } else {
-                $controleModel->db->transCommit();
-                session()->setFlashdata('sucesso', 'Agendamento atualizado com sucesso!');
-            }
-        } catch (\Exception $e) {
-            $controleModel->db->transRollback();
-            log_message('error', '[AgendamentoController] Erro em update: ' . $e->getMessage());
-            session()->setFlashdata('erros', ['Ocorreu um erro inesperado no servidor.']);
+        if ($sucesso) {
+            session()->setFlashdata('sucesso', 'Agendamento atualizado com sucesso!');
+        } else {
+            session()->setFlashdata('erros', ['Ocorreu um erro ao salvar as alterações.']);
         }
-        
+
         return redirect()->to(site_url('sys/agendamento/'));
     }
+
 
     public function delete()
     {
         $post = $this->request->getPost();
-        
         $deleteInfo = json_decode($post['delete_info'], true);
 
         if (empty($deleteInfo)) {
             return redirect()->back()->with('erros', ['Dados para exclusão não fornecidos.']);
         }
 
+        $alunoIds = $deleteInfo['aluno_ids'] ?? [];
+        $datas    = $deleteInfo['datas'] ?? [];
+        $motivo   = $deleteInfo['motivo'] ?? '';
+
         $controleModel = new ControleRefeicoesModel();
-        
-        try {
-            $controleModel->db->transBegin();
+        $sucesso = $controleModel->deleteAgendamentos($alunoIds, $datas, $motivo);
 
-            $query = $controleModel
-                ->where('motivo', $deleteInfo['motivo'])
-                ->whereIn('data_refeicao', $deleteInfo['datas']);
-
-            // lógica usa sempre 'aluno_ids' que contém todas as matrículas do grupo
-            if (!empty($deleteInfo['aluno_ids'])) {
-                $query->whereIn('aluno_id', $deleteInfo['aluno_ids']);
-            } else {
-                // Fallback caso algo dê errado, para não apagar a tabela toda
-                throw new \Exception("Nenhum ID de aluno fornecido para exclusão.");
-            }
-            
-            $query->delete();
-
-            if ($controleModel->db->transStatus() === false) {
-                $controleModel->db->transRollback();
-                return redirect()->back()->with('erros', ['Erro ao deletar o agendamento.']);
-            }
-
-            $controleModel->db->transCommit();
+        if ($sucesso) {
             session()->setFlashdata('sucesso', 'Agendamento deletado com sucesso!');
-            return redirect()->back();
-
-        } catch (\Exception $e) {
-            $controleModel->db->transRollback();
-            log_message('error', '[AgendamentoController] Erro em delete: ' . $e->getMessage());
-            return redirect()->back()->with('erros', ['Ocorreu um erro interno ao deletar o agendamento.']);
+        } else {
+            session()->setFlashdata('erros', ['Ocorreu um erro interno ao deletar o agendamento.']);
         }
+
+        return redirect()->back();
     }
+
     
     public function getAlunosByTurma($turma_id)
     {
         $alunoModel = new AlunoModel();
-        $alunos = $alunoModel->where('turma_id', $turma_id)
-            ->where('status', 1)
-            ->findAll();
+        $alunos = $alunoModel->getAtivosByTurma((int) $turma_id);
+
         return $this->response->setJSON($alunos);
     }
+
 
     public function createSendMessages(array $matriculas, array $datasSelecionadas)
     {

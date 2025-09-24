@@ -43,4 +43,279 @@ class ControleRefeicoesModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    //
+    //
+    // FUNÇÕES DO MÉTODO INDEX() DO CONTROLLER --> AgendamentoController.php
+    //
+    //
+    public function getAgendamentosAgrupados(): array
+    {
+        $agendamentos = $this->orderBy('data_refeicao', 'ASC')->findAll();
+
+        $agendamentosPorAluno = [];
+        foreach ($agendamentos as $agendamento) {
+            $alunoId = $agendamento['aluno_id'];
+            $motivo = $agendamento['motivo'];
+            $status = $agendamento['status'];
+
+            $chaveAlunoMotivo = $alunoId . '|' . $motivo;
+
+            if (!isset($agendamentosPorAluno[$chaveAlunoMotivo])) {
+                $agendamentosPorAluno[$chaveAlunoMotivo] = [
+                    'aluno_id' => $alunoId,
+                    'motivo'   => $motivo,
+                    'status'   => $status,
+                    'datas'    => []
+                ];
+            }
+            $agendamentosPorAluno[$chaveAlunoMotivo]['datas'][] = $agendamento['data_refeicao'];
+        }
+
+        $agendamentosAgrupados = [];
+        foreach ($agendamentosPorAluno as $dadosAluno) {
+            sort($dadosAluno['datas']);
+            $datasString = implode(',', $dadosAluno['datas']);
+            $chaveFinal = md5($datasString . '|' . $dadosAluno['motivo']);
+
+            if (!isset($agendamentosAgrupados[$chaveFinal])) {
+                $agendamentosAgrupados[$chaveFinal] = [
+                    'aluno_ids'      => [],
+                    'datas_refeicao' => $dadosAluno['datas'],
+                    'status'         => $dadosAluno['status'],
+                    'motivo'         => $dadosAluno['motivo'],
+                ];
+            }
+            $agendamentosAgrupados[$chaveFinal]['aluno_ids'][] = $dadosAluno['aluno_id'];
+        }
+
+        return $agendamentosAgrupados;
+    }
+
+    //Função que pega os agendamentos da tabela para chamar no index() do AgendamentoController.php
+    public function getAgendamentosParaTabela(AlunoModel $alunoModel, TurmaModel $turmaModel): array
+    {
+        $statusMap = [
+            0 => 'Disponível',
+            1 => 'Confirmada',
+            2 => 'Retirada',
+            3 => 'Cancelada',
+        ];
+        $motivoMap = [
+            0 => 'Contraturno',
+            1 => 'Estágio',
+            2 => 'Treino',
+            3 => 'Projeto',
+            4 => 'Visita Técnica',
+        ];
+
+        $agendamentosAgrupados = $this->getAgendamentosAgrupados();
+
+        $todosIdsAlunos = [];
+        foreach ($agendamentosAgrupados as $agrupado) {
+            $todosIdsAlunos = array_merge($todosIdsAlunos, $agrupado['aluno_ids']);
+        }
+        $alunosData = $alunoModel->getAlunosByIds(array_unique($todosIdsAlunos));
+
+        $result = [];
+        foreach ($agendamentosAgrupados as $agrupado) {
+            $idsAlunos = $agrupado['aluno_ids'];
+            $turmasDoGrupo = [];
+            $alunosParaModal = [];
+
+            foreach ($idsAlunos as $id) {
+                if (!isset($alunosData[$id])) continue;
+                $aluno = $alunosData[$id];
+                $turmaId = $aluno['turma_id'] ?? 'sem_turma';
+                $turmasDoGrupo[$turmaId][] = $aluno['nome'];
+            }
+
+            $nomesAlunos = array_reduce($turmasDoGrupo, 'array_merge', []);
+            $qtdTurmas = count($turmasDoGrupo);
+            $tipo = 'aluno';
+            $turmaOuAluno = $nomesAlunos[0] ?? 'Aluno não encontrado';
+
+            if ($qtdTurmas > 1) {
+                $tipo = 'multi_turma';
+                $turmaOuAluno = "$qtdTurmas turmas selecionadas";
+
+                foreach ($turmasDoGrupo as $turmaId => $nomes) {
+                    $nomeTurma = ($turmaId === 'sem_turma') ? 'Alunos sem Turma' : $turmaModel->getNomeTurmaComCurso($turmaId);
+                    $alunosParaModal[$nomeTurma] = $nomes;
+                }
+
+            } elseif ($qtdTurmas === 1) {
+                $turmaId = key($turmasDoGrupo);
+                if (count($idsAlunos) > 1 && $turmaId !== 'sem_turma') {
+                    $tipo = 'turma';
+                    $turmaOuAluno = $turmaModel->getNomeTurmaComCurso($turmaId);
+                }
+            }
+
+            $datasFormatadas = array_map(fn($d) => $d ? (new \DateTime($d))->format('d/m/Y') : '', $agrupado['datas_refeicao']);
+
+            $result[] = [
+                'tipo'             => $tipo,
+                'turma_aluno'      => $turmaOuAluno,
+                'data'             => implode('<br>', $datasFormatadas),
+                'status'           => $statusMap[$agrupado['status']] ?? 'Desconhecido',
+                'motivo'           => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
+                'alunos'           => $nomesAlunos,
+                'alunos_por_turma' => $alunosParaModal,
+                'delete_info'      => [
+                    'aluno_ids' => $idsAlunos,
+                    'motivo'    => $agrupado['motivo'],
+                    'datas'     => $agrupado['datas_refeicao']
+                ]
+            ];
+        }
+
+        return $result;
+    }
+
+    // Fução para retornar para a o controller os dadaos. --> AgendamentoController.php
+    public function getViewData(AlunoModel $alunoModel, TurmaModel $turmaModel): array
+    {
+        return [
+            'agendamentos' => $this->getAgendamentosParaTabela($alunoModel, $turmaModel),
+            'alunos'       => $alunoModel->orderBy('nome')->findAll(),
+            'turmas'       => $turmaModel->select('turmas.id, turmas.nome as nome_turma, cursos.nome as nome_curso')
+                                           ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+                                           ->orderBy('turmas.nome')
+                                           ->findAll()
+        ];
+    }
+
+    //
+    // FUNÇÃO COMO O MÉTODO CREATE() DO CONTROLLER --> AgendamentoController.php
+    //
+
+    public function createAgendamentos(array $matriculas, array $datas, string $status, string $motivo): bool
+    {
+        if (empty($matriculas) || empty($datas)) {
+            return false;
+        }
+
+        $dadosParaInserir = [];
+
+        foreach ($matriculas as $matricula) {
+            $matricula = trim($matricula);
+            if (empty($matricula) || !is_numeric($matricula)) {
+                continue;
+            }
+
+            foreach ($datas as $data) {
+                $data = trim($data);
+                if (empty($data)) {
+                    continue;
+                }
+
+                $dadosParaInserir[] = [
+                    'aluno_id'      => $matricula,
+                    'data_refeicao' => $data,
+                    'status'        => $status,
+                    'motivo'        => $motivo,
+                ];
+            }
+        }
+
+        if (!empty($dadosParaInserir)) {
+            return (bool) $this->insertBatch($dadosParaInserir);
+        }
+
+        return false;
+    }
+
+    //
+    // FUNÇÃO DO MÉTODO UPDATE() DO CONTROLLER. --> AgendamentoController.php
+    //
+
+    public function updateAgendamentos(
+        array $originalAlunoIds,
+        array $originalDatas,
+        string $originalMotivo,
+        array $newMatriculas,
+        array $newDatas,
+        string $newStatus,
+        string $newMotivo
+    ): bool {
+        if (empty($newMatriculas) || empty($newDatas)) {
+            return false;
+        }
+
+        $this->db->transBegin();
+
+        try {
+            // Deleta os registros antigos
+            $this->where('motivo', $originalMotivo)
+                ->whereIn('data_refeicao', $originalDatas)
+                ->whereIn('aluno_id', $originalAlunoIds)
+                ->delete();
+
+            // Prepara os novos dados
+            $dadosParaInserir = [];
+            foreach ($newMatriculas as $matricula) {
+                foreach ($newDatas as $data) {
+                    $dadosParaInserir[] = [
+                        'aluno_id'      => trim($matricula),
+                        'data_refeicao' => trim($data),
+                        'status'        => $newStatus,
+                        'motivo'        => $newMotivo,
+                    ];
+                }
+            }
+
+            if (!empty($dadosParaInserir)) {
+                $this->insertBatch($dadosParaInserir);
+            }
+
+            if ($this->db->transStatus() === false) {
+                $this->db->transRollback();
+                return false;
+            }
+
+            $this->db->transCommit();
+            return true;
+
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            log_message('error', '[ControleRefeicoesModel] Erro em updateAgendamentos: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    //
+    // FUNÇÃO PARA O METEDO DELETE() DO CONTROLLER --> AgendamentoController.php
+    //
+
+    public function deleteAgendamentos(array $alunoIds, array $datas, string $motivo): bool
+    {
+        if (empty($alunoIds) || empty($datas)) {
+            log_message('error', '[ControleRefeicoesModel] deleteAgendamentos chamado sem IDs ou datas.');
+            return false;
+        }
+
+        $this->db->transBegin();
+
+        try {
+            $this->where('motivo', $motivo)
+                ->whereIn('data_refeicao', $datas)
+                ->whereIn('aluno_id', $alunoIds)
+                ->delete();
+
+            if ($this->db->transStatus() === false) {
+                $this->db->transRollback();
+                return false;
+            }
+
+            $this->db->transCommit();
+            return true;
+
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            log_message('error', '[ControleRefeicoesModel] Erro em deleteAgendamentos: ' . $e->getMessage());
+            return false;
+        }
+    }
+
 }

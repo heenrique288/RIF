@@ -14,8 +14,12 @@
         "ext-intl": "*",
         "ext-mbstring": "*",
         "codeigniter4/shield": "^1.2",
+        "fabpot/goutte": "^4.0",
+        "guzzlehttp/guzzle": "^7.10",
         "laminas/laminas-escaper": "^2.14",
-        "psr/log": "^3.0"
+        "psr/log": "^3.0",
+        "symfony/css-selector": "^6.4",
+        "symfony/dom-crawler": "^6.4"
     },
     "require-dev": {
         "codeigniter/coding-standard": "^1.7",

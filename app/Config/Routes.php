@@ -127,3 +127,6 @@ $routes->group('sys', function ($routes) {
         $routes->post('excluir-permanentemente', 'AdminController::excluirPermanentemente');
     });
 });
+
+//Rota do Webhook
+$routes->post('webhook/response', 'WebhookController::response');

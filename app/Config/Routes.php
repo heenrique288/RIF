@@ -93,6 +93,11 @@ $routes->group('sys', function ($routes) {
         $routes->post('delete', 'SolicitacaoRefeicoesController::delete');
     });
 
+      //==============================================================
+    // Rotas de Análise de solicitação
+    //==============================================================
+   $routes->get('analise', 'AnaliseSolicitacaoController::index');
+
     //==============================================================
     // Rotas do Restaurante
     //==============================================================

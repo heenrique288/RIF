@@ -19,7 +19,7 @@
                     
                     <div class="form-group">
                         <label for="edit-nome">Nome</label>
-                        <input type="text" class="form-control" required
+                        <input type="text" class="form-control" minlength="3" required
                             id="edit-nome" name="nome" placeholder="Insira o nome da Turma">
                     </div>
                     

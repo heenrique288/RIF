@@ -16,7 +16,7 @@
 
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome da Turma</label>
-                        <input type="text" class="form-control" id="nome" name="nome" required>
+                        <input type="text" class="form-control" id="nome" name="nome" minlength="3" required>
                     </div>
 
                     <div class="mb-3">

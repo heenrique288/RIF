@@ -90,7 +90,7 @@
                 template: (value = '') => `
                     <div class="telefone-repeater-item d-flex align-items-center mb-2">
                         <div class="input-group me-2">
-                            <input type="text" class="form-control form-control-sm" name="telefone[]" placeholder="Ex: (99) 99999-9090" value="${value}" required>
+                            <input type="text" class="form-control form-control-sm telefone-input" name="telefone[]" placeholder="Ex: (99) 99999-9090" value="${value}" required>
                         </div>
                         <button type="button" class="btn btn-inverse-danger btn-sm icon-btn remove-telefone me-2" data-bs-toggle="tooltip" title="Remover Telefone">
                             <i class="mdi mdi-delete"></i>
@@ -317,5 +317,18 @@
                 position: 'top-center'
             });
         <?php endif; ?>
+
+        $(document).on('input', '.telefone-input', function () {
+            let telefone = $(this).val().replace(/\D/g, '').slice(0, 11);
+
+            if (telefone.length > 2)
+                telefone = '(' + telefone.slice(0, 2) + ') ' + telefone.slice(2);
+
+            if (telefone.length > 10)
+                telefone = telefone.slice(0, 10) + '-' + telefone.slice(10);
+
+            $(this).val(telefone);
+        });    
+
     });
 </script>

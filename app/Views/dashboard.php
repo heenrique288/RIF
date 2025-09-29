@@ -127,6 +127,17 @@
                                 </li>
                             <?php endif; ?>
 
+                             <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?php echo base_url('sys/analise'); ?>">
+                                        <span class="menu-icon">
+                                            <i class="mdi mdi-magnify"></i>
+                                        </span>
+                                        <span class="menu-title">Análise de Solicitações</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+
                             <?php if (auth()->user()->inGroup('admin', 'solicitante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/solicitacoes'); ?>">

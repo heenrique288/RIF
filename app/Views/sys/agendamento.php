@@ -1,4 +1,4 @@
-<?php echo view('components/agendamentos/modal_cadastrar_agendamento', ["turmas" => $turmas], ["alunos" => $alunos]) ?>
+<?php echo view('components/agendamentos/modal_cadastrar_agendamento', ['turmas' => $turmas, 'alunos' => $alunos]) ?>
 <?php echo view('components/agendamentos/modal_editar_agendamento', ["turmas" => $turmas]); ?>
 <?php echo view('components/agendamentos/modal_deletar_agendamento');?>
 
@@ -550,6 +550,29 @@
             if (tooltip) {
                 tooltip.dispose();
             }
+        });
+         $(document).ready(function() {
+            <?php if (session()->getFlashdata('sucesso')): ?>
+                $.toast({
+                    heading: 'Sucesso!',
+                    text: '<?= session()->getFlashdata('sucesso') ?>',
+                    showHideTransition: 'fade',
+                    icon: 'success',
+                    loaderBg: '#28a745',
+                    position: 'top-center'
+                });
+            <?php endif; ?>
+
+            <?php if (session()->getFlashdata('erros')): ?>
+                $.toast({
+                    heading: 'Erro',
+                    text: '<?= session()->getFlashdata('erros')[0]?>',
+                    showHideTransition: 'fade',
+                    icon: 'error',
+                    loaderBg: '#dc3545',
+                    position: 'top-center'
+                });
+            <?php endif; ?>
         });
 
     });

@@ -27,10 +27,14 @@ class AgendamentoController extends BaseController
         try {
             $post = $this->request->getPost();
 
-            $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
-            $datasString      = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
-            $status           = strip_tags($post['status']);
-            $motivo           = strip_tags($post['motivo']);
+            // $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
+            // $datasString      = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
+            // $status           = strip_tags($post['status']);
+            // $motivo           = strip_tags($post['motivo']);
+            $matriculasString = $this->request->getPost('matriculas') ?? '';
+            $datasString      = $this->request->getPost('datas') ?? '';
+            $status           = strip_tags($this->request->getPost('status'));
+            $motivo           = strip_tags($this->request->getPost('motivo'));
 
             if (empty($matriculasString) || empty($datasString)) {
                 return $this->response->setJSON([
@@ -146,27 +150,32 @@ class AgendamentoController extends BaseController
         $enviarMensagensModel = new EnviarMensagensModel();
         
         foreach ($matriculas as $matricula) {
-            $aluno = $alunoModel->find($matricula);
-            $telefoneAluno = $alunoTelefoneModel->getTelefoneAtivoByAlunoId($matricula);
-        
-            if ($aluno && $telefoneAluno) {
-                foreach ($datasSelecionadas as $dataRefeicao) {
-                    
-                    $nomeAluno = $aluno['nome'];
-                    //$destinatario = $telefoneAluno['telefone'];
-                    $destinatario = '69992599048'; 
+            try {
+                $aluno = $alunoModel->find($matricula);
+                $telefoneAluno = $alunoTelefoneModel->getTelefoneAtivoByAlunoId($matricula);
+            
+                if ($aluno && $telefoneAluno) {
+                    foreach ($datasSelecionadas as $dataRefeicao) {
+                        
+                        $nomeAluno = $aluno['nome'];
+                        //$destinatario = $telefoneAluno['telefone'];
+                        $destinatario = '69992599048'; 
 
-                    $mensagem = "Prezado(o) {$nomeAluno}\n";
-                    $mensagem .= "Confirme sua refeição para o dia {$dataRefeicao}\n";
-                    $mensagem .= "*Digite 1* para sim, irei utilizar o beneficio no dia informado\n";
-                    $mensagem .= "*Digite 2* para não, não irei utilizar o beneficio no dia informado";
+                        $mensagem = "Prezado(o) {$nomeAluno}\n";
+                        $mensagem .= "Confirme sua refeição para o dia {$dataRefeicao}\n";
+                        $mensagem .= "*Digite 1* para sim, irei utilizar o beneficio no dia informado\n";
+                        $mensagem .= "*Digite 2* para não, não irei utilizar o beneficio no dia informado";
 
-                    $enviarMensagensModel->insert([
-                        'destinatario' => $destinatario,
-                        'mensagem'     => $mensagem,
-                        'status'       => 0, // Pendente
-                    ]);
+                        $enviarMensagensModel->insert([
+                            'destinatario' => $destinatario,
+                            'mensagem'     => $mensagem,
+                            'status'       => 0, // Pendente
+                        ]);
+                    }
                 }
+
+            } catch (\Exception $e) {
+                log_message('error', "[AgendamentoController] Falha ao criar mensagem para matrícula {$matricula}: " . $e->getMessage());
             }
         }
     }

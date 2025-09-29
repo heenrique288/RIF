@@ -28,12 +28,12 @@
                     <ul id="lista-alunos" class="list-unstyled mb-3 p-2 rounded" style="background-color: #2a3038; max-height: 150px; overflow-y: auto; min-height: 50px;">
                         <li class="text-muted small p-2">Nenhum aluno selecionado.</li>
                     </ul>
-                    <input type="hidden" name="matriculas[]" id="matriculas-hidden">
+                    <input type="hidden" name="matriculas" id="matriculas-hidden">
 
                     <div class="mb-3">
                         <label class="form-label">Data(s) do Agendamento</label>
                         <div id="datepicker-container-cadastro"></div> 
-                        <input type="hidden" name="datas[]" id="datas-hidden">
+                        <input type="hidden" name="datas" id="datas-hidden">
                     </div>
 
                     <div class="row">

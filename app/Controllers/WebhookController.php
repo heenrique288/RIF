@@ -25,8 +25,9 @@ class WebhookController extends BaseController
 
         $primeiraMensagem = $dados['messages'][0];
 
-        $destinatario = $primeiraMensagem['remoteJid'];
-        $resposta = trim($primeiraMensagem['body'] ?? ''); 
+        $destinatarioSujo = $dados['data']['key']['remoteJid'] ?? null;
+        $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);
+        $resposta = trim($dados['data']['message']['conversation'] ?? '');
 
         $mensagem = $mensagemModel
             ->where('destinatario', $destinatario)

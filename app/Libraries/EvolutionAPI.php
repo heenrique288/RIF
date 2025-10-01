@@ -22,7 +22,8 @@ class EvolutionAPI
         {
             try 
             {
-                $this->client->request('POST', 'http://103.14.27.53:8090/message/sendText/ChatBotIF', [
+                //$this->client->request('POST', 'http://103.14.27.53:8090/message/sendText/ChatBotIF', [
+                $this->client->request('POST', 'http://103.14.27.53:8090/message/sendText/Isabela', [
                     'headers' => [
                         'Content-Type'  => 'application/json',
                         'apikey'	=> $this->API_KEY
@@ -43,7 +44,7 @@ class EvolutionAPI
     {        
         try 
         {
-            $response = $this->client->request('POST', 'http://103.14.27.53:8090/chat/findChats/ChatBotIF', [
+            $response = $this->client->request('POST', 'http://103.14.27.53:8090/chat/findChats/Isabela', [
                 'headers' => [
                     'Content-Type'  => 'application/json',
                     'apikey'	=> $this->API_KEY

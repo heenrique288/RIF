@@ -99,6 +99,16 @@ class AgendamentoController extends BaseController
         );
 
         if ($sucesso) {
+            $alunosAdicionados = array_diff($newMatriculas, $originalAlunoIds);
+            $alunosRemovidos   = array_diff($originalAlunoIds, $newMatriculas);
+
+            if (!empty($alunosAdicionados)) {
+                $this->createSendMessages($alunosAdicionados, $newDatas);
+            }
+
+            $enviarMensagensModel = new EnviarMensagensModel();
+            $enviarMensagensModel->deleteByMatriculaDatas($alunosRemovidos, $originalDatas);
+
             session()->setFlashdata('sucesso', 'Agendamento atualizado com sucesso!');
         } else {
             session()->setFlashdata('erros', ['Ocorreu um erro ao salvar as alterações.']);
@@ -125,6 +135,9 @@ class AgendamentoController extends BaseController
         $sucesso = $controleModel->deleteAgendamentos($alunoIds, $datas, $motivo);
 
         if ($sucesso) {
+            $enviarMensagensModel = new EnviarMensagensModel();
+            $enviarMensagensModel->deleteByMatriculaDatas($alunoIds, $datas);
+
             session()->setFlashdata('sucesso', 'Agendamento deletado com sucesso!');
         } else {
             session()->setFlashdata('erros', ['Ocorreu um erro interno ao deletar o agendamento.']);

@@ -66,4 +66,32 @@ class EnviarMensagensModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function deleteByMatriculaDatas(array $matriculas, array $datas)
+    {
+        if (empty($matriculas) || empty($datas)) {
+            return false;
+        }
+
+        $alunoTelefoneModel = new AlunoTelefoneModel();
+
+        $telefones = $alunoTelefoneModel->select('telefone')
+            ->whereIn('aluno_id', $matriculas)
+            ->where('status', 1)
+            ->findAll();
+
+        $destinatarios = array_column($telefones, 'telefone');
+
+        if (empty($destinatarios)) {
+            return false;
+        }
+
+        foreach ($destinatarios as $telefone) {
+            foreach ($datas as $data) {
+                $result = $this->where('destinatario', trim($telefone))
+                            ->like('mensagem', trim($data), 'both') 
+                            ->delete();
+            }
+        }
+    }
 }

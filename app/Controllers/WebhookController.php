@@ -8,6 +8,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\EnviarMensagensModel;
 use App\Models\ControleRefeicoesModel;
 
+use App\Libraries\EvolutionAPI;
+
+
 class WebhookController extends BaseController
 {
     public function index()
@@ -19,6 +22,7 @@ class WebhookController extends BaseController
     {
         $mensagemModel = new EnviarMensagensModel();
         $refeicaoModel = new ControleRefeicoesModel();
+        $evolutionAPI = new EvolutionAPI();
 
         //a resposta do aluno
         $dados = $this->request->getJSON(true); 
@@ -43,18 +47,21 @@ class WebhookController extends BaseController
             ->orderBy('id', 'DESC')
             ->first();
 
+        $mensagemRetorno = '';
+
         if ($resposta === '1') {
             $refeicaoModel->update($refeicao['id'], ['status' => 1]);
-            return $this->response->setJSON(['sucesso' => 'Refeição confirmada.']);
+            $mensagemRetorno = 'Refeição confirmada.';
 
         } else if ($resposta === '2') {
             $refeicaoModel->update($refeicao['id'], ['status' => 3]);
-            return $this->response->setJSON(['sucesso' => 'Refeição recusada.']);
+            $mensagemRetorno = 'Refeição recusada.';
 
         } else {
-            return $this->response->setJSON([
-                'mensagem' => 'Resposta recebida, mas não reconhecida.'
-            ]);
+            $mensagemRetorno = 'Resposta recebida, mas não reconhecida.';
         }
+
+        $evolutionAPI->sendText($destinatario, 'Obrigado, sua resposta foi registrada.');
+        return $this->response->setJSON(['mensagem' => $mensagemRetorno]);
     }
 }

@@ -172,7 +172,7 @@ class AgendamentoController extends BaseController
                         
                         $nomeAluno = $aluno['nome'];
                         //$destinatario = $telefoneAluno['telefone'];
-                        $destinatario = '69992599048'; 
+                        $destinatario = '69992809488'; 
 
                         $mensagem = "Prezado(o) {$nomeAluno}\n";
                         $mensagem .= "Confirme sua refeição para o dia {$dataRefeicao}\n";

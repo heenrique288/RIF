@@ -4,13 +4,13 @@
 <?= $this->include('components/turmas/modal_importar_alunos_turma', ['cursos' => $cursos]) ?>
 
 
+<div class="mb-3">
+    <h2 class="card-title mb-0">Turmas</h2>
+</div>
 <div class="row">
     <div class="col-md-2 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
-                <div class="mb-3">
-                    <h4 class="card-title mb-0">Turmas</h4>
-                </div>
                 <div>
                     <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-turma">
                         <i class="fa fa-plus-circle btn-icon-prepend"></i>

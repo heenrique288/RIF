@@ -2,31 +2,63 @@
 <?php echo view('components/agendamentos/modal_editar_agendamento', ["turmas" => $turmas]); ?>
 <?php echo view('components/agendamentos/modal_deletar_agendamento');?>
 
-<h1>Agendamento de Refeição</h1>
-<div class="my-4">
-    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
-        <i class="fa fa-plus-circle btn-icon-prepend"></i>
-        Novo Agendamento
-    </button>
+
+<div class="mb-3">
+    <h2 class="card-title mb-0">Agendamento de Refeição</h2>
+</div>
+<div class="row">
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body ">
+                <div class="mb-3">
+                    <h5 class="card-title mb-0">Ações</h5>
+                </div>
+                <div class="my-4 ">
+                    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
+                        <i class="fa fa-plus-circle btn-icon-prepend"></i>
+                        Novo Agendamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body">
+                <div class="mb-3">
+                    <h5 class="card-title mb-0">Filtros</h5>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<?php if (isset($agendamentos) && !empty($agendamentos)): ?>
-<table class="table mb-4" id="listagem-agendamentos">
-    <thead>
-        <tr>
-            <th><strong>Turma ou Aluno</strong></th>
-            <th><strong>Data</strong></th>
-            <th><strong>Status</strong></th>
-            <th><strong>Motivo</strong></th>
-            <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-<?php else: ?>
-    <p>Nenhum agendamento encontrado no banco de dados.</p>
-<?php endif; ?>
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <?php if (isset($agendamentos) && !empty($agendamentos)): ?>
+                    <table class="table mb-4" id="listagem-agendamentos">
+                        <thead>
+                            <tr>
+                                <th><strong>Turma ou Aluno</strong></th>
+                                <th><strong>Data</strong></th>
+                                <th><strong>Status</strong></th>
+                                <th><strong>Motivo</strong></th>
+                                <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>Nenhum agendamento encontrado no banco de dados.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="modal-ver-alunos" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -267,7 +299,7 @@
                         const editInfoAttr = JSON.stringify(row);
 
                         return `
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex align-center justify-content-center gap-2">
                                 <span data-bs-toggle="tooltip" title="Editar agendamento">
                                     <button type="button" class="btn btn-inverse-success btn-icon me-1 btn-editar-agendamento d-flex align-items-center justify-content-center"
                                         data-bs-toggle="modal" data-bs-target="#modal-editar-agendamento"

@@ -4,12 +4,15 @@
 <?= $this->include('components/turmas/modal_importar_alunos_turma', ['cursos' => $cursos]) ?>
 
 
+<div class="mb-3">
+    <h2 class="card-title mb-0">Turmas</h2>
+</div>
 <div class="row">
     <div class="col-md-2 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h4 class="card-title mb-0">Turmas</h4>
+                    <h5 class="card-title mb-0">Ações</h5>
                 </div>
                 <div>
                     <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-turma">
@@ -25,7 +28,7 @@
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h4 class="card-title mb-0">Filtros</h4>
+                    <h5 class="card-title mb-0">Filtros</h5>
                 </div>
             </div>
         </div>
@@ -89,7 +92,7 @@
                         data: null,
                         render: function(data, type, row) {
                             return `
-                                <div class="d-flex">
+                                <div class="d-flex d-flex align-center justify-content-center gap-2">
                                     <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
                                         <button
                                             type="button"

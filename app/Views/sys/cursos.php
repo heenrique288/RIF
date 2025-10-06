@@ -2,14 +2,17 @@
 <?php echo view('components/cursos/modal_editar_curso') ?>
 <?php echo view('components/cursos/modal_deletar_curso') ?>
 
+<div class="mb-3">
+    <h2 class="card-title mb-0">Cursos</h2>
+</div>
 <div class="row">
     <div class="col-md-2 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
-                <div class="mb-3">
-                    <h4 class="card-title mb-0">Cursos</h4>
-                </div>
                 <div>
+                    <div class="mb-3">
+                        <h5 class="card-title mb-0">Ações</h5>
+                    </div>
                     <button type="button" class="btn btn-primary btn-fw " data-bs-toggle="modal" data-bs-target="#modal-cadastrar-curso">
                         <i class="fa fa-plus-circle btn-icon-prepend"></i>
                         Novo Curso
@@ -23,7 +26,7 @@
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h4 class="card-title mb-0">Filtros</h4>
+                    <h5 class="card-title mb-0">Filtros</h5>
                 </div>
             </div>
         </div>
@@ -35,17 +38,17 @@
         <div class="card">
             <div class="card-body">
                 <?php if (isset($cursos) && !empty($cursos)): ?>
-                <table class="table mb-4" id="listagem-cursos">
-                    <thead>
-                        <tr>
-                            <th style="width: 3%; min-width: 50px;"><strong>Código</strong></th>
-                            <th><strong>Nome</strong></th>
-                            <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
+                    <table class="table mb-4" id="listagem-cursos" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 3%; min-width: 50px;"><strong>Código</strong></th>
+                                <th><strong>Nome</strong></th>
+                                <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
                 <?php else: ?>
                     <p>Nenhum curso encontrado no banco de dados.</p>
                 <?php endif; ?>

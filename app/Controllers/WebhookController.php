@@ -26,15 +26,14 @@ class WebhookController extends BaseController
 
         //a resposta do aluno
         $dados = $this->request->getJSON(true); 
+        $data = $dados['data'];
 
         //Teste
         log_message('debug', 'Webhook recebido: ' . json_encode($dados));
 
-        $primeiraMensagem = $dados['messages'][0];
-
-        $destinatarioSujo = $dados['key']['remoteJid'];
+        $destinatarioSujo = $data['key']['remoteJid'];
         $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);
-        $resposta = trim($dados['message']['conversation']);
+        $resposta = trim($data['message']['conversation']);
 
         $mensagem = $mensagemModel
             ->where('destinatario', $destinatario)

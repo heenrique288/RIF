@@ -3,33 +3,58 @@
 <?= $this->include('components/turmas/modal_deletar_turma', ['cursos' => $cursos]) ?>
 <?= $this->include('components/turmas/modal_importar_alunos_turma', ['cursos' => $cursos]) ?>
 
-<div>
-    <h1>Turmas</h1>
 
-    <div class="my-4">
-        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-turma">
-            <i class="fa fa-plus-circle btn-icon-prepend"></i>
-            Nova Turma
-        </button>
+<div class="row">
+    <div class="col-md-2 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body">
+                <div class="mb-3">
+                    <h4 class="card-title mb-0">Turmas</h4>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-turma">
+                        <i class="fa fa-plus-circle btn-icon-prepend"></i>
+                        Nova Turma
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="table-responsive">
-        <?php if (!empty($turmas)): ?>
-            <table class="table mb-4" id="tabela-turmas">
-                <thead>
-                    <tr>
-                        <th style="width: 4%; min-width: 45px;">Id</th>
-                        <th>Nome</th>
-                        <th>Curso</th>
-                        <th class="text-nowrap" style="width: 12%; min-width: 100px;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        <?php else: ?>
-            <p>Nenhuma turma encontrada no banco de dados.</p>
-        <?php endif; ?>
+    <div class="col-md-10 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body">
+                <div class="mb-3">
+                    <h4 class="card-title mb-0">Filtros</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <?php if (!empty($turmas)): ?>
+                    <table class="table mb-4" id="tabela-turmas">
+                        <thead>
+                            <tr>
+                                <th style="width: 4%; min-width: 45px;"><strong>Id</strong></th>
+                                <th><strong>Nome</strong></th>
+                                <th><strong>Curso</strong></th>
+                                <th class="text-nowrap" style="text-align: center; width: 12%; min-width: 100px;"><strong>Ações</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>Nenhuma turma encontrada no banco de dados.</p>
+                <?php endif; ?>
+
+            </div>
+        </div>
     </div>
 </div>
 

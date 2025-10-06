@@ -3,41 +3,66 @@
 <?= $this->include('components/alunos/modal_edit_aluno', ['turmas' => $turmas]) ?>
 <?= $this->include('components/alunos/modal_importar_aluno', ['turmas' => $turmas]) ?>
 
-<div class="container-fluid">
-    <h1 class="mt-4">Alunos Cadastrados</h1>
 
-    <div class="my-4">
-        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-aluno">
-            <i class="mdi mdi-plus-circle btn-icon-prepend"></i>
-            Novo Aluno
-        </button>
-        <button type="button" class="btn btn-info btn-fw" data-bs-toggle="modal" data-bs-target="#modal-importar-aluno">
-            <i class="fa fa-upload btn-icon-prepend"></i> 
-            Importar Turmas do SUAP
-        </button>
+
+<div class="row">
+    <div class="col-md-4 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body">
+                <div class="mb-3">
+                    <h4 class="card-title mb-0">Alunos Cadastrados</h4>
+                </div>
+                <div class="my-4">
+                    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-aluno">
+                        <i class="mdi mdi-plus-circle btn-icon-prepend"></i>
+                        Novo Aluno
+                    </button>
+                    <button type="button" class="btn btn-info btn-fw" data-bs-toggle="modal" data-bs-target="#modal-importar-aluno">
+                        <i class="fa fa-upload btn-icon-prepend"></i> 
+                        Importar Turmas do SUAP
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="table-responsive">
-        <?php if (!empty($alunos)): ?>
-            <table class="table" id="tabela-alunos" style="width:100%;">
-                <thead>
-                    <tr>
-                        <th>Matrícula</th>
-                        <th>Nome</th>
-                        <th>Turma</th>
-                        <th>Curso</th>
-                        <th>Email</th>
-                        <th>Telefone</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        <?php else: ?>
-            <p>Nenhum aluno encontrado no banco de dados.</p>
-        <?php endif; ?>
+    <div class="col-md-8 grid-margin stretch-card">
+        <div class="card ">
+            <div class="card-body">
+                <div class="mb-3">
+                    <h4 class="card-title mb-0">Filtros</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <?php if (!empty($alunos)): ?>
+                    <table class="table" id="tabela-alunos" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Matrícula</th>
+                                <th>Nome</th>
+                                <th>Turma</th>
+                                <th>Curso</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>Nenhum aluno encontrado no banco de dados.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 

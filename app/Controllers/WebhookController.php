@@ -27,56 +27,62 @@ class WebhookController extends BaseController
         //a resposta do aluno
         $dados = $this->request->getJSON(true); 
 
-        if (!isset($dados['event']) || $dados['event'] !== 'messages.upsert') {
-            return $this->response->setJSON(['status' => 'evento ignorado']);
+        if (!isset($dados['event'])) {
+            return $this->response->setJSON(['status' => 'evento inválido']);
         }
 
+        $evento = $dados['event'];
         $data = $dados['data'];
 
-        //Teste
-        log_message('debug', 'Webhook recebido: ' . json_encode($dados));
+        if ($evento === 'messages.upsert') {
 
-        if (isset($data['key']['fromMe']) && $data['key']['fromMe'] === true) {
-            return $this->response->setJSON(['status' => 'mensagem do bot ignorada']);
+            if (isset($data['key']['fromMe']) && $data['key']['fromMe'] === true) {
+                return $this->response->setJSON(['status' => 'mensagem do bot ignorada']);
+            }
+
+            if (!isset($data['message']['conversation'])) {
+                return $this->response->setJSON(['status' => 'mensagem sem texto']);
+            }
+
+            $destinatarioSujo = $data['key']['remoteJid'];
+            $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);
+            $resposta = trim($data['message']['conversation']);
+
+            $mensagem = $mensagemModel
+                ->where('destinatario', $destinatario)
+                ->where('status', 1)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            //atualizar a tabela de mensagens para recebido
+            $mensagemModel->update($mensagem['id'], ['status' => 2]);
+
+            $refeicao = $refeicaoModel
+                ->where('aluno_id', $destinatario)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            $mensagemRetorno = '';
+
+            if ($resposta === '1') {
+                $refeicaoModel->update($refeicao['id'], ['status' => 1]);
+                $mensagemRetorno = 'Refeição confirmada.';
+
+            } else if ($resposta === '2') {
+                $refeicaoModel->update($refeicao['id'], ['status' => 3]);
+                $mensagemRetorno = 'Refeição recusada.';
+
+            } else {
+                $mensagemRetorno = 'Resposta recebida, mas não reconhecida.';
+            }
+
+            $evolutionAPI->sendText($destinatario, 'Obrigado, sua resposta foi registrada.');
+            return $this->response->setJSON(['mensagem' => $mensagemRetorno]);
+        }
+        else{
+            return $this->response->setJSON(['status' => 'demais eventos']);
         }
 
-        if (!isset($data['message']['conversation'])) {
-            return $this->response->setJSON(['status' => 'mensagem sem texto']);
-        }
-
-        $destinatarioSujo = $data['key']['remoteJid'];
-        $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);
-        $resposta = trim($data['message']['conversation']);
-
-        $mensagem = $mensagemModel
-            ->where('destinatario', $destinatario)
-            ->where('status', 1)
-            ->orderBy('id', 'DESC')
-            ->first();
-
-        //atualizar a tabela de mensagens para recebido
-        $mensagemModel->update($mensagem['id'], ['status' => 2]);
-
-        $refeicao = $refeicaoModel
-            ->where('aluno_id', $destinatario)
-            ->orderBy('id', 'DESC')
-            ->first();
-
-        $mensagemRetorno = '';
-
-        if ($resposta === '1') {
-            $refeicaoModel->update($refeicao['id'], ['status' => 1]);
-            $mensagemRetorno = 'Refeição confirmada.';
-
-        } else if ($resposta === '2') {
-            $refeicaoModel->update($refeicao['id'], ['status' => 3]);
-            $mensagemRetorno = 'Refeição recusada.';
-
-        } else {
-            $mensagemRetorno = 'Resposta recebida, mas não reconhecida.';
-        }
-
-        $evolutionAPI->sendText($destinatario, 'Obrigado, sua resposta foi registrada.');
-        return $this->response->setJSON(['mensagem' => $mensagemRetorno]);
+        
     }
 }

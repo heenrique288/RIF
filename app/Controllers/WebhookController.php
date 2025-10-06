@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 use App\Models\EnviarMensagensModel;
 use App\Models\ControleRefeicoesModel;
+use App\Models\AlunoTelefoneModel;
 
 use App\Libraries\EvolutionAPI;
 
@@ -22,10 +23,13 @@ class WebhookController extends BaseController
     {
         $mensagemModel = new EnviarMensagensModel();
         $refeicaoModel = new ControleRefeicoesModel();
+        $alunoTelefoneModel = new AlunoTelefoneModel();
         $evolutionAPI = new EvolutionAPI();
 
         //a resposta do aluno
         $dados = $this->request->getJSON(true); 
+
+        log_message('info', 'Webhook recebido -> ' . json_encode($dados));
 
         if (!isset($dados['event'])) {
             return $this->response->setJSON(['status' => 'evento inválido']);
@@ -45,8 +49,16 @@ class WebhookController extends BaseController
             }
 
             $destinatarioSujo = $data['key']['remoteJid'];
-            $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);
+            $destinatarioCompleto = str_replace('@s.whatsapp.net', '', $destinatarioSujo); 
+            $destinatario = substr($destinatarioCompleto, 2); //sem o dd de pais por enquanto
+
             $resposta = trim($data['message']['conversation']);
+
+            $alunoTelefone = $alunoTelefoneModel
+                ->where('telefone', $destinatario)
+                ->first();
+
+            $alunoMatricula = $alunoTelefone['aluno_id'];
 
             $mensagem = $mensagemModel
                 ->where('destinatario', $destinatario)
@@ -58,7 +70,7 @@ class WebhookController extends BaseController
             $mensagemModel->update($mensagem['id'], ['status' => 2]);
 
             $refeicao = $refeicaoModel
-                ->where('aluno_id', $destinatario)
+                ->where('aluno_id', $alunoMatricula)
                 ->orderBy('id', 'DESC')
                 ->first();
 
@@ -76,8 +88,8 @@ class WebhookController extends BaseController
                 $mensagemRetorno = 'Resposta recebida, mas não reconhecida.';
             }
 
-            $evolutionAPI->sendText($destinatario, 'Obrigado, sua resposta foi registrada.');
-            return $this->response->setJSON(['mensagem' => $mensagemRetorno]);
+            $evolutionAPI->sendText($destinatario, $mensagemRetorno);
+            return $this->response->setJSON(['mensagem' => 'Processamento concluído: ' . $mensagemRetorno]);
         }
         else{
             return $this->response->setJSON(['status' => 'demais eventos']);

@@ -92,7 +92,7 @@
                         data: null,
                         render: function(data, type, row) {
                             return `
-                                <div class="d-flex">
+                                <div class="d-flex d-flex align-center justify-content-center gap-2">
                                     <span data-bs-toggle="tooltip" data-placement="top" title="Editar">
                                         <button
                                             type="button"

@@ -38,17 +38,17 @@
         <div class="card">
             <div class="card-body">
                 <?php if (isset($cursos) && !empty($cursos)): ?>
-                <table class="table mb-4" id="listagem-cursos">
-                    <thead>
-                        <tr>
-                            <th style="width: 3%; min-width: 50px;"><strong>Código</strong></th>
-                            <th><strong>Nome</strong></th>
-                            <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
+                    <table class="table mb-4" id="listagem-cursos" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 3%; min-width: 50px;"><strong>Código</strong></th>
+                                <th><strong>Nome</strong></th>
+                                <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
                 <?php else: ?>
                     <p>Nenhum curso encontrado no banco de dados.</p>
                 <?php endif; ?>

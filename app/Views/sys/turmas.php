@@ -11,6 +11,9 @@
     <div class="col-md-2 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
+                <div class="mb-3">
+                    <h5 class="card-title mb-0">Ações</h5>
+                </div>
                 <div>
                     <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-turma">
                         <i class="fa fa-plus-circle btn-icon-prepend"></i>
@@ -25,7 +28,7 @@
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h4 class="card-title mb-0">Filtros</h4>
+                    <h5 class="card-title mb-0">Filtros</h5>
                 </div>
             </div>
         </div>

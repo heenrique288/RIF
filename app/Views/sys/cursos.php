@@ -10,6 +10,9 @@
         <div class="card ">
             <div class="card-body">
                 <div>
+                    <div class="mb-3">
+                        <h5 class="card-title mb-0">Ações</h5>
+                    </div>
                     <button type="button" class="btn btn-primary btn-fw " data-bs-toggle="modal" data-bs-target="#modal-cadastrar-curso">
                         <i class="fa fa-plus-circle btn-icon-prepend"></i>
                         Novo Curso
@@ -23,7 +26,7 @@
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h4 class="card-title mb-0">Filtros</h4>
+                    <h5 class="card-title mb-0">Filtros</h5>
                 </div>
             </div>
         </div>

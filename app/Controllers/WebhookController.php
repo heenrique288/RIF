@@ -26,10 +26,23 @@ class WebhookController extends BaseController
 
         //a resposta do aluno
         $dados = $this->request->getJSON(true); 
+
+        if (!isset($dados['event']) || $dados['event'] !== 'messages.upsert') {
+            return $this->response->setJSON(['status' => 'evento ignorado']);
+        }
+
         $data = $dados['data'];
 
         //Teste
         log_message('debug', 'Webhook recebido: ' . json_encode($dados));
+
+        if (isset($data['key']['fromMe']) && $data['key']['fromMe'] === true) {
+            return $this->response->setJSON(['status' => 'mensagem do bot ignorada']);
+        }
+
+        if (!isset($data['message']['conversation'])) {
+            return $this->response->setJSON(['status' => 'mensagem sem texto']);
+        }
 
         $destinatarioSujo = $data['key']['remoteJid'];
         $destinatario = str_replace('@s.whatsapp.net', '', $destinatarioSujo);

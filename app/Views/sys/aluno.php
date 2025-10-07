@@ -22,7 +22,7 @@
                     </button>
                     <button type="button" class="btn btn-info btn-fw" data-bs-toggle="modal" data-bs-target="#modal-importar-aluno">
                         <i class="fa fa-upload btn-icon-prepend"></i> 
-                        Importar Turmas do SUAP
+                        Importar Alunos do SUAP
                     </button>
                 </div>
             </div>

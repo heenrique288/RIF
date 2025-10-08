@@ -97,7 +97,7 @@ class WebhookController extends BaseController
                 $mensagemRetorno = 'Resposta recebida, mas não reconhecida.';
             }
 
-            $evolutionAPI->sendText($destinatario, $mensagemRetorno);
+            $evolutionAPI->sendMessage($destinatario, $mensagemRetorno);
             return $this->response->setJSON(['mensagem' => 'Processamento concluído: ' . $mensagemRetorno]);
         }
         else{

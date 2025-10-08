@@ -50,6 +50,7 @@
                     <div class="mb-3">
                         <label for="grupo" class="form-label">Grupo</label> <!--DEFININDO OS GRUPOS NO SISTEMA -->
                         <select class="form-control" id="grupo" name="grupo">
+                            <option value="" selected disabled>Selecione o Grupo</option>
                             <option value="admin" <?= old('grupo') == 'admin' ? 'selected' : '' ?>>Administrador</option>
                             <option value="solicitante" <?= old('grupo') == 'solicitante' || old('grupo') == '' ? 'selected' : '' ?>>Solicitante</option>
                             <option value="aluno" <?= old('grupo') == 'aluno' || old('grupo') == '' ? 'selected' : '' ?>>Aluno</option>

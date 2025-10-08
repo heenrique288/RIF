@@ -24,6 +24,7 @@
                     <div class="mb-3">
                         <label for="novo_grupo" class="form-label">Novo Grupo</label>
                         <select class="form-control text-white" id="novo_grupo" name="novo_grupo">
+                            <option value="" selected disabled>Selecione o Grupo</option>
                             <option value="admin">Administrador</option>
                             <option value="solicitante">Solicitante</option>
                             <option value="aluno">Aluno</option>

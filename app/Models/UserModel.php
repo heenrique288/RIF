@@ -22,7 +22,10 @@ class UserModel extends ShieldUserModel
     public function getUsuariosComGrupos() // Seleciona todos os usuários com grupos OBS: Se não tiver grupo, também aparece na view "Nenhum grupo atribuído"
     {
         
-        $usuarios = $this->select('id, username')->findAll();
+        $usuarios = $this->select('users.id, users.username, auth_identities.secret as email')
+                     ->join('auth_identities', 'auth_identities.user_id = users.id', 'left')
+                     ->where('auth_identities.type', 'email_password')
+                     ->findAll();
 
         $userGroupModel = model(UserGroupModel::class);
 

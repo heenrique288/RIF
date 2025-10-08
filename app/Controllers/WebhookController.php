@@ -40,13 +40,13 @@ class WebhookController extends BaseController
 
         if ($evento === 'messages.upsert') {
 
-            if (isset($data['key']['fromMe']) && $data['key']['fromMe'] === true) {
-                return $this->response->setJSON(['status' => 'mensagem do bot ignorada']);
-            }
+            // if (isset($data['key']['fromMe']) && $data['key']['fromMe'] === true) {
+            //     return $this->response->setJSON(['status' => 'mensagem do bot ignorada']);
+            // }
 
-            if (!isset($data['message']['conversation'])) {
-                return $this->response->setJSON(['status' => 'mensagem sem texto']);
-            }
+            // if (!isset($data['message']['conversation'])) {
+            //     return $this->response->setJSON(['status' => 'mensagem sem texto']);
+            // }
 
             $destinatarioSujo = $data['key']['remoteJid'];
             $destinatarioCompleto = str_replace('@s.whatsapp.net', '', $destinatarioSujo); 
@@ -60,7 +60,7 @@ class WebhookController extends BaseController
             } else {
                 $destinatario = $ddd_e_numero;
             }
-            
+
             $resposta = trim($data['message']['conversation']);
 
             $alunoTelefone = $alunoTelefoneModel

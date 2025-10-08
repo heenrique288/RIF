@@ -50,8 +50,17 @@ class WebhookController extends BaseController
 
             $destinatarioSujo = $data['key']['remoteJid'];
             $destinatarioCompleto = str_replace('@s.whatsapp.net', '', $destinatarioSujo); 
-            $destinatario = substr($destinatarioCompleto, 2); //sem o dd de pais por enquanto
+            $ddd_e_numero  =  substr($destinatarioCompleto, 2); //sem o dd de pais por enquanto
 
+            $ddd = substr($ddd_e_numero, 0, 2); 
+            $numero = substr($ddd_e_numero, 2);
+
+            if (strlen($numero) === 8) {
+                $destinatario = $ddd . '9' . $numero;
+            } else {
+                $destinatario = $ddd_e_numero;
+            }
+            
             $resposta = trim($data['message']['conversation']);
 
             $alunoTelefone = $alunoTelefoneModel

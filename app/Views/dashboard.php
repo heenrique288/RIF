@@ -30,7 +30,6 @@
     
 
     <style>
-        /* Ajuste para o texto digitado ficar cinza */
         .select2-container--default .select2-search--dropdown .select2-search__field,
         .select2-container--default .select2-search--inline .select2-search__field {
             color: #999 !important;
@@ -45,34 +44,22 @@
             font-size: 0.80rem;
         }
 
-        /* Estilo para os cards de estatísticas */
-        .statistics-details>div {
-            background-color: #202124;
-            /* Fundo preto sólido para alto contraste */
-            padding: 15px;
-            border-radius: 8px;
-            flex-grow: 1;
-            /* Para que ocupem o espaço disponível */
-            margin-right: 15px;
-            /* Adiciona espaçamento entre os cards */
+        .stretch-card {
+            display: -webkit-flex;
+            display: flex;
+            -webkit-align-items: stretch;
+            align-items: stretch;
+            -webkit-justify-content: stretch;
+            justify-content: stretch;
         }
-
-        /* Remover a margem direita do último item */
-        .statistics-details>div:last-child {
-            margin-right: 0;
+        .card.card-img-holder {
+            position: relative;
         }
-
-        /* Adicionar espaçamento entre a linha de cards de estatísticas e os gráficos */
-        .statistics-details {
-            margin-bottom: 25px;
-            /* Adiciona margem inferior para separar dos gráficos */
-        }
-
-        /* Fundo para os cards de gráficos */
-        .card.card-rounded {
-            background-color: #202124;
-            /* Fundo preto sólido para alto contraste */
-            border-radius: 8px;
+        .card.card-img-holder .card-img-absolute {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
         }
     </style>
 
@@ -177,14 +164,14 @@
 
                             <ul class="nav flex-column sub-menu">
 
-                                <li class="nav-item">
-                                    <a class="nav-link" href="<?php echo base_url('sys/usuarios'); ?>">
+                                <!-- <li class="nav-item">
+                                    <a class="nav-link" href="<?php //echo base_url('sys/usuarios'); ?>">
                                         <span class="menu-icon">
                                             <i class="mdi mdi-account"></i>
                                         </span>
                                         <span class="menu-title">Usuários</span>
                                     </a>
-                                </li>
+                                </li> -->
 
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/alunos'); ?>">
@@ -321,77 +308,76 @@
                         <?php echo $content; ?>
                     <?php else : ?>
                         <div class="row">
-                            <div class="col-sm-12">
-                                <div class="home-tab">
-                                    <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                                        <ul class="nav nav-tabs" role="tablist">
-                                            <li class="nav-item">
-                                                <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Visão Geral</a>
-                                            </li>
-                                        </ul>
+                            <div class="col-xl-3 col-md-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-muted">Usuários do Sistema</h4>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h2 class="font-weight-bold mb-0"><?= $totalUsuarios ?? 'N/A' ?></h2>
+                                            <div class="icon-container">
+                                                <i class="fa fa-users fa-2x text-primary"></i>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="tab-content tab-content-basic">
-                                        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <div class="statistics-details d-flex align-items-center justify-content-between">
-                                                        <div>
-                                                            <p class="statistics-title">Turmas Hoje</p>
-                                                            <h3 class="rate-percentage"><?= $turmasHoje ?></h3>
-                                                        </div>
-                                                        <div>
-                                                            <p class="statistics-title">Alunos Confirmados</p>
-                                                            <h3 class="rate-percentage"><?= $alunosConfirmados ?></h3>
-                                                        </div>
-                                                        <div>
-                                                            <p class="statistics-title">Solicitações Pendentes</p>
-                                                            <h3 class="rate-percentage"><?= $solicitacoesPendentes ?></h3>
-                                                        </div>
-                                                        <div class="d-none d-md-block">
-                                                            <p class="statistics-title">Não Retiraram Refeição (30 dias)</p>
-                                                            <h3 class="rate-percentage"><?= $naoRetiradasUltimos30Dias ?></h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-muted">Turmas Cadastradas</h4>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h2 class="font-weight-bold mb-0"><?= $totalTurmas ?? 'N/A' ?></h2>
+                                            <div class="icon-container">
+                                                <i class="mdi mdi-account-group fa-2x text-success"></i>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-lg-6 d-flex flex-column">
-                                                    <div class="row flex-grow">
-                                                        <div class="col-12 col-lg-4 col-lg-12">
-                                                            <div class="card card-rounded">
-                                                                <div class="card-body">
-                                                                    <div class="d-sm-flex justify-content-between align-items-start">
-                                                                        <div>
-                                                                            <h4 class="card-title card-title-dash text-light">Gráfico - Últimos 7 Dias</h4>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
-                                                                        <canvas id="graficoPassado"></canvas>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 d-flex flex-column">
-                                                    <div class="row flex-grow">
-                                                        <div class="col-12 col-lg-4 col-lg-12">
-                                                            <div class="card card-rounded">
-                                                                <div class="card-body">
-                                                                    <div class="d-sm-flex justify-content-between align-items-start">
-                                                                        <div>
-                                                                            <h4 class="card-title card-title-dash text-light">Gráfico - Próximos 7 Dias</h4>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="chartjs-wrapper mt-4" style="height: 300px; overflow: hidden;">
-                                                                        <canvas id="graficoFuturo"></canvas>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-muted">Solicitações Pendentes</h4>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h2 class="font-weight-bold mb-0"><?= $solicitacoesPendentes ?? 'N/A' ?></h2>
+                                            <div class="icon-container">
+                                                <i class="fa fa-clock-o fa-2x text-warning"></i>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title text-muted">Refeições Hoje</h4>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h2 class="font-weight-bold mb-0"><?= $alunosConfirmados ?? 'N/A' ?></h2>
+                                            <div class="icon-container">
+                                                <i class="mdi mdi-silverware-clean fa-2x text-info"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Gráfico - Últimos 7 Dias</h4>
+                                        <div class="chartjs-wrapper mt-4" style="height: 300px;">
+                                            <canvas id="graficoPassado"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Gráfico - Próximos 7 Dias</h4>
+                                        <div class="chartjs-wrapper mt-4" style="height: 300px;">
+                                            <canvas id="graficoFuturo"></canvas>
                                         </div>
                                     </div>
                                 </div>

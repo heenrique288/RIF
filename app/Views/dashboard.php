@@ -27,7 +27,9 @@
     <script src="<?php echo base_url('assets/js/typeahead.js') ?>"></script>
     <script src="<?php echo base_url('assets/js/flatpickr.js') ?>"></script>
     <script src="<?php echo base_url('assets/js/flatpickr.ptbr.js') ?>"></script>
-    
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
 
     <style>
         .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -52,9 +54,11 @@
             -webkit-justify-content: stretch;
             justify-content: stretch;
         }
+
         .card.card-img-holder {
             position: relative;
         }
+
         .card.card-img-holder .card-img-absolute {
             position: absolute;
             top: 0;
@@ -114,7 +118,7 @@
                                 </li>
                             <?php endif; ?>
 
-                             <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/analise'); ?>">
                                         <span class="menu-icon">
@@ -165,7 +169,8 @@
                             <ul class="nav flex-column sub-menu">
 
                                 <!-- <li class="nav-item">
-                                    <a class="nav-link" href="<?php //echo base_url('sys/usuarios'); ?>">
+                                    <a class="nav-link" href="<?php //echo base_url('sys/usuarios'); 
+                                                                ?>">
                                         <span class="menu-icon">
                                             <i class="mdi mdi-account"></i>
                                         </span>

@@ -50,6 +50,9 @@ $routes->group('sys', ['filter' => 'session'], static function ($routes) {
         $routes->post('salvar', 'ControleRefeicoesController::salvar');
         $routes->post('atualizar', 'ControleRefeicoesController::atualizar');
         $routes->post('deletar', 'ControleRefeicoesController::deletar');
+        $routes->get('confirmacao', 'ControleRefeicoesController::tela_confirmacao');
+        $routes->post('validar', 'ControleRefeicoesController::validar');
+        $routes->post('confirmar', 'ControleRefeicoesController::confirmar');
     });
 
     //==============================================================

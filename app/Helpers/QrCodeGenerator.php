@@ -21,12 +21,6 @@ class QrCodeGenerator
 
         $result = $writer->write($qrCode);
 
-        $qrcode_file_name = 'qrcode-' . uniqid() . '.png';
-
-        $path = WRITEPATH . 'qrcodes/' . $qrcode_file_name;
-
-        $result->saveToFile($path);
-
-        return $path;
+        return $result->getDataUri();
     }
 }

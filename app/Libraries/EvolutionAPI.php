@@ -59,5 +59,38 @@ class EvolutionAPI
             exit($e->getMessage());
         }        
     }
+
+    public function sendMedia($number, $message, $base64Image)
+    {
+        if(strlen($number) > 9)
+        {
+            try 
+            {
+                $media = $base64Image;
+
+                $this->client->request('POST', 'http://103.14.27.53:8090/message/sendMedia/Isabela', [
+                    'headers' => [
+                        'Content-Type'  => 'application/json',
+                        'apikey'	=> $this->API_KEY
+                    ],
+                    'json' => [
+                        'number' => "55" . $number, //ajustar para poder aceitar numeros internacionais também
+                        'mediatype' => 'image',
+                        "mimetype" => "image/png",
+                        'media' => $media,
+                        'caption' => $message,
+                        "fileName" => "qrCode.jpg",
+                        "delay"=> 123
+                    ]
+                ]); 
+
+            }
+            catch(\Exception  $e) {
+                //trabalhar observabilidade aqui
+            } 
+        }
+    }
+
+    
    
 }

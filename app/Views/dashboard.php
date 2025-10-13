@@ -107,7 +107,7 @@
                     <div class="collapse" id="refeicoes">
                         <ul class="nav flex-column sub-menu">
 
-                            <?php //if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/agendamento'); ?>">
                                         <span class="menu-icon">
@@ -116,9 +116,9 @@
                                         <span class="menu-title">Agendamentos</span>
                                     </a>
                                 </li>
-                            <?php //endif; ?>
+                            <?php endif; ?>
 
-                            <?php //if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/analise'); ?>">
                                         <span class="menu-icon">
@@ -127,9 +127,9 @@
                                         <span class="menu-title">Análise de Solicitações</span>
                                     </a>
                                 </li>
-                            <?php //endif; ?>
+                            <?php endif; ?>
 
-                            <?php //if (auth()->user()->inGroup('admin', 'solicitante')): ?>
+                            <?php if (auth()->user()->inGroup('admin', 'solicitante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('sys/solicitacoes'); ?>">
                                         <span class="menu-icon">
@@ -138,9 +138,9 @@
                                         <span class="menu-title">Solicitações</span>
                                     </a>
                                 </li>
-                            <?php //endif; ?>
+                            <?php endif; ?>
 
-                            <?php //if (auth()->user()->inGroup('admin', 'restaurante')): ?>
+                            <?php if (auth()->user()->inGroup('admin', 'restaurante')): ?>
                                 <li class="nav-item">
                                     <a class="nav-link" href="<?php echo base_url('#'); ?>">
                                         <span class="menu-icon">
@@ -149,12 +149,12 @@
                                         <span class="menu-title">Entregas</span>
                                     </a>
                                 </li>
-                            <?php //endif; ?>
+                            <?php endif; ?>
                         </ul>
                     </div>
                 </li>
 
-                <?php //if (auth()->user()->inGroup('admin')): ?>
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#cadastros" aria-expanded="false" aria-controls="cadastros">
@@ -208,9 +208,9 @@
                             </ul>
                         </div>
                     </li>
-                <?php //endif; ?>
+                <?php endif; ?>
 
-                <?php //if (auth()->user()->inGroup('admin')): ?>
+                <?php if (auth()->user()->inGroup('admin')): ?>
 
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#op_avancadas" aria-expanded="false" aria-controls="op_avancadas">
@@ -251,7 +251,7 @@
                         </div>
                     </li>
 
-                <?php //endif; ?>
+                <?php endif; ?>
 
             </ul>
         </nav>

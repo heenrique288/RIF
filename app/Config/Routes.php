@@ -87,7 +87,7 @@ $routes->group('sys', ['filter' => 'session'], static function ($routes) {
     $routes->group('agendamento', ['filter' => 'app_group:admin,developer'], static function ($routes) {
         $routes->get('', 'AgendamentoController::index');
         $routes->post('admin/create', 'AgendamentoController::create');
-        $routes->get('admin/getAlunosByTurma/(:num)', 'AgendamentoController::getAlunosByTurma/$1');
+        $routes->get('admin/getAlunosByTurma', 'AgendamentoController::getAlunosByTurma');
         $routes->post('admin/update', 'AgendamentoController::update');
         $routes->post('admin/delete', 'AgendamentoController::delete');
     });

@@ -25,25 +25,25 @@ class AgendamentoController extends BaseController
         $this->response->setContentType('application/json');
 
         try {
-            $post = $this->request->getPost();
+            //$post = $this->request->getPost(); --> REMOVI ESTE TRECHO POIS NÃO ESTAVA SENDO USADO
 
             // $matriculasString = is_array($post['matriculas']) && isset($post['matriculas'][0]) ? $post['matriculas'][0] : '';
             // $datasString      = is_array($post['datas']) && isset($post['datas'][0]) ? $post['datas'][0] : '';
             // $status           = strip_tags($post['status']);
             // $motivo           = strip_tags($post['motivo']);
-            $matriculasString = $this->request->getPost('matriculas') ?? '';
+            $matriculas = $this->request->getPost('matriculas');
             $datasString      = $this->request->getPost('datas') ?? '';
             $status           = strip_tags($this->request->getPost('status'));
             $motivo           = strip_tags($this->request->getPost('motivo'));
 
-            if (empty($matriculasString) || empty($datasString)) {
+            if (empty($matriculas) || empty($datasString)) {
                 return $this->response->setJSON([
                     'success' => false, 
                     'message' => 'Selecione pelo menos um aluno e uma data.'
                 ]);
             }
 
-            $matriculas = explode(',', $matriculasString);
+            //$matriculas = explode(',', $matriculasString); --> Antes, armazenava como array de strings separadas por vírgula, agora, já está vindo como array do formulário
             $datas      = explode(',', $datasString);
 
             $controleModel = new ControleRefeicoesModel();
@@ -147,10 +147,19 @@ class AgendamentoController extends BaseController
     }
 
     
-    public function getAlunosByTurma($turma_id)
+    public function getAlunosByTurma()
     {
         $alunoModel = new AlunoModel();
-        $alunos = $alunoModel->getAtivosByTurma((int) $turma_id);
+        // Pega o parâmetro 'turmas' do GET (ex: "1,2,5")
+        $turmas = $this->request->getGet('turmas');
+
+        if (!$turmas) {
+            return $this->response->setJSON([]); // nenhuma turma selecionada
+        }
+
+        $turmasArray = array_filter(array_map('intval', explode(',', $turmas)));
+        if (empty($turmasArray)) return $this->response->setJSON([]); // transforma em array de inteiros
+        $alunos = $alunoModel->getAtivosByTurmas($turmasArray); // novo método no Model
 
         return $this->response->setJSON($alunos);
     }

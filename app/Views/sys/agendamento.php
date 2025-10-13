@@ -42,7 +42,8 @@
                     <table class="table mb-4" id="listagem-agendamentos">
                         <thead>
                             <tr>
-                                <th><strong>Turma ou Aluno</strong></th>
+                                <th><strong>Aluno(a)</strong></th>
+                                <th><strong>Turma</strong></th>
                                 <th><strong>Data</strong></th>
                                 <th><strong>Status</strong></th>
                                 <th><strong>Motivo</strong></th>
@@ -259,6 +260,22 @@
     }
 
     $(document).ready(function() {
+
+        //ESSA PARTE APENAS RENDERIZA O MODELO DO CORONA
+        $('.js-example-basic-single').select2();
+        $('.js-example-basic-multiple').select2();
+
+        
+        $('#modal-cadastrar-agendamento').on('shown.bs.modal', function () {
+            $(this).find('.js-example-basic-single').select2({
+                dropdownParent: $('#modal-cadastrar-agendamento')
+            });
+            $(this).find('.js-example-basic-multiple').select2({
+                dropdownParent: $('#modal-cadastrar-agendamento')
+            });
+        });
+        //FIM DA PARTE DO CORONA
+
         if (agendamentosData && agendamentosData.length > 0) {
             $('#listagem-agendamentos').DataTable({
                 data: agendamentosData,
@@ -285,6 +302,8 @@
                         return data;
                     }
                 }, {
+                    data: 'turma'
+                },{
                     data: 'data'
                 }, {
                     data: 'status'
@@ -374,6 +393,12 @@
             $('#edit_original_aluno_ids').val(deleteInfo.aluno_ids.join(','));
             $('#edit_original_datas').val(deleteInfo.datas.join(','));
             $('#edit_original_motivo').val(deleteInfo.motivo);
+            $('#edit_turma_id').val(data.turmas || []).trigger('change');
+
+            // Aguarda o carregamento dos alunos
+            setTimeout(() => {
+                $('#edit_alunos_id').val(deleteInfo.aluno_ids || []).trigger('change');
+            }, 500);
 
             $('#edit_motivo').val(motivoMap[data.motivo] || deleteInfo.motivo);
             $('#edit_status').val(statusMap[data.status]);
@@ -394,6 +419,16 @@
         $('#modal-editar-agendamento').on('shown.bs.modal', function () {
             const datasParaSelecionar = $(this).data('datas-para-selecionar');
             const minDateParaEditar = $(this).data('min-date-para-editar');
+
+            $('#edit_turma_id').select2({
+                dropdownParent: $('#modal-editar-agendamento'),
+                width: '100%'
+            });
+            $('#edit_alunos_id').select2({
+                dropdownParent: $('#modal-editar-agendamento'),
+                width: '100%'
+            });
+            
             if (flatpickrEditInstance) {
                 flatpickrEditInstance.destroy();
             }
@@ -414,69 +449,58 @@
 
         if (document.getElementById('form-cadastrar-agendamento')) {
 
-            const alunosSelecionadosCadastro = new Map();
-            function atualizarListaAlunosCadastro() {
-                const listaUl = $('#lista-alunos');
-                listaUl.empty();
-
-                if (alunosSelecionadosCadastro.size === 0) {
-                    listaUl.append('<li class="text-muted small p-2">Nenhum aluno selecionado.</li>');
-                } else {
-                    alunosSelecionadosCadastro.forEach((nome, matricula) => {
-                        const li = `
-                            <li data-matricula="${matricula}">
-                                <span>${nome}</span>
-                                <span class="remove-aluno" style="cursor:pointer; font-weight:bold; color:#dc3545;">&times;</span>
-                            </li>`;
-                        listaUl.append(li);
-                    });
-                }
-                $('#matriculas-hidden').val(Array.from(alunosSelecionadosCadastro.keys()).join(','));
-            }
-
-            // Busca alunos quando uma turma é selecionada
+            const getAlunosByTurmaUrl = "<?= base_url('sys/agendamento/admin/getAlunosByTurma') ?>";
+            // Inicializa Select2 nos selects já existentes
             $('#turma_id').on('change', function() {
-                const turmaId = $(this).val();
-                const container = $('#alunos-container');
-                container.html(turmaId ? 'Carregando...' : '');
+                const turmasSelecionadas = $(this).val(); // array de IDs
+                const alunosSelect = $('#alunos_id');
 
-                if (turmaId) {
-                    fetch(`${getAlunosByTurmaUrl}/${turmaId}`)
-                        .then(res => res.json())
-                        .then(alunos => {
-                            container.empty();
+                alunosSelect.prop('disabled', true).empty();
 
-                            // Botão "Selecionar Todos"
-                            if (alunos.length > 0) {
-                                const btnTodos = $('<button type="button" class="btn btn-success btn-sm m-1">Selecionar Todos</button>');
-                                btnTodos.on('click', function() {
-                                    alunos.forEach(aluno => {
-                                        alunosSelecionadosCadastro.set(String(aluno.matricula), aluno.nome);
-                                    });
-                                    atualizarListaAlunosCadastro();
-                                });
-                                container.append(btnTodos);
-                            }
-                            
-                            // Botões individuais dos alunos
-                            alunos.forEach(aluno => {
-                                const btn = $(`<button type="button" class="btn btn-outline-primary btn-sm m-1">${aluno.nome}</button>`);
-                                btn.on('click', function() {
-                                    alunosSelecionadosCadastro.set(String(aluno.matricula), aluno.nome);
-                                    atualizarListaAlunosCadastro();
-                                });
-                                container.append(btn);
-                            });
+                if (turmasSelecionadas && turmasSelecionadas.length > 0) {
+                    fetch(`${getAlunosByTurmaUrl}?turmas=${turmasSelecionadas.join(',')}`)
+                        .then(res => {
+                            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                            return res.json();
                         })
-                        .catch(() => container.html('<span class="text-danger">Erro ao carregar alunos.</span>'));
+                        .then(alunos => {
+                            alunosSelect.empty();
+                            // Adiciona a opção "Selecionar Todos"
+                            alunosSelect.append('<option value="select_all">-- Selecionar Todos --</option>');
+
+                            // Adiciona os alunos retornados
+                            alunos.forEach(aluno => {
+                                // Cria opção apenas se ainda não existir
+                                if ($('#alunos_id option[value="' + aluno.matricula + '"]').length === 0) {
+                                    const option = new Option(aluno.nome, aluno.matricula, false, false); // selecionado
+                                    $('#alunos_id').append(option).trigger('change');
+                                }
+                            });
+                            alunosSelect.prop('disabled', false).trigger('change');
+                        })
+                        .catch(err => {
+                            alunosSelect.prop('disabled', false);
+                            console.error('Erro no fetch:', err);
+                            alert('Erro ao carregar alunos. Veja o console para detalhes.');
+                        });
+                } else {
+                    alunosSelect.prop('disabled', false);
                 }
             });
 
-            // Remove um aluno da lista de selecionados
-            $('#lista-alunos').on('click', '.remove-aluno', function() {
-                const matricula = $(this).closest('li').data('matricula');
-                alunosSelecionadosCadastro.delete(String(matricula));
-                atualizarListaAlunosCadastro();
+            // Evento: Selecionar Todos os alunos
+            $('#alunos_id').on('change', function() {
+                const valoresSelecionados = $(this).val() || [];
+                if (valoresSelecionados.includes('select_all')) {
+                    // Marca todos os alunos (exceto o "select_all")
+                    const todosAlunos = $('#alunos_id option')
+                        .map(function() { return this.value; })
+                        .get()
+                        .filter(v => v !== 'select_all');
+
+                    // Atualiza o Select2
+                    $('#alunos_id').val(todosAlunos).trigger('change');
+                }
             });
 
             // Inicialização de Plugins (Flatpickr)
@@ -530,25 +554,38 @@
             });
         }
 
+        const getAlunosByTurmaUrl = "<?= base_url('sys/agendamento/admin/getAlunosByTurma') ?>";
+
+        // --- EDIÇÃO ---
         $('#edit_turma_id').on('change', function() {
-            const turmaId = $(this).val();
-            const container = $('#edit_alunos-container');
-            container.html(turmaId ? 'Carregando...' : '');
-            
-            if (turmaId) {
-                fetch(`${getAlunosByTurmaUrl}/${turmaId}`)
-                    .then(res => res.json())
+            const turmasSelecionadas = $(this).val(); // array de IDs
+            const alunosSelect = $('#edit_alunos_id');
+
+            alunosSelect.prop('disabled', true).empty();
+
+            if (turmasSelecionadas && turmasSelecionadas.length > 0) {
+                fetch(`${getAlunosByTurmaUrl}?turmas=${turmasSelecionadas.join(',')}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                        return res.json();
+                    })
                     .then(alunos => {
-                        container.empty();
                         alunos.forEach(aluno => {
-                            const btn = $(`<button type="button" class="btn btn-outline-primary btn-sm m-1">${aluno.nome}</button>`);
-                            btn.on('click', function() {
-                                alunosSelecionadosEdit.set(String(aluno.matricula), aluno.nome);
-                                atualizarListaAlunosEdit();
-                            });
-                            container.append(btn);
+                            // Evita duplicatas
+                            if ($('#edit_alunos_id option[value="' + aluno.matricula + '"]').length === 0) {
+                                const option = new Option(aluno.nome, aluno.matricula, false, false);
+                                alunosSelect.append(option);
+                            }
                         });
-                    }).catch(() => container.html('<span class="text-danger">Erro ao carregar.</span>'));
+                        alunosSelect.prop('disabled', false).trigger('change');
+                    })
+                    .catch(err => {
+                        alunosSelect.prop('disabled', false);
+                        console.error('Erro no fetch:', err);
+                        alert('Erro ao carregar alunos. Veja o console para detalhes.');
+                    });
+            } else {
+                alunosSelect.prop('disabled', false);
             }
         });
         

@@ -101,6 +101,7 @@ class ControleRefeicoesModel extends Model
             2 => 'Retirada',
             3 => 'Cancelada',
         ];
+
         $motivoMap = [
             0 => 'Contraturno',
             1 => 'Estágio',
@@ -109,69 +110,48 @@ class ControleRefeicoesModel extends Model
             4 => 'Visita Técnica',
         ];
 
-        $agendamentosAgrupados = $this->getAgendamentosAgrupados();
-
-        $todosIdsAlunos = [];
-        foreach ($agendamentosAgrupados as $agrupado) {
-            $todosIdsAlunos = array_merge($todosIdsAlunos, $agrupado['aluno_ids']);
-        }
-        $alunosData = $alunoModel->getAlunosByIds(array_unique($todosIdsAlunos));
+        // Busca os agendamentos individuais
+        $agendamentos = $this->select('
+                controle_refeicoes.id,
+                controle_refeicoes.data_refeicao,
+                controle_refeicoes.status,
+                controle_refeicoes.motivo,
+                alunos.matricula AS aluno_matricula,
+                alunos.nome AS aluno_nome,
+                alunos.turma_id,
+                turmas.nome AS turma_nome,
+                cursos.nome AS curso_nome
+            ')
+            ->join('alunos', 'alunos.matricula = controle_refeicoes.aluno_id', 'left')
+            ->join('turmas', 'turmas.id = alunos.turma_id', 'left')
+            ->join('cursos', 'cursos.id = turmas.curso_id', 'left')
+            ->orderBy('controle_refeicoes.data_refeicao', 'DESC')
+            ->findAll();
 
         $result = [];
-        foreach ($agendamentosAgrupados as $agrupado) {
-            $idsAlunos = $agrupado['aluno_ids'];
-            $turmasDoGrupo = [];
-            $alunosParaModal = [];
-
-            foreach ($idsAlunos as $id) {
-                if (!isset($alunosData[$id])) continue;
-                $aluno = $alunosData[$id];
-                $turmaId = $aluno['turma_id'] ?? 'sem_turma';
-                $turmasDoGrupo[$turmaId][] = $aluno['nome'];
-            }
-
-            $nomesAlunos = array_reduce($turmasDoGrupo, 'array_merge', []);
-            $qtdTurmas = count($turmasDoGrupo);
-            $tipo = 'aluno';
-            $turmaOuAluno = $nomesAlunos[0] ?? 'Aluno não encontrado';
-
-            if ($qtdTurmas > 1) {
-                $tipo = 'multi_turma';
-                $turmaOuAluno = "$qtdTurmas turmas selecionadas";
-
-                foreach ($turmasDoGrupo as $turmaId => $nomes) {
-                    $nomeTurma = ($turmaId === 'sem_turma') ? 'Alunos sem Turma' : $turmaModel->getNomeTurmaComCurso($turmaId);
-                    $alunosParaModal[$nomeTurma] = $nomes;
-                }
-
-            } elseif ($qtdTurmas === 1) {
-                $turmaId = key($turmasDoGrupo);
-                if (count($idsAlunos) > 1 && $turmaId !== 'sem_turma') {
-                    $tipo = 'turma';
-                    $turmaOuAluno = $turmaModel->getNomeTurmaComCurso($turmaId);
-                }
-            }
-
-            $datasFormatadas = array_map(fn($d) => $d ? (new \DateTime($d))->format('d/m/Y') : '', $agrupado['datas_refeicao']);
-
+        foreach ($agendamentos as $a) {
+            $turmaCompleta = trim(($a['turma_nome'] ?? '') . ' - ' . ($a['curso_nome'] ?? ''));
             $result[] = [
-                'tipo'             => $tipo,
-                'turma_aluno'      => $turmaOuAluno,
-                'data'             => implode('<br>', $datasFormatadas),
-                'status'           => $statusMap[$agrupado['status']] ?? 'Desconhecido',
-                'motivo'           => $motivoMap[$agrupado['motivo']] ?? 'Não especificado',
-                'alunos'           => $nomesAlunos,
-                'alunos_por_turma' => $alunosParaModal,
-                'delete_info'      => [
-                    'aluno_ids' => $idsAlunos,
-                    'motivo'    => $agrupado['motivo'],
-                    'datas'     => $agrupado['datas_refeicao']
+                'id'            => $a['id'],
+                'turma_aluno'   => $a['aluno_nome'] ?? 'Sem nome',
+                'turma'         => $turmaCompleta ?: 'Sem turma',
+                'data'          => $a['data_refeicao'] ? (new \DateTime($a['data_refeicao']))->format('d/m/Y') : '',
+                'status'        => $statusMap[$a['status']] ?? 'Desconhecido',
+                'motivo'        => $motivoMap[$a['motivo']] ?? 'Não especificado',
+                'alunos'        => [$a['aluno_nome'] ?? 'Sem nome'], // array com apenas 1 aluno
+                'alunos_por_turma' => [$turmaCompleta ?: 'Sem turma' => [$a['aluno_nome'] ?? 'Sem nome']],
+                'delete_info'   => [
+                    'aluno_ids' => [$a['aluno_matricula']],
+                    'motivo'    => $a['motivo'],
+                    'datas'     => [$a['data_refeicao']],
                 ]
             ];
         }
 
         return $result;
     }
+
+
 
     // Fução para retornar para a o controller os dadaos. --> AgendamentoController.php
     public function getViewData(AlunoModel $alunoModel, TurmaModel $turmaModel): array

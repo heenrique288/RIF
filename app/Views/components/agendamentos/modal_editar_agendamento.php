@@ -14,22 +14,22 @@
                     <input type="hidden" name="original_motivo" id="edit_original_motivo">
 
                     <div class="mb-3">
-                        <label for="edit_turma_id" class="form-label">Adicionar Alunos da Turma</label>
-                        <select class="form-select" id="edit_turma_id">
-                            <option value="">Selecione uma turma...</option>
-                            <?php if (!empty($turmas)): ?>
-                                <?php foreach ($turmas as $turma): ?>
-                                    <option value="<?= $turma['id'] ?>"><?= esc($turma['nome_turma'] . ' - ' . $turma['nome_curso']) ?></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                        <label for="edit_turma_id" class="form-label">Selecione a Turma(s)</label>
+                        <select id="edit_turma_id" name="turma_id[]" class="js-example-basic-multiple" multiple="multiple" style="width: 100%;">
+                            <?php foreach ($turmas as $turma): ?>
+                                <option value="<?= $turma['id'] ?>">
+                                    <?= esc($turma['nome_turma'] . ' - ' . esc($turma['nome_curso'])) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
-                    <div id="edit_alunos-container" class="d-flex flex-wrap gap-1 mb-3"></div>
 
-                    <h6>Alunos Selecionados</h6>
-                    <ul id="edit_lista-alunos" class="list-unstyled mb-3 p-2 rounded" style="background-color: #2a3038; max-height: 150px; overflow-y: auto; min-height: 50px;">
-                    </ul>
-                    <input type="hidden" name="matriculas[]" id="edit_matriculas-hidden">
+                    <div class="mb-3">
+                        <label for="edit_alunos_id" class="form-label">Selecione os Alunos</label>
+                        <select id="edit_alunos_id" name="matriculas[]" class="js-example-basic-multiple" multiple="multiple" style="width:100%">
+                            <!-- Opções serão carregadas dinamicamente via JS -->
+                        </select>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Data(s) do Agendamento</label>

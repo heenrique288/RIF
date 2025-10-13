@@ -12,9 +12,8 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="turma_id" class="form-label">Adicionar Alunos da Turma</label>
-                        <select id="turma_id" name="turma_id" class="form-select">
-                            <option value="">Selecione a turma</option>
+                        <label for="turma_id" class="form-label">Selecione a Turma(s)</label>
+                        <select id="turma_id" name="turma_id[]" class="js-example-basic-multiple" multiple="multiple" style="width: 100%;">
                             <?php foreach ($turmas as $turma): ?>
                                 <option value="<?= $turma['id'] ?>">
                                     <?= esc($turma['nome_turma'] . ' - ' . esc($turma['nome_curso'])) ?>
@@ -22,13 +21,13 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div id="alunos-container" class="d-flex flex-wrap gap-1 mb-3"></div>
-                    
-                    <h6>Alunos Selecionados</h6>
-                    <ul id="lista-alunos" class="list-unstyled mb-3 p-2 rounded" style="background-color: #2a3038; max-height: 150px; overflow-y: auto; min-height: 50px;">
-                        <li class="text-muted small p-2">Nenhum aluno selecionado.</li>
-                    </ul>
-                    <input type="hidden" name="matriculas" id="matriculas-hidden">
+
+                    <div class="mb-3">
+                        <label for="alunos_id" class="form-label">Selecione os Alunos</label>
+                        <select id="alunos_id" name="matriculas[]" class="js-example-basic-multiple" multiple="multiple" style="width:100%">
+                            <!-- Opções serão carregadas dinamicamente via JS -->
+                        </select>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Data(s) do Agendamento</label>

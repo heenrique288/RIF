@@ -72,10 +72,12 @@ class AlunoModel extends Model
     // FUNÇÃO DO MÉTODO GETALUNOSBYTURMA() DO CONTROLLER --> AgendamentoController.php
     //
     
-    public function getAtivosByTurma(int $turmaId): array
+    public function getAtivosByTurmas(array $turmas)
     {
-        return $this->where('turma_id', $turmaId)
+        if (empty($turmas)) return [];
+        return $this->whereIn('turma_id', $turmas)
                     ->where('status', 1)
                     ->findAll();
     }
+
 }

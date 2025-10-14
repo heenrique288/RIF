@@ -42,11 +42,11 @@
                     <table class="table mb-4" id="listagem-agendamentos">
                         <thead>
                             <tr>
-                                <th><strong>Aluno(a)</strong></th>
-                                <th><strong>Turma</strong></th>
-                                <th><strong>Data</strong></th>
-                                <th><strong>Status</strong></th>
-                                <th><strong>Motivo</strong></th>
+                                <th><strong>Aluno(a)<i class="mdi mdi-chevron-down"></i></strong></th>
+                                <th><strong>Turma<i class="mdi mdi-chevron-down"></i></strong></th>
+                                <th><strong>Data<i class="mdi mdi-chevron-down"></i></strong></th>
+                                <th><strong>Status<i class="mdi mdi-chevron-down"></i></strong></th>
+                                <th><strong>Motivo<i class="mdi mdi-chevron-down"></i></strong></th>
                                 <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
                             </tr>
                         </thead>
@@ -76,70 +76,6 @@
 </div>
 
 <style>
-    #lista-alunos li {
-        background-color: #2a3038;
-        color: #ffffff;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
-        margin-bottom: 0.25rem;
-    }
-
-    #lista-alunos li .remove-aluno {
-        cursor: pointer;
-        color: #dc3545;
-        font-weight: bold;
-        margin-left: 1rem;
-    }
-
-    #lista-alunos li .remove-aluno:hover {
-        color: #a71d2a;
-    }
-
-    #lista-alunos-modal .list-group-item {
-        background-color: #2a3038;
-        color: #ffffff;
-        border-color: #444;
-        border-width: 0 0 1px 0;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-    }
-
-    #lista-alunos-modal .list-group-item:first-child {
-        border-top-width: 1px;
-    }
-
-    #lista-alunos-modal .turma-header {
-        background-color: #212529;
-        font-weight: bold;
-        font-size: 1.05em;
-    }
-
-    #lista-alunos-modal .aluno-item {
-        padding-left: 2rem;
-    }
-
-    #lista-alunos-modal .list-group-item:last-child {
-        border-bottom-width: 0;
-    }
-    #lista-alunos li, #edit_lista-alunos li {
-        background-color: #2a3038;
-        color: #ffffff;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
-        margin-bottom: 0.25rem;
-    }
-
-    #listagem-agendamentos td:last-child {
-        width: 1%;
-        white-space: nowrap;
-        padding: 8px 12px !important;
-    }
     .flatpickr-calendar {
         background-color: #2a3038 !important;
         color: #fff !important;

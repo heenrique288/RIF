@@ -40,6 +40,7 @@ $routes->group('sys', ['filter' => 'session'], static function ($routes) {
         $routes->post('delete', 'TurmaController::delete');
         $routes->post('import', 'TurmaController::import');
         $routes->post('importProcess', 'TurmaController::importProcess'); 
+        $routes->get('verificarAlunos/(:num)', 'TurmaController::verificarAlunos/$1');
     });
 
     //==============================================================

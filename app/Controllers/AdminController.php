@@ -29,9 +29,9 @@ class AdminController extends BaseController
     {
         $usuarios = $this->gerenciarUsuarios();
         $data['usuarios'] = $usuarios;
+        $data['content'] = view('sys/gerenciar-usuarios', $data);
 
-        $this->content_data['content'] = view('sys/gerenciar-usuarios', $data);
-        return view('dashboard', $this->content_data);
+        return view('dashboard', $data);
     }
 
     public function gerenciarUsuarios()

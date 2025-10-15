@@ -2,6 +2,7 @@
 <?= $this->include('components/turmas/modal_editar_turma', ['cursos' => $cursos]) ?>
 <?= $this->include('components/turmas/modal_deletar_turma', ['cursos' => $cursos]) ?>
 <?= $this->include('components/turmas/modal_importar_alunos_turma', ['cursos' => $cursos]) ?>
+<?= $this->include('components/turmas/modal_confirmar_senha') ?>
 
 
 <div class="mb-3">
@@ -212,5 +213,63 @@
             modal.find('#importar-curso-id').val(cursoId);
             modal.find('#importar-curso-nome').text(cursoNome);
         });
+    });
+
+    function abrirModalDeletarTurma(id, nome) { // Função para abrir o modal de deletar turma
+        $('#deleteTurmaId').val(id);
+        $('#deletar-nome').text(nome);
+
+        // Verifica via AJAX se há alunos vinculados à turma
+        $.get("<?= base_url('sys/turmas/verificarAlunos') ?>/" + id, function (resposta) {
+            const temAlunos = resposta.temAlunos;
+
+            if (temAlunos) {
+                // Mensagem de alerta se houver alunos 
+                $('#deleteModalBody').html(`
+                    <p class="text-break">
+                        <strong>ATENÇÃO!</strong>
+                        A turma <strong>${nome}</strong> possui alunos cadastrados.
+                        Deseja excluir mesmo assim?
+                    </p>
+                `);
+
+                // Botões
+                $('#deleteModalFooter').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim</button>
+                `);
+
+                // Abre modal principal
+                $('#modal-deletar-turma').modal('show');
+
+                // Se clicar em “Sim”, abre o modal para excluir permanentemente a turma
+                $(document).off('click', '#btnConfirmarExclusao').on('click', '#btnConfirmarExclusao', function () {
+                    $('#senhaTurmaId').val(id);
+                    $('#modal-deletar-turma').modal('hide');
+                    $('#modal-confirmar-senha').modal('show');
+                });
+
+            } else {
+                // Mensagem normal
+                $('#deleteModalBody').html(`
+                    <p class="text-break">
+                        Confirma a exclusão da turma <strong>${nome}</strong>?
+                    </p>
+                `);
+
+                $('#deleteModalFooter').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" id="btnExcluirTurma">Excluir Turma</button>
+                `);
+
+                $('#modal-deletar-turma').modal('show');
+            }
+        });
+    }
+
+    $(document).on('click', '.delete-turma-btn', function () { // Função para capturar o clique no botão de deletar turma
+        const id = $(this).data('id');
+        const nome = $(this).data('nome');
+        abrirModalDeletarTurma(id, nome);
     });
 </script>

@@ -215,16 +215,13 @@
         });
     });
 
-    function abrirModalDeletarTurma(id, nome) { // Função para abrir o modal de deletar turma
-        $('#deleteTurmaId').val(id);
-        $('#deletar-nome').text(nome);
-
+    function abrirModalDeletarTurma(id, nome) {
         // Verifica via AJAX se há alunos vinculados à turma
         $.get("<?= base_url('sys/turmas/verificarAlunos') ?>/" + id, function (resposta) {
             const temAlunos = resposta.temAlunos;
 
             if (temAlunos) {
-                // Mensagem de alerta se houver alunos 
+                // Mensagem de alerta se houver alunos
                 $('#deleteModalBody').html(`
                     <p class="text-break">
                         <strong>ATENÇÃO!</strong>
@@ -233,17 +230,16 @@
                     </p>
                 `);
 
-                // Botões
                 $('#deleteModalFooter').html(`
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim</button>
                 `);
 
-                // Abre modal principal
+                $('#deleteTurmaId').val(id); // Atualiza o input hidden
                 $('#modal-deletar-turma').modal('show');
 
-                // Se clicar em “Sim”, abre o modal para excluir permanentemente a turma
-                $(document).off('click', '#btnConfirmarExclusao').on('click', '#btnConfirmarExclusao', function () {
+                // Clique em "Sim" → abre modal de senha
+                $(document).off('click', '#btnConfirmarExclusao').on('click', '#btnConfirmarExclusao', function() {
                     $('#senhaTurmaId').val(id);
                     $('#modal-deletar-turma').modal('hide');
                     $('#modal-confirmar-senha').modal('show');
@@ -262,12 +258,14 @@
                     <button type="submit" class="btn btn-danger" id="btnExcluirTurma">Excluir Turma</button>
                 `);
 
+                $('#deleteTurmaId').val(id);
                 $('#modal-deletar-turma').modal('show');
             }
         });
     }
 
-    $(document).on('click', '.delete-turma-btn', function () { // Função para capturar o clique no botão de deletar turma
+    // Botão de deletar
+    $(document).on('click', '.delete-turma-btn', function () {
         const id = $(this).data('id');
         const nome = $(this).data('nome');
         abrirModalDeletarTurma(id, nome);

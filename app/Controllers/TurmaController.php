@@ -87,8 +87,12 @@ class TurmaController extends BaseController
     public function delete()
     {
         $post = $this->request->getPost();
-        $id = (int) strip_tags($post['id']);
+        $id = isset($post['id']) ? (int) strip_tags($post['id']) : null;
         $senha = $post['senha'] ?? null;
+
+        if (!$id) {
+            return $this->redirectToBaseRoute(['ID da turma não informado!']);
+        }
 
         try {
             // MESMA LÓGICA DO AdminController.php
@@ -97,14 +101,19 @@ class TurmaController extends BaseController
                 return $this->redirectToBaseRoute(['Você precisa estar autenticado para excluir uma turma.']);
             }
 
-            // Verifica se a senha foi informada
-            if (!$senha) {
-                return $this->redirectToBaseRoute(['Por favor, informe sua senha para confirmar a exclusão.']);
-            }
+            // Verifica se há alunos vinculados
+            $alunoModel = new AlunoModel();
+            $temAlunos = $alunoModel->where('turma_id', $id)->countAllResults() > 0;
 
-            // Verifica se a senha informada está correta
-            if (!password_verify($senha, $usuario->password_hash)) {
-                return $this->redirectToBaseRoute(['Senha incorreta! A exclusão foi cancelada.']);
+            // Se houver alunos, a senha é obrigatória
+            if ($temAlunos) {
+                if (!$senha) {
+                    return $this->redirectToBaseRoute(['Por favor, informe sua senha para confirmar a exclusão.']);
+                }
+
+                if (!password_verify($senha, $usuario->password_hash)) {
+                    return $this->redirectToBaseRoute(['Senha incorreta! A exclusão foi cancelada.']);
+                }
             }
 
             $turma = new TurmaModel();

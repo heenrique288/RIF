@@ -28,6 +28,7 @@ $routes->group('sys', ['filter' => 'session'], static function ($routes) {
         $routes->post('create', 'CursoController::create');
         $routes->post('update', 'CursoController::update');
         $routes->post('delete', 'CursoController::delete');
+        $routes->get('verificarTurmas/(:num)', 'CursoController::verificarTurmas/$1');
     });
 
     //==============================================================

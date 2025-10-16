@@ -1,6 +1,7 @@
 <?php echo view('components/cursos/modal_cadastrar_curso') ?>
 <?php echo view('components/cursos/modal_editar_curso') ?>
 <?php echo view('components/cursos/modal_deletar_curso') ?>
+<?php echo view('components/cursos/modal_confirmar_senha_curso') ?>
 
 <div class="mb-3">
     <h2 class="card-title mb-0">Cursos</h2>
@@ -103,7 +104,7 @@
                                     <span data-bs-toggle="tooltip" data-placement="top" title="Excluir curso">
                                         <button
                                             type="button"
-                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1"
+                                            class="justify-content-center align-items-center d-flex btn btn-inverse-danger button-trans-danger btn-icon me-1 delete-curso-btn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modal-deletar-curso"
                                             data-id="${data.id}"
@@ -158,5 +159,63 @@
                 position: 'top-center'
             });
         <?php endif; ?>
+    });
+
+    function abrirModalDeletarCurso(id, nome) {
+        $('#deletar-id').val(id);
+        $('#deletar-nome').text(nome);
+
+        // Verifica via AJAX se o curso tem turmas associadas
+        $.get("<?= base_url('sys/cursos/verificarTurmas') ?>/" + id, function (resposta) {
+            const temTurmas = resposta.temTurmas;
+
+            if (temTurmas) {
+                // Altera o corpo do modal com aviso
+                $('#modal-deletar-curso .modal-body').html(`
+                    <p class="text-break">
+                        O curso <strong>${nome}</strong> possui turmas cadastradas. Ao deletar o curso, todas as turmas associadas também serão excluídas.<br>
+                        Deseja excluir mesmo assim?
+                    </p>
+                `);
+
+                // Altera os botões
+                $('#modal-deletar-curso .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarExclusaoCurso">Sim</button>
+                `);
+
+                $('#modal-deletar-curso').modal('show');
+
+                // Ao clicar em "Sim", abre o modal de senha
+                $(document).off('click', '#btnConfirmarExclusaoCurso').on('click', '#btnConfirmarExclusaoCurso', function () {
+                    $('#senhaCursoId').val(id);
+                    $('#modal-deletar-curso').modal('hide');
+                    $('#modal-confirmar-senha-curso').modal('show');
+                });
+
+            } else {
+                // Caso não tenha turmas, usa o modal simples
+                $('#modal-deletar-curso .modal-body').html(`
+                    <p class="text-break">Confirma a exclusão do curso <strong>${nome}</strong>?</p>
+                `);
+
+                $('#modal-deletar-curso .modal-footer').html(`
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                `);
+
+                
+                $('#deletar-id').val(id); // ← importante!
+                
+                $('#modal-deletar-curso').modal('show');
+            }
+        });
+    }
+
+    // Ao clicar no botão de deletar curso
+    $(document).on('click', '.delete-curso-btn', function () {
+        const id = $(this).data('id');
+        const nome = $(this).data('nome');
+        abrirModalDeletarCurso(id, nome);
     });
 </script>

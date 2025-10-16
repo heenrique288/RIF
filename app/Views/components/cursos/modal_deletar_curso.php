@@ -5,17 +5,15 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-deletar-curso-label">Confirmação necessária</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                    <span aria-hidden="true">x</span>
                 </button>
             </div>
 
             <form id="form-deletar-curso" class="forms-sample" method="post" action="<?php echo base_url("sys/cursos/delete"); ?>">
                 <?php echo csrf_field() ?>
 
+                <input type="hidden" id="deletar-id" name="id" />
                 <div class="modal-body text-break">
-
-                    <input type="hidden" id="deletar-id" name="id" />
-
                     <p>Confirma a exclusão do curso <strong id="deletar-nome"></strong>?</p>
                 </div>
 

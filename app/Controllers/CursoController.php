@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\CursoModel;
+use App\Models\TurmaModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
 
@@ -82,9 +83,37 @@ class CursoController extends BaseController
     {
         $post = $this->request->getPost();
 
+        if (!isset($post['id'])) {
+            return $this->redirectToBaseRoute(['ID do curso não informado!']);
+        }
+        
         $id = (int) strip_tags($post['id']);
 
+        $senha = $post['senha'] ?? null;
+
         try {
+
+            // Verifica se o usuário está autenticado
+            $usuario = auth()->user();
+            if (!$usuario) {
+                return $this->redirectToBaseRoute(['Você precisa estar autenticado para excluir um curso.']);
+            }
+
+            $turmaModel = new TurmaModel();
+            $temTurmas = $turmaModel->where('curso_id', $id)->countAllResults() > 0;
+            // Se o curso tiver turmas, exige senha
+            if ($temTurmas) {
+                if (!$senha) {
+                    return $this->redirectToBaseRoute(['Por favor, informe sua senha para confirmar a exclusão.']);
+                }
+
+                if (!password_verify($senha, $usuario->password_hash)) {
+                    return $this->redirectToBaseRoute(['Senha incorreta! A exclusão foi cancelada.']);
+                }
+            }
+
+            $turmaModel->where('curso_id', $id)->delete();
+            
             $curso = new CursoModel();
             $sucesso = $curso->delete($id);
 
@@ -98,4 +127,15 @@ class CursoController extends BaseController
             return $this->redirectToBaseRoute(['Ocorreu um erro ao deletar o curso!']);
         }
     }
+
+    public function verificarTurmas($id)
+    {
+        $turmaModel = new TurmaModel();
+
+        // Verifica se existem turmas associadas ao curso
+        $temTurmas = $turmaModel->where('curso_id', $id)->countAllResults() > 0;
+
+        return $this->response->setJSON(['temTurmas' => $temTurmas]);
+    }
+
 }

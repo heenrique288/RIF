@@ -303,15 +303,14 @@ class AlunoController extends BaseController
         $mapeiaCabecalho = [
             'matricula'      => array_search('Matrícula', $cabecalho ),
             'nome'           => array_search('Nome', $cabecalho ),
-            'email_academico' => array_search('Email Acadêmico', $cabecalho ),
-            'email_pessoal'   => array_search('Email Pessoal', $cabecalho ),
-            'email_responsavel' => array_search('Email do Responsável', $cabecalho ),
+            'descricao_curso'=> array_search('Descrição do Curso', $cabecalho),
             'status'         => array_search('Situação no Curso', $cabecalho ),
             'telefone'       => array_search('Telefone', $cabecalho ),
+            'cod_turma'      => array_search('Turma', $cabecalho ),
         ];
 
         if (in_array(false, $mapeiaCabecalho, true)) {
-            session()->setFlashdata('erros', ['A planilha não contém todas as colunas necessárias (Matrícula, Nome, Email Acadêmico e/ou Email Pessoal e/ou Email do Responsável, Situação no Curso e Telefone).']);
+            session()->setFlashdata('erros', ['A planilha não contém todas as colunas necessárias (Matrícula, Nome, Descrição do Curso, Situação no Curso, Telefone, Turma).']);
             return redirect()->to(base_url('sys/alunos'));
         }
 
@@ -333,24 +332,24 @@ class AlunoController extends BaseController
                 $rowData[] = $cell->getValue(); //pega os dados da linha
             }
 
+            //Só vai salvar os alunos matriculados
+            $status = $rowData[$mapeiaCabecalho['status']];
+            if ($status !== 'Matriculado') {
+                continue; 
+            }
+
+            //Só vai pegar o ensino médio 
+            $descricao_curso = $rowData[$mapeiaCabecalho['descricao_curso']];
+            if (stripos($descricao_curso, 'Integrado ao Ensino Médio') === false) {
+                continue; 
+            }
+
             $matricula = $rowData[$mapeiaCabecalho['matricula']];
             $matricula_limpa = preg_replace('/[^0-9]/', '', $matricula);
 
             $nome = $rowData[$mapeiaCabecalho['nome']];
-            $email = []; //academico, pessoal, responsavel
 
-            if (isset($rowData[$mapeiaCabecalho['email_academico']]) && !empty($rowData[$mapeiaCabecalho['email_academico']])) {
-                $email[] = $rowData[$mapeiaCabecalho['email_academico']];
-            }
-            if (isset($rowData[$mapeiaCabecalho['email_pessoal']]) && !empty($rowData[$mapeiaCabecalho['email_pessoal']])) {
-                $email[] = $rowData[$mapeiaCabecalho['email_pessoal']];
-            }
-            if (isset($rowData[$mapeiaCabecalho['email_responsavel']]) && !empty($rowData[$mapeiaCabecalho['email_responsavel']])) {
-                $email[] = $rowData[$mapeiaCabecalho['email_responsavel']];
-            }     
-
-            $status = $rowData[$mapeiaCabecalho['status']];
-            $status_padrao = ($status === 'Matriculado' || $status === 'Matrícula Vínculo Institucional') ? 'ativo' : 'inativo';
+            $status_padrao = ($status === 'Matriculado')  ? 'ativo' : 'inativo';
 
             $telefone =[];
 
@@ -362,14 +361,19 @@ class AlunoController extends BaseController
                         $telefone[] = $tel; 
                     }
                 }
+
+                $telefone = array_unique($telefone);
             }
+
+            $cod_turma_completo = $rowData[$mapeiaCabecalho['cod_turma']] ?? '';
+            $cod_turma= substr($cod_turma_completo, 0, 15);
 
             $dataRows[] = [
                 'matricula' => $matricula_limpa,
                 'nome'      => $nome,
-                'email'     => $email,
                 'status'    => $status_padrao,
-                'telefone' => $telefone
+                'telefone' => $telefone,
+                'cod_turma'    => $cod_turma
             ];
 
         }
@@ -382,8 +386,8 @@ class AlunoController extends BaseController
     }
 
     /**
-     * @route POST /alunos/importProcess
-     */
+    * @route POST /alunos/importProcess
+    */
     public function importProcess()
     {
         $selecionados = $this->request->getPost('selecionados');
@@ -394,10 +398,10 @@ class AlunoController extends BaseController
         }
 
         $aluno = new AlunoModel();
-        $emailModel = new AlunoEmailModel();
         $telefoneModel = new AlunoTelefoneModel();
+        $turmaModel = new TurmaModel();
         
-        $testar_enviar_telefone = 0; //pra testar sem lotar de mensagem por enquanto
+        $testar_enviar_telefone = 0; // pra testar sem lotar de mensagem por enquanto
         
         $insertedCount = 0;
         $errors = [];
@@ -405,84 +409,75 @@ class AlunoController extends BaseController
         foreach ($selecionados as $alunoJson) {
             $alunoData = json_decode($alunoJson, true, 512, JSON_BIGINT_AS_STRING);
 
-            $data = [
-                'matricula' => $alunoData['matricula'],
-                'nome'      => $alunoData['nome'],
-                'status' => $alunoData['status'], 
-            ];
+            $codTurma = $alunoData['cod_turma']; 
+            $turma = $turmaModel->where('codTurma', $codTurma)->first();
 
-            $sucesso = $aluno->insert($data);
+            if ($turma) {
+                $turmaID = $turma['id'];
+                $data = [
+                    'matricula' => $alunoData['matricula'],
+                    'nome'      => $alunoData['nome'],
+                    'status'    => $alunoData['status'],
+                    'turma_id'  => $turmaID,
+                ];
 
-            if (!$sucesso) {
-                $errosDoModelo = $aluno->errors();
-                $errors[] = "Ocorreu um erro ao importar o aluno de matrícula {$alunoData['matricula']}: " . implode(', ', $errosDoModelo);
-            } else {
-                $insertedCount++;
-                $alunoId = $aluno->getInsertID();
+                $sucesso = $aluno->insert($data);
+                
+                if (!$sucesso) {
+                    $errosDoModelo = $aluno->errors();
+                    $errors[] = "Ocorreu um erro ao importar o aluno de matrícula {$alunoData['matricula']}: " . implode(', ', $errosDoModelo);
+                } else {
+                    $insertedCount++;
+                    $alunoId = $aluno->getInsertID();
 
-                //Faz a inserção dos emails
-                if (!empty($alunoData['email'])) {
-                    foreach ($alunoData['email'] as $email) {
-                        // se não é vazio ou apenas um hífen
-                        if (!empty(trim($email)) && trim($email) !== '-') {
-                            $emailModel->insert([
-                                'aluno_id' => $alunoId,
-                                'email'    => $email,
-                                'status' => 'ativo' //deixar assim por enquanto até verificar como será validado
-                            ]);
-                        }
-                    }
-                }
+                    $destino = null; // destino vai ser o primeiro telefone a tentar ser validado
 
-                $destino = null; //destino vai ser o primeiro telefone a tentar ser validado
+                    // Faz a inserção dos telefones
+                    if (!empty($alunoData['telefone'])) {
+                        foreach ($alunoData['telefone'] as $telefone) {
+                            if (!empty(trim($telefone)) && trim($telefone) !== '-') {
 
-                //Faz a inserção dos telefones
-                if (!empty($alunoData['telefone'])) {
-                    foreach ($alunoData['telefone'] as $telefone) {
-                        if (!empty(trim($telefone)) && trim($telefone) !== '-') {
+                                $telefonePadrao = str_replace(['(', ')', ' ', '-'], '', $telefone);
+                                
+                                // pega o telefone a ser validado
+                                if ($destino === null) {
+                                    $destino = $telefonePadrao;
+                                }
 
-                            $telefonePadrao = str_replace(['(', ')', ' ', '-'], '', $telefone);
-                            
-                            //pega o telefone a ser validado
-                            if($destino === null){
-                                $destino = $telefonePadrao;
+                                $telefoneModel->insert([
+                                    'aluno_id' => $alunoId,
+                                    'telefone' => $telefonePadrao,
+                                    'status' => 'inativo' // todos por padrão vão começar inativos
+                                ]);
                             }
-
-                            $telefoneModel->insert([
-                                'aluno_id' => $alunoId,
-                                'telefone' => $telefonePadrao,
-                                'status' => 'inativo' //todos por padrão vão começar inativos
-                            ]);
                         }
+                    }
+
+                    /**
+                     * Carrega os parâmetros pra função (Envio de Whatsapp)
+                     */
+                    if ($testar_enviar_telefone == 0) { // esse if é só pra testar sem enviar um monte
+
+                        $destino = "69992599048"; // pra não enviar pros telefones reais da planilha
+
+                        $nome = $alunoData['nome']; 
+
+                        $mensagem = "Prezado(a) {$nome},\n\n";
+                        $mensagem .= "Você foi cadastrado no Sistema de Refeições do IFRO e precisamos validar seu telefone para que possa receber os avisos.\nDigite uma das opções abaixo.\n\n";
+                        $mensagem .= "*1* - Quero receber os avisos por esse telefone.\n";
+                        $mensagem .= "*2* - Não quero receber os avisos por este telefone e sim informar outro.\n";
+
+                        $testar_enviar_telefone += 1;
+
+                        //$this->enviarWhatsapp($destino, $mensagem);
+
                     }
                 }
 
-
-                /**
-                * Carrega os parâmetros pra função
-                */
-                if ($testar_enviar_telefone == 0){ //esse if é só pra testar sem enviar um monte
-
-                    $destino = "69992599048"; // pra não enviar pros telefones reais da planilha
-
-                    $nome = $alunoData['nome']; 
-
-                    $mensagem = "Prezado(a) {$nome},\n\n";
-                    $mensagem .= "Você foi cadastrado no Sistema de Refeições do IFRO. Clique aqui para validar seu número e receber os Qr Codes. \n\n";
-                    $mensagem .= "Esse é o seu número principal para receber as mensagens?\n\n";
-                    $mensagem .= "Futuro Botão 1 e Futuro Botão 2\n\n";
-
-                    //será o footer mais pra frente
-                    $mensagem .= "Se esse número de telefone não pertence a {$nome}, por favor desconsidere esse mensagem\n\n";
-                    $mensagem .= "Atenciosamente, DEPAE.";
-
-                    $testar_enviar_telefone += 1;
-
-                    $this->enviarWhatsapp($destino, $mensagem);
-
-                }
+            } else {
+                $errors[] = "A turma com código '{$codTurma}' do aluno {$alunoData['nome']} ({$alunoData['matricula']}) não está cadastrada.";
             }
-        }
+        } // Fim do foreach
 
         $redirect = redirect()->to('sys/alunos');
 
@@ -508,33 +503,33 @@ class AlunoController extends BaseController
     }
 
     // provisoriamente aqui 
-    public function enviarEmail(){
-        $email = \Config\Services::email();
+    // public function enviarEmail(){
+    //     $email = \Config\Services::email();
 
-        $destino = 'isatereza.07@gmail.com';
-        $nome = 'Isabella';
+    //     $destino = 'isatereza.07@gmail.com';
+    //     $nome = 'Isabella';
 
-        $data = date('d/m/Y', strtotime('+2 days')); //se for 48h de antecedencia
+    //     $data = date('d/m/Y', strtotime('+2 days')); //se for 48h de antecedencia
 
-        $link = 'link.provisorio.com.br';
+    //     $link = 'link.provisorio.com.br';
 
-        $mensagem = "Prezado(a) {$nome},<br><br>";
-        $mensagem .= "Clique no link abaixo para confirmar o almoço do dia **{$data}**, caso não irá utilizar o benefício no mesmo link marque a opção que não irá fazer uso nesse dia.<br><br>";
-        $mensagem .= "<a href='{$link}'>Clique aqui</a><br><br>";
-        $mensagem .= "Sua resposta é de extrema importância para o planejamento das refeições do campus, ao não responder o link, você estará sujeito a perder o benefício. Qualquer problema entrar em contato com o DEPAE.<br><br>";
-        $mensagem .= "Atenciosamente, DEPAE. <br>";
+    //     $mensagem = "Prezado(a) {$nome},<br><br>";
+    //     $mensagem .= "Clique no link abaixo para confirmar o almoço do dia **{$data}**, caso não irá utilizar o benefício no mesmo link marque a opção que não irá fazer uso nesse dia.<br><br>";
+    //     $mensagem .= "<a href='{$link}'>Clique aqui</a><br><br>";
+    //     $mensagem .= "Sua resposta é de extrema importância para o planejamento das refeições do campus, ao não responder o link, você estará sujeito a perder o benefício. Qualquer problema entrar em contato com o DEPAE.<br><br>";
+    //     $mensagem .= "Atenciosamente, DEPAE. <br>";
 
 
-        $email->setTo($destino);
-        $email->setSubject("Confirme a refeição do dia {$data}");
-        $email->setMessage($mensagem);
+    //     $email->setTo($destino);
+    //     $email->setSubject("Confirme a refeição do dia {$data}");
+    //     $email->setMessage($mensagem);
 
-        if ($email->send()) {
-            echo "Operação concluída e e-mail de confirmação enviado.";
-        } else{
-            echo "Operação concluída, mas falha ao enviar o e-mail.";
-            echo $email->printDebugger();
-        }
-    }
+    //     if ($email->send()) {
+    //         echo "Operação concluída e e-mail de confirmação enviado.";
+    //     } else{
+    //         echo "Operação concluída, mas falha ao enviar o e-mail.";
+    //         echo $email->printDebugger();
+    //     }
+    // }
 
 }

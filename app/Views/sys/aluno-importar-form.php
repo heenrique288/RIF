@@ -25,7 +25,7 @@
                     <th>Matrícula</th>
                     <th>Nome</th>
                     <?php if (isset($import_completo) && $import_completo): ?>
-                        <th>Email</th>
+                        <th>Código Turma</th>
                         <th>Telefone</th>
                         <!-- <th>Turma</th> -->
                     <?php endif; ?>                    
@@ -51,9 +51,8 @@
                             <td><?= esc($aluno['matricula']) ?></td>
                             <td><?= esc($aluno['nome']) ?></td>
                             <?php if (isset($import_completo) && $import_completo): ?>
-                                <td><?= esc(implode(', ', $aluno['email'])) ?></td>
+                                <td><?= esc($aluno['cod_turma'] ?? '') ?></td>
                                 <td><?= esc(implode(', ', $aluno['telefone'])) ?></td>
-                                <!-- turma -->
                             <?php endif; ?>
                             <td><?= esc($aluno['status']) ?></td>
                         </tr>

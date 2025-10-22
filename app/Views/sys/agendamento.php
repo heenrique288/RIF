@@ -27,7 +27,42 @@
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
-                    <h5 class="card-title mb-0">Filtros</h5>
+                    <h5 class="card-title">Filtros</h5>
+                    <div class="form-group row align-items-end">
+                      <div class="col">
+                        <label>Turma</label>
+                        <select id="filtro-turma" class="js-example-basic-single" style="width:100%">
+                            <option value="">--</option>
+                            <?php foreach ($turmas as $turma): ?>
+                                <option value="<?= esc($turma['id']) ?>"><?= esc($turma['nome_turma']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Status</label>
+                        <select id="filtro-status" class="js-example-basic-single" style="width:100%">
+                            <option value="">--</option>
+                            <option value="Disponível">Disponível</option>
+                            <option value="Confirmada">Confirmada</option>
+                            <option value="Retirada">Retirada</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <label>Motivo</label>
+                        <select id="filtro-motivo" class="js-example-basic-single" style="width:100%">
+                            <option value="">--</option>
+                            <option value="Contraturno">Contraturno</option>
+                            <option value="Estágio">Estágio</option>
+                            <option value="Treino">Treino</option>
+                            <option value="Projeto">Projeto</option>
+                            <option value="Visita Técnica">Visita Técnica</option>
+                        </select>
+                      </div>
+                      <div class="col">
+                        <button id="btn-filtrar" class="btn btn-primary">Filtrar</button>
+                      </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -213,7 +248,7 @@
         //FIM DA PARTE DO CORONA
 
         if (agendamentosData && agendamentosData.length > 0) {
-            $('#listagem-agendamentos').DataTable({
+            const tabela = $('#listagem-agendamentos').DataTable({
                 data: agendamentosData,
                 columns: [{
                     data: 'turma_aluno',
@@ -289,7 +324,26 @@
                     initTooltips();
                 }
             });
-        }
+
+            $('#btn-filtrar').on('click', function () {
+                const turmaSelecionada = $('#filtro-turma').val()?.trim(); // pega o value
+                const statusSelecionado = $('#filtro-status').val()?.toLowerCase().trim();
+                const motivoSelecionado = $('#filtro-motivo').val()?.toLowerCase().trim();
+
+                const filtrados = agendamentosData.filter(item => {
+                    // Se turmaSelecionada estiver vazia (""), retorna todas
+                    const matchTurma = !turmaSelecionada || item.turma?.includes($('#filtro-turma option:selected').text().trim());
+
+                    const matchStatus = !statusSelecionado || item.status?.toLowerCase().trim() === statusSelecionado;
+                    const matchMotivo = !motivoSelecionado || item.motivo?.toLowerCase().trim() === motivoSelecionado;
+
+                    return matchTurma && matchStatus && matchMotivo;
+                });
+
+                tabela.clear().rows.add(filtrados).draw();
+            });
+
+        }        
         // Modal de VISUALIZAÇÃO de Alunos
         $('#listagem-agendamentos tbody').on('click', '.ver-alunos-link', function(e) {
             e.preventDefault();

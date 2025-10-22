@@ -14,6 +14,7 @@ class TurmaModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
+        'codTurmaTurma',
         'nome',
         'curso_id',
     ];
@@ -33,11 +34,17 @@ class TurmaModel extends Model
 
     // Validation
     protected $validationRules      = [
+        'codTurmaTurma' => 'permit_empty|max_length[15]|is_unique[turmas.codTurmaTurma]',
         'nome'     => 'required|min_length[3]|max_length[96]',
         'curso_id' => 'required|numeric'
     ];
 
     protected $validationMessages   = [
+        'codTurmaTurma' => [
+            'max_length'  => 'O código da turma não pode ter mais de 15 caracteres.',
+            'is_unique'   => 'Este código de turma já está cadastrado.',
+            'required'    => 'Informe o código da turma.',
+        ],
         'nome'     => [
             'required' => 'Informe o nome da turma',
             'min_length' => 'O nome é muito curto.',

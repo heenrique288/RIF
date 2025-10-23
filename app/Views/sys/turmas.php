@@ -45,6 +45,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 4%; min-width: 45px;"><strong>Id</strong></th>
+                                <th><strong>Código da Turma</strong></th>
                                 <th><strong>Nome</strong></th>
                                 <th><strong>Curso</strong></th>
                                 <th class="text-nowrap" style="text-align: center; width: 12%; min-width: 100px;"><strong>Ações</strong></th>
@@ -87,6 +88,7 @@
                 data: turmasData,
                 columns: [
                     { data: 'id' },
+                    { data: 'codTurma' },
                     { data: 'nome' },
                     { data: 'curso_nome' },
                     { 
@@ -101,6 +103,7 @@
                                             data-bs-toggle="modal"
                                             data-bs-target="#modal-editar-turma"
                                             data-id="${data.id}"
+                                            data-cod="${data.codTurma}"
                                             data-nome="${data.nome}"
                                             data-curso_id="${data.curso_id}">
                                             <i class="fa fa-edit"></i>

@@ -16,7 +16,12 @@
                     
                     <input type="hidden" name="id" id="editTurmaId" />
 
-                    
+                    <div class="form-group">
+                        <label for="edit-codigo">Código da Turma</label>
+                        <input type="text" class="form-control" minlength="15" required
+                            id="edit-codigo" name="codTurma" placeholder="Insira o código da turma">
+                    </div>
+
                     <div class="form-group">
                         <label for="edit-nome">Nome</label>
                         <input type="text" class="form-control" minlength="3" required
@@ -49,11 +54,13 @@
         $("#modal-editar-turma").on("show.bs.modal", function(event) {
             var button = $(event.relatedTarget);
 
+            var codigo = button.data("cod");
             var nome = button.data("nome");
             var id = button.data("id");
             var curso_id = button.data("curso_id");
 
             var modal = $(this);
+            modal.find("#edit-codigo").val(codigo);
             modal.find("#editTurmaId").val(id);
             modal.find("#edit-nome").val(nome);
             modal.find("#edit-curso_id").val(curso_id);

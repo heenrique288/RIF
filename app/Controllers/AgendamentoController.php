@@ -58,7 +58,7 @@ class AgendamentoController extends BaseController
                 if ($existe) {
                     return $this->response->setJSON([
                         'success' => false,
-                        'message' => "O aluno de matrícula já possui agendamento no dia {$data}."
+                        'message' => "O aluno já possui agendamento no dia {$data}."
                     ]);
                 }
             }

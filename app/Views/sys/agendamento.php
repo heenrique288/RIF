@@ -29,7 +29,7 @@
                 <div class="mb-3">
                     <h5 class="card-title">Filtros</h5>
                     <div class="form-group row align-items-end">
-                      <div class="col">
+                      <div class="col-md-2">
                         <label>Turma</label>
                         <select id="filtro-turma" class="js-example-basic-single" style="width:100%">
                             <option value="">--</option>
@@ -38,7 +38,7 @@
                             <?php endforeach; ?>
                         </select>
                       </div>
-                      <div class="col">
+                      <div class="col-md-2">
                         <label>Status</label>
                         <select id="filtro-status" class="js-example-basic-single" style="width:100%">
                             <option value="">--</option>
@@ -48,7 +48,7 @@
                             <option value="Cancelada">Cancelada</option>
                         </select>
                       </div>
-                      <div class="col">
+                      <div class="col-md-2">
                         <label>Motivo</label>
                         <select id="filtro-motivo" class="js-example-basic-single" style="width:100%">
                             <option value="">--</option>
@@ -59,7 +59,15 @@
                             <option value="Visita Técnica">Visita Técnica</option>
                         </select>
                       </div>
-                      <div class="col">
+                      <div class="col-md-4">
+                        <label for="">Período:</label>
+                        <div id="datepicker-popup" class="input-group input-daterange d-flex align-items-center">
+                            <input type="text" class="form-control" style="background-color: black;"> 
+                            <div class="input-group-addon mx-4"> até </div>
+                            <input type="text" class="form-control" style="background-color: black;">
+                        </div>
+                      </div>
+                      <div class="col-md-2 text-start">
                         <button id="btn-filtrar" class="btn btn-primary">Filtrar</button>
                       </div>
                     </div>
@@ -325,10 +333,53 @@
                 }
             });
 
+            // Função para converter data no formato DMY para objeto Date
+            function parseDateDMY(str) {
+                if (typeof str !== 'string' || !str.trim()) return null;
+
+                const s = str.trim();
+
+                // Padrões de formato possíveis
+                const isoPattern = /^(\d{4})-(\d{2})-(\d{2})$/;  // YYYY-MM-DD
+                const brPattern  = /^(\d{2})\/(\d{2})\/(\d{4})$/; // DD/MM/YYYY
+
+                let dia, mes, ano;
+
+                if (isoPattern.test(s)) {
+                    [, ano, mes, dia] = s.match(isoPattern).map(Number);
+                } else if (brPattern.test(s)) {
+                    [, dia, mes, ano] = s.match(brPattern).map(Number);
+                } else {
+                    return null; // formato não reconhecido
+                }
+
+                const data = new Date(ano, mes - 1, dia);
+
+                // Garante que a data é válida (ex: 31/02 -> inválida)
+                return isNaN(data.getTime()) ? null : data;
+            }
+
+            if ($('#datepicker-popup').length) {
+                $('#datepicker-popup').datepicker('destroy'); // remove a configuração antiga
+                $('#datepicker-popup').datepicker({
+                    format: 'dd/mm/yyyy',
+                    autoclose: true,
+                    todayHighlight: true,
+                    language: 'pt-BR'
+                });
+            }
+
             $('#btn-filtrar').on('click', function () {
                 const turmaSelecionada = $('#filtro-turma').val()?.trim(); // pega o value
                 const statusSelecionado = $('#filtro-status').val()?.toLowerCase().trim();
                 const motivoSelecionado = $('#filtro-motivo').val()?.toLowerCase().trim();
+
+                const dataInicioStr = $('#datepicker-popup input:first').val()?.trim(); 
+                const dataFimStr = $('#datepicker-popup input:last').val()?.trim();
+
+                // Converte para objetos Date (se existirem)
+                const dataInicio = parseDateDMY(dataInicioStr);
+                const dataFim = parseDateDMY(dataFimStr);
 
                 const filtrados = agendamentosData.filter(item => {
                     // Se turmaSelecionada estiver vazia (""), retorna todas
@@ -337,7 +388,16 @@
                     const matchStatus = !statusSelecionado || item.status?.toLowerCase().trim() === statusSelecionado;
                     const matchMotivo = !motivoSelecionado || item.motivo?.toLowerCase().trim() === motivoSelecionado;
 
-                    return matchTurma && matchStatus && matchMotivo;
+                    // Filtro de datas
+                    let matchData = true;
+                    if (dataInicio || dataFim) {
+                        const itemData = parseDateDMY(item.data); // item.data deve estar no formato YYYY-MM-DD
+                        if (!itemData) return false;
+                        if (dataInicio && itemData < dataInicio) matchData = false;
+                        if (dataFim && itemData > dataFim) matchData = false;
+                    }
+
+                    return matchTurma && matchStatus && matchMotivo && matchData;
                 });
 
                 tabela.clear().rows.add(filtrados).draw();

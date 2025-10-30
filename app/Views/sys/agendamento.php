@@ -7,23 +7,25 @@
     <h2 class="card-title mb-0">Agendamento de Refeição</h2>
 </div>
 <div class="row">
-    <div class="col-md-3 grid-margin stretch-card">
-        <div class="card ">
-            <div class="card-body ">
+    <div class="col-12 col-xl-3 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
                 <div class="mb-3">
                     <h5 class="card-title mb-0">Ações</h5>
                 </div>
-                <div class="my-4 ">
-                    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
-                        <i class="fa fa-plus-circle btn-icon-prepend"></i>
-                        Novo Agendamento
-                    </button>
+                <div class="my-4">
+                    <span data-bs-toggle="tooltip" title="Cadastrar Agendamento">
+                        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
+                            <i class="fa fa-plus-circle btn-icon-prepend"></i>
+                            <span class="d-none d-md-inline ms-1">Novo Agendamento</span>
+                        </button>
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-9 grid-margin stretch-card">
+    <div class="col-12 col-xl-9 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">
@@ -81,24 +83,26 @@
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <?php if (isset($agendamentos) && !empty($agendamentos)): ?>
-                    <table class="table mb-4" id="listagem-agendamentos">
-                        <thead>
-                            <tr>
-                                <th><strong>Aluno(a)<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Turma<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Data<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Status<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Motivo<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>Nenhum agendamento encontrado no banco de dados.</p>
-                <?php endif; ?>
+                <div class="table-responsive">
+                    <?php if (isset($agendamentos) && !empty($agendamentos)): ?>
+                        <table class="table mb-4" id="listagem-agendamentos">
+                            <thead>
+                                <tr>
+                                    <th><strong>Aluno(a)<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Turma<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Data<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Status<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Motivo<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>Nenhum agendamento encontrado no banco de dados.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

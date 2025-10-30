@@ -73,24 +73,26 @@
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <?php if (isset($agendamentos) && !empty($agendamentos)): ?>
-                    <table class="table mb-4" id="listagem-agendamentos">
-                        <thead>
-                            <tr>
-                                <th><strong>Aluno(a)<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Turma<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Data<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Status<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th><strong>Motivo<i class="mdi mdi-chevron-down"></i></strong></th>
-                                <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>Nenhum agendamento encontrado no banco de dados.</p>
-                <?php endif; ?>
+                <div class="table-responsive">
+                    <?php if (isset($agendamentos) && !empty($agendamentos)): ?>
+                        <table class="table mb-4" id="listagem-agendamentos">
+                            <thead>
+                                <tr>
+                                    <th><strong>Aluno(a)<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Turma<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Data<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Status<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th><strong>Motivo<i class="mdi mdi-chevron-down"></i></strong></th>
+                                    <th style="text-align: center; width: 10%; min-width: 100px;"><strong>Ações</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>Nenhum agendamento encontrado no banco de dados.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

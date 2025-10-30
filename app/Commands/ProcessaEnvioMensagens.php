@@ -55,7 +55,8 @@ class ProcessaEnvioMensagens extends BaseCommand
                     $wpp->sendMessage($destinatario, $mensagemTexto);
                     $sucessoEnvio = true;
                     
-                } elseif ($categoria == 1) {
+                }
+                elseif ($categoria == 1) {
                     //qrCodes
                     
                     $alunoTelefone = $alunoTelefoneModel
@@ -92,6 +93,10 @@ class ProcessaEnvioMensagens extends BaseCommand
                         continue;
                     }
                     
+                }
+                elseif ($categoria == 2) {
+                    $wpp->sendMessage($destinatario, $mensagemTexto);
+                    $sucessoEnvio = true;
                 }
                 
                 if ($sucessoEnvio) {

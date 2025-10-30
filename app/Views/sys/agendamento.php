@@ -7,23 +7,25 @@
     <h2 class="card-title mb-0">Agendamento de Refeição</h2>
 </div>
 <div class="row">
-    <div class="col-md-3 grid-margin stretch-card">
-        <div class="card ">
-            <div class="card-body ">
+    <div class="col-12 col-xl-3 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
                 <div class="mb-3">
                     <h5 class="card-title mb-0">Ações</h5>
                 </div>
-                <div class="my-4 ">
-                    <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
-                        <i class="fa fa-plus-circle btn-icon-prepend"></i>
-                        Novo Agendamento
-                    </button>
+                <div class="my-4">
+                    <span data-bs-toggle="tooltip" title="Cadastrar Agendamento">
+                        <button type="button" class="btn btn-primary btn-fw" data-bs-toggle="modal" data-bs-target="#modal-cadastrar-agendamento">
+                            <i class="fa fa-plus-circle btn-icon-prepend"></i>
+                            <span class="d-none d-md-inline ms-1">Novo Agendamento</span>
+                        </button>
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-9 grid-margin stretch-card">
+    <div class="col-12 col-xl-9 grid-margin stretch-card">
         <div class="card ">
             <div class="card-body">
                 <div class="mb-3">

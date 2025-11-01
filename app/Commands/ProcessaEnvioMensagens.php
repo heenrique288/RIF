@@ -49,6 +49,33 @@ class ProcessaEnvioMensagens extends BaseCommand
                 $mensagemTexto = $mensagem['mensagem'];
                 $caminhoAnexo = null;
 
+                $alunoTelefone = $alunoTelefoneModel
+                                ->where('telefone', $destinatario)
+                                ->first();
+
+                $alunoId = $alunoTelefone['aluno_id'];
+
+                $refeicaoAlvo = $controleRefeicao
+                                ->where('aluno_id', $alunoId)
+                                ->whereIn('status', [0, 1]) 
+                                ->orderBy('data_refeicao', 'ASC')
+                                ->first();
+                                    
+                $dataRefeicao = new DateTime($refeicaoAlvo['data_refeicao']);
+                $difHoras = ($dataRefeicao->getTimestamp() - (new DateTime())->getTimestamp()) / 3600;
+
+                $podeEnviar = false;
+
+                if ($categoria == 0 && $difHoras <= 48 && $difHoras >= 0) {
+                    $podeEnviar = true;
+                } elseif ($categoria == 1 && $difHoras <= 24 && $difHoras >= 0) {
+                    $podeEnviar = true;
+                }
+
+                if (!$podeEnviar) {
+                    continue; // não processa, vai para a próxima mensagem
+                }           
+
                 if ($categoria == 0) {
                     //solicitações
                     
@@ -58,12 +85,6 @@ class ProcessaEnvioMensagens extends BaseCommand
                 }
                 elseif ($categoria == 1) {
                     //qrCodes
-                    
-                    $alunoTelefone = $alunoTelefoneModel
-                                ->where('telefone', $destinatario)
-                                ->first(); //depois sera o confirmado
-
-                    $alunoId = $alunoTelefone['aluno_id'];
                     $aluno = $alunoModel->find($alunoId);
 
                     $refeicao = $controleRefeicao

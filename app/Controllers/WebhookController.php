@@ -35,9 +35,9 @@ class WebhookController extends BaseController
         if ($evento === 'messages.upsert') {
 
             //ignorar as mensagens do telefone de origem
-            if ($data['key']['fromMe'] === true) {
-                return;
-            }
+            // if ($data['key']['fromMe'] === true) {
+            //     return;
+            // }
 
             $destinatarioSujo = $data['key']['remoteJid'];
             $destinatarioCompleto = str_replace('@s.whatsapp.net', '', $destinatarioSujo); //destinatario completo = com dd de país

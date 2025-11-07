@@ -11,6 +11,7 @@ use App\Models\ControleRefeicoesModel;
 use App\Models\TurmaModel;
 use App\Libraries\EvolutionAPI;
 use App\Helpers\QrCodeGenerator;
+use DateTime; 
 
 class ProcessaEnvioMensagens extends BaseCommand
 {
@@ -69,6 +70,8 @@ class ProcessaEnvioMensagens extends BaseCommand
                 if ($categoria == 0 && $difHoras <= 48 && $difHoras >= 0) {
                     $podeEnviar = true;
                 } elseif ($categoria == 1 && $difHoras <= 24 && $difHoras >= 0) {
+                    $podeEnviar = true;
+                } elseif ($categoria == 2) { 
                     $podeEnviar = true;
                 }
 

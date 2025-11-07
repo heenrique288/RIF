@@ -82,6 +82,7 @@ class Filters extends BaseFilters
                     'forgot-password', 
                     'reset-password', 
                     'email-verification',
+                    'webhook/*', //apenas provisório para testes no reqbin
                 ],
             ],
             // 'honeypot',

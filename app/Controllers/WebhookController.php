@@ -61,6 +61,8 @@ class WebhookController extends BaseController
 
             $alunoMatricula = $alunoTelefone['aluno_id'];
 
+            $mensagemRetorno = '';
+
             $mensagem = $mensagemModel
                 ->where('destinatario', $destinatario)
                 ->where('status', 1)
@@ -68,12 +70,11 @@ class WebhookController extends BaseController
                 ->first();
             
             if (!$mensagem) {
-                return;
+                $mensagemRetorno = 'Mensagem não encontrada';
+                //return;
             }
 
             $categoria = $mensagem['categoria'];
-
-            $mensagemRetorno = '';
 
             $mensagemModel->update($mensagem['id'], ['status' => 2]); //Recebida
 

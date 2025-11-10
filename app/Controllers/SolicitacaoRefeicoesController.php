@@ -35,6 +35,8 @@ class SolicitacaoRefeicoesController extends BaseController
         $input['status'] = 0; //por padrão, significa "pendente"
         $input['codigo'] = (int) strip_tags($post['codigo']);
         $input['justificativa'] = strip_tags($post['justificativa']);
+        $input['id_creat'] = auth()->id(); // Pega o ID do usuário logado (metodo Shild)
+        $input['solicitada'] = (date('Y-m-d H:i:s'));
 
         try {
             $solicitacao = new SolicitacaoRefeicoesModel();
@@ -65,6 +67,8 @@ class SolicitacaoRefeicoesController extends BaseController
         $input['status'] = (int) strip_tags($post['status']);
         $input['codigo'] = (int) strip_tags($post['codigo']);
         $input['justificativa'] = strip_tags($post['justificativa']);
+        $input['id_creat'] = auth()->id(); // Pega o ID do usuário logado (metodo Shild)
+        $input['solicitada'] = (date('Y-m-d H:i:s'));
 
         try {
             $solicitacao = new SolicitacaoRefeicoesModel();

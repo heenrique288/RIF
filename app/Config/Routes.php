@@ -103,10 +103,13 @@ $routes->group('sys', [], static function ($routes) {
         $routes->post('delete', 'SolicitacaoRefeicoesController::delete');
     });
 
-    //==============================================================
+   //==============================================================
     // Rotas de Análise de solicitação - Acesso Restrito
     //==============================================================
-    $routes->get('analise', 'AnaliseSolicitacaoController::index', ['filter' => 'app_group:admin,developer']);
+    $routes->group('analise', ['filter' => 'app_group:admin,developer'], static function ($routes) {
+    $routes->get('', 'AnaliseSolicitacaoController::index');          // Lista solicitações
+    $routes->post('atualizar', 'AnaliseSolicitacaoController::atualizar'); // Atualiza status
+   });
 
     //==============================================================
     // Rotas de Restaurante - Acesso para 'restaurante'

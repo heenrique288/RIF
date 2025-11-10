@@ -12,7 +12,7 @@ class SolicitacaoRefeicoesModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['turma_id', 'data_refeicao', 'crc', 'status', 'codigo', 'justificativa'];
+    protected $allowedFields    = ['turma_id', 'data_refeicao', 'crc', 'status', 'codigo', 'justificativa', 'id_creat', 'data_solicitada'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

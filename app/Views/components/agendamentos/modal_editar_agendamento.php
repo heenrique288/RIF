@@ -33,8 +33,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Data(s) do Agendamento</label>
-                        <div id="edit-datepicker"></div>
-                        <input type="hidden" name="datas[]" id="edit_datas-hidden">
+                        <div id="edit-inline-datepicker" class="datepicker"></div>
+                        <input type="hidden" id="edit_datas-hidden" name="datas[]">
                     </div>
 
                     <div class="row">

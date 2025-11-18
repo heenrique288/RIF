@@ -127,6 +127,10 @@
         border-top-color: #333 !important;
     }
 
+    .datepicker table tr td.today.active::before {
+        background-color: #28a745 !important;
+        color: #fff !important;
+    }
 </style>
 
 <script>

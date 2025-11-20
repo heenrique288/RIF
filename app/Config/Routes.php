@@ -98,8 +98,9 @@ $routes->group('sys', [], static function ($routes) {
     //==============================================================
     $routes->group('solicitacoes', ['filter' => 'app_group:aluno,solicitante,admin,developer'], static function ($routes) {
         $routes->get('', 'SolicitacaoRefeicoesController::index');
-        $routes->post('create', 'SolicitacaoRefeicoesController::create');
-        $routes->post('update', 'SolicitacaoRefeicoesController::update');
+        $routes->post('admin/create', 'SolicitacaoRefeicoesController::create');
+        $routes->get('admin/getAlunosByTurma', 'AgendamentoController::getAlunosByTurma');
+        $routes->post('admin/update', 'SolicitacaoRefeicoesController::update');
         $routes->post('delete', 'SolicitacaoRefeicoesController::delete');
     });
 

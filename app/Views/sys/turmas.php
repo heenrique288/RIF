@@ -134,7 +134,7 @@
                                             <i class="fa fa-trash"></i>
                                         </button>
                                     </span>
-                                    <span data-bs-toggle="tooltip" data-placement="top" title="Importar Lista de alunos">
+                                    <span data-bs-toggle="tooltip" data-placement="top" title="Vincular alunos para essa Turma">
                                         <button
                                             type="button"
                                             class="justify-content-center align-items-center d-flex btn btn-inverse-info button-trans-info btn-icon me-1 import-alunos-btn"

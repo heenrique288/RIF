@@ -66,10 +66,8 @@ $routes->group('sys', [], static function ($routes) {
         $routes->put('update', 'AlunoController::update');
         $routes->delete('delete', 'AlunoController::delete');
         $routes->post('import', 'AlunoController::import');
+        $routes->post('filter', 'AlunoController::filter');
         $routes->post('importProcess', 'AlunoController::importProcess');
-        
-        //provisorio
-        $routes->get('sendEmail', 'AlunoController::enviarEmail'); 
     });
 
     //==============================================================

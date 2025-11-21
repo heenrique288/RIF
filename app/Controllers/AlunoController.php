@@ -296,12 +296,16 @@ class AlunoController extends BaseController
         $primeiraLinha = true;
         $cabecalho = $sheet->toArray(null, false, true, false)[0];
 
+        $cabecalhoNormalizado = array_map(function($valor) {
+            return trim(mb_convert_encoding($valor, 'UTF-8', 'UTF-8')); // normaliza primeiro
+        }, $cabecalho);
+
         $mapeiaCabecalho = [
-            'matricula'      => array_search('Matrícula', $cabecalho ),
-            'nome'           => array_search('Nome', $cabecalho ),
-            'descricao_curso'=> array_search('Descrição do Curso', $cabecalho),
-            'status'         => array_search('Situação no Curso', $cabecalho ),
-            'telefone'       => array_search('Telefone', $cabecalho ),
+            'matricula'      => array_search('Matrícula', $cabecalhoNormalizado),
+            'nome'           => array_search('Nome', $cabecalhoNormalizado),
+            'descricao_curso'=> array_search('Descrição do Curso', $cabecalhoNormalizado),
+            'status'         => array_search('Situação no Curso', $cabecalhoNormalizado),
+            'telefone'       => array_search('Telefone', $cabecalhoNormalizado),
         ];
 
         if (in_array(false, $mapeiaCabecalho, true)) {

@@ -460,8 +460,6 @@ class AlunoController extends BaseController
         $aluno = new AlunoModel();
         $telefoneModel = new AlunoTelefoneModel();
         
-        $testar_enviar_telefone = 0; // pra testar sem lotar de mensagem por enquanto
-
         $insertedCount = 0;
         $errors = [];
 
@@ -510,10 +508,7 @@ class AlunoController extends BaseController
                 * Carrega os parâmetros pra função (Envio de Whatsapp)
                 */
                 if ($destino !== null) { 
-                    if ($testar_enviar_telefone < 5) { 
-                        $this->criaMensagemValidacao($alunoData, $destino);
-                        $testar_enviar_telefone++;
-                    }
+                    $this->criaMensagemValidacao($alunoData, $destino);
                 }
                     
             }
@@ -546,7 +541,6 @@ class AlunoController extends BaseController
     protected function criaMensagemValidacao(array $alunoData, string $destino)
     {
         $destinoReal = $destino;
-        $destino = "69992809488"; //Próvisório 
 
         $nome = $alunoData['nome'];
 
@@ -558,7 +552,7 @@ class AlunoController extends BaseController
         $enviaMensagensModel = new EnviarMensagensModel();
 
         $dataMensagem = [
-            'destinatario' => $destino,
+            'destinatario' => $destinodestinoReal,
             'mensagem'     => $mensagem,
             'status'       => 0, 
             'categoria'    => 2, 

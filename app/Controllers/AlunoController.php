@@ -296,12 +296,16 @@ class AlunoController extends BaseController
         $primeiraLinha = true;
         $cabecalho = $sheet->toArray(null, false, true, false)[0];
 
+        $cabecalhoNormalizado = array_map(function($valor) {
+            return trim(mb_convert_encoding($valor, 'UTF-8', 'UTF-8')); // normaliza primeiro
+        }, $cabecalho);
+
         $mapeiaCabecalho = [
-            'matricula'      => array_search('Matrícula', $cabecalho ),
-            'nome'           => array_search('Nome', $cabecalho ),
-            'descricao_curso'=> array_search('Descrição do Curso', $cabecalho),
-            'status'         => array_search('Situação no Curso', $cabecalho ),
-            'telefone'       => array_search('Telefone', $cabecalho ),
+            'matricula'      => array_search('Matrícula', $cabecalhoNormalizado),
+            'nome'           => array_search('Nome', $cabecalhoNormalizado),
+            'descricao_curso'=> array_search('Descrição do Curso', $cabecalhoNormalizado),
+            'status'         => array_search('Situação no Curso', $cabecalhoNormalizado),
+            'telefone'       => array_search('Telefone', $cabecalhoNormalizado),
         ];
 
         if (in_array(false, $mapeiaCabecalho, true)) {
@@ -460,8 +464,6 @@ class AlunoController extends BaseController
         $aluno = new AlunoModel();
         $telefoneModel = new AlunoTelefoneModel();
         
-        $testar_enviar_telefone = 0; // pra testar sem lotar de mensagem por enquanto
-
         $insertedCount = 0;
         $errors = [];
 
@@ -510,10 +512,7 @@ class AlunoController extends BaseController
                 * Carrega os parâmetros pra função (Envio de Whatsapp)
                 */
                 if ($destino !== null) { 
-                    if ($testar_enviar_telefone < 5) { 
-                        $this->criaMensagemValidacao($alunoData, $destino);
-                        $testar_enviar_telefone++;
-                    }
+                    $this->criaMensagemValidacao($alunoData, $destino);
                 }
                     
             }
@@ -546,7 +545,6 @@ class AlunoController extends BaseController
     protected function criaMensagemValidacao(array $alunoData, string $destino)
     {
         $destinoReal = $destino;
-        $destino = "69992809488"; //Próvisório 
 
         $nome = $alunoData['nome'];
 
@@ -558,7 +556,7 @@ class AlunoController extends BaseController
         $enviaMensagensModel = new EnviarMensagensModel();
 
         $dataMensagem = [
-            'destinatario' => $destino,
+            'destinatario' => $destinodestinoReal,
             'mensagem'     => $mensagem,
             'status'       => 0, 
             'categoria'    => 2, 
